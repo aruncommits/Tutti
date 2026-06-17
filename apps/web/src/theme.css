@@ -432,6 +432,31 @@ header {
 }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
+/* add-recipe */
+.subtabs { display: flex; gap: 6px; margin: 4px 0 14px; }
+.subtab {
+  flex: 1; padding: 9px; border-radius: 10px; border: 1px solid var(--card-edge);
+  background: var(--card); color: var(--muted); cursor: pointer; font-size: 14px;
+}
+.subtab.on { background: var(--bg2); color: var(--ink); border-color: var(--accent); }
+.paste-area, .url-input {
+  width: 100%; font-family: inherit; font-size: 14px; padding: 12px 14px; margin-bottom: 12px;
+  border-radius: 12px; border: 1px solid var(--card-edge); background: var(--bg2); color: var(--ink); resize: vertical;
+}
+.url-input { font-family: var(--display); font-size: 18px; }
+.hint { color: var(--faint); font-size: 12.5px; margin-top: 10px; line-height: 1.5; }
+.hint code, .idle code { background: rgba(255,255,255,.06); padding: 1px 5px; border-radius: 5px; }
+.parse-result { margin-top: 16px; padding: 14px; border-radius: 14px; border: 1px solid var(--card-edge); background: var(--card); }
+.parse-result ul { margin: 6px 0 0 18px; }
+.badge-unverified {
+  font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--accent-deep);
+  border: 1px solid var(--accent-deep); border-radius: 20px; padding: 1px 8px;
+}
+.add-dish {
+  width: 100%; margin: 6px 0 4px; padding: 13px; border-radius: 12px; cursor: pointer;
+  border: 1px dashed var(--card-edge); background: none; color: var(--accent); font-size: 14px;
+}
+
 /* plan preview gantt */
 .gantt {
   display: flex;

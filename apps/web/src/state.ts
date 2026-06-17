@@ -6,6 +6,7 @@ export type Screen =
   | "onboarding"
   | "kitchen"
   | "home"
+  | "addRecipe"
   | "pick"
   | "serveTime"
   | "preview"

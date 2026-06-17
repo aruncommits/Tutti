@@ -1,10 +1,11 @@
-import { applyEvent, compile, formatClock, parseClock, thaliV1, type MasterExecutionPlan } from "@tutti/engine";
+import { applyEvent, compile, formatClock, parseClock, thaliV1, type MasterExecutionPlan, type RecipeGraph } from "@tutti/engine";
 import { usePersistentState, type Screen } from "./state";
 import { CookScreen } from "./CookScreen";
 import { KitchenScreen, DEFAULT_KITCHEN, toKitchenProfile, type KitchenUi } from "./KitchenScreen";
 import { OnboardingScreen } from "./OnboardingScreen";
 import { PickScreen, ServeTimeScreen } from "./PlanFlow";
 import { PreviewScreen } from "./PreviewScreen";
+import { AddRecipe } from "./AddRecipe";
 
 const ALL_DISHES = thaliV1.recipes.map((r) => r.recipeId);
 
@@ -15,13 +16,15 @@ export function App() {
   const [dishes, setDishes] = usePersistentState<string[]>("tutti.dishes", ALL_DISHES);
   const [target, setTarget] = usePersistentState<string>("tutti.target", thaliV1.targetServeTime);
   const [pro, setPro] = usePersistentState<boolean>("tutti.pro", false);
+  const [candidates, setCandidates] = usePersistentState<RecipeGraph[]>("tutti.candidates", []);
+  const allRecipes = [...thaliV1.recipes, ...candidates];
   const [plan, setPlan] = usePersistentState<MasterExecutionPlan>(
     "tutti.plan",
     compile(thaliV1.recipes, thaliV1.kitchenProfile, thaliV1.targetServeTime),
   );
 
   // live preview for the pick/serve-time screens (pure, cheap to recompute)
-  const selectedRecipes = thaliV1.recipes.filter((r) => dishes.includes(r.recipeId));
+  const selectedRecipes = allRecipes.filter((r) => dishes.includes(r.recipeId));
   const previewPlan = selectedRecipes.length
     ? compile(selectedRecipes, toKitchenProfile(kitchen), target)
     : null;
@@ -39,6 +42,11 @@ export function App() {
   const undo = (id: string) => setPlan((prev) => applyEvent(prev, { type: "undo", nodeId: id, at: "" }));
   const toggleDish = (id: string) =>
     setDishes((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  const addCandidate = (g: RecipeGraph) => {
+    setCandidates((prev) => [...prev.filter((c) => c.recipeId !== g.recipeId), g]);
+    setDishes((prev) => (prev.includes(g.recipeId) ? prev : [...prev, g.recipeId]));
+    setScreen("pick");
+  };
   const buildPlan = () => {
     setPlan(previewPlan ?? compile(thaliV1.recipes, toKitchenProfile(kitchen), target));
     setScreen("preview");
@@ -73,13 +81,16 @@ export function App() {
         <CookScreen plan={plan} pro={pro} onComplete={complete} onUndo={undo} onReset={reset} />
       ) : screen === "kitchen" ? (
         <KitchenScreen kitchen={kitchen} onChange={setKitchen} onDone={() => setScreen("home")} />
+      ) : screen === "addRecipe" ? (
+        <AddRecipe onAdd={addCandidate} onBack={() => setScreen("home")} />
       ) : screen === "pick" ? (
         <PickScreen
-          recipes={thaliV1.recipes}
+          recipes={allRecipes}
           selected={dishes}
           onToggle={toggleDish}
           soloMins={soloMins}
           interleavedMins={makespan}
+          onAdd={() => setScreen("addRecipe")}
           onNext={() => setScreen("serveTime")}
         />
       ) : screen === "serveTime" ? (

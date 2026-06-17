@@ -12,6 +12,7 @@ export function PickScreen({
   onToggle,
   soloMins,
   interleavedMins,
+  onAdd,
   onNext,
 }: {
   recipes: RecipeGraph[];
@@ -19,6 +20,7 @@ export function PickScreen({
   onToggle: (id: string) => void;
   soloMins: number;
   interleavedMins: number;
+  onAdd: () => void;
   onNext: () => void;
 }) {
   return (
@@ -36,10 +38,12 @@ export function PickScreen({
           >
             <span className="pick-box">{on ? "✓" : ""}</span>
             <span className="node-title">{r.name}</span>
+            {!r.verified && <span className="badge-unverified">unverified</span>}
             <span className="dur">{soloMinutes(r)}m</span>
           </button>
         );
       })}
+      <button className="add-dish" onClick={onAdd}>+ Add a dish (paste · find online · AI)</button>
       {selected.length > 0 && (
         <div className="delta">
           <span className="strike">{soloMins} min separately</span>
