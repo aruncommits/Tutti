@@ -86,6 +86,10 @@ export interface MasterExecutionPlan {
   criticalPath: string[];
   projectedServeTime: string;
   schedule: Record<string, ScheduleEntry>;
+  /** set by reschedule(): e.g. "Start Fry brinjals in 3 min to stay on time", or null. */
+  nextStartAlert?: string | null;
+  /** set by reschedule(): true when the projected serve time has slipped past the target. */
+  runningLate?: boolean;
 }
 
 export interface ViewState {

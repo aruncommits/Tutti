@@ -3,6 +3,7 @@
 // nodes are now active (promotion) or locked again (after undo). Pure and instant.
 
 import type { CookEvent, MasterExecutionPlan, NodeStatus, TaskNode } from "./types";
+import { reschedule } from "./reschedule";
 
 /** Recompute locked/active for every non-completed node from the current completed set. */
 function recompute(nodes: TaskNode[]): TaskNode[] {
@@ -35,5 +36,7 @@ export function applyEvent(plan: MasterExecutionPlan, event: CookEvent): MasterE
       nodes = nodes.map((n) => (n.nodeId === event.nodeId ? { ...n, status: "active" as const } : n));
       break;
   }
-  return { ...plan, nodes: recompute(nodes) };
+  const next = { ...plan, nodes: recompute(nodes) };
+  // keep the clock honest when a real timestamp is supplied (Doc 2 §5.3 -> §6).
+  return event.at ? reschedule(next, event.at) : next;
 }

@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 7,
-  "lastTick": "2026-06-18T01:17:09.5260675+08:00",
-  "lastTickEpoch": 1781716630,
+  "iteration": 8,
+  "lastTick": "2026-06-18T01:24:33.7036610+08:00",
+  "lastTickEpoch": 1781717074,
   "phase": "brief-v1-engine-core",
-  "nextResearchTheme": "Brief v1 items 1-6 done (engine produces real plans; web Cook Mode renders compile->deriveViewState, tap-to-Done auto-promotes, verified in browser; 43 engine tests). NEXT: item 7 — applyEvent(plan, event) (complete -> mark completed + record actualDuration + promote newly-unblocked; undo -> revert + re-lock dependents whose deps no longer met); then item 8 reschedule(plan, now)."
+  "nextResearchTheme": "Brief v1 items 1-7 done (applyEvent complete/undo wired into web; 48 engine tests). NEXT: item 8 — reschedule(plan, now) (Doc 2 §6): re-run forward pass on remaining (non-completed) nodes with t0=now, freeze in-progress, recompute projectedServeTime + slack, set nextStartAlert for soonest not-yet-started critical node; never reorder the currently-active task. Then item 9 pace EMA, item 10 six-invariant property tests."
 }

@@ -20,4 +20,5 @@ export { parseClock, formatClock } from "./time";
 export { compile, type PaceModel } from "./compile";
 export { deriveViewState } from "./viewstate";
 export { applyEvent } from "./events";
+export { reschedule } from "./reschedule";
 export { HANDS, normalizeKitchen, nodeRequirements, capacityOf } from "./resources";

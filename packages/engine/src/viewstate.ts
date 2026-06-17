@@ -24,6 +24,6 @@ export function deriveViewState(plan: MasterExecutionPlan): ViewState {
     queue,
     archive,
     projectedServeTime: plan.projectedServeTime,
-    nextStartAlert: null, // populated by reschedule() once the live clock is in play (item 8)
+    nextStartAlert: plan.nextStartAlert ?? null, // populated by reschedule() (Doc 2 §6)
   };
 }
