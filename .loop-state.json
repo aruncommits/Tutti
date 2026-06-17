@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 24,
-  "lastTick": "2026-06-18T02:40:36.8499054+08:00",
-  "lastTickEpoch": 1781721637,
+  "iteration": 25,
+  "lastTick": "2026-06-18T02:44:02.2984958+08:00",
+  "lastTickEpoch": 1781721842,
   "phase": "brief-v4-multi-dish",
-  "nextResearchTheme": "PHASE 3 COMPLETE (full recipe ingestion; 98 tests). Brief v4 authored. NEXT: Brief v4 item 1 - engine scaleRecipe(graph, factor): multiply ingredient amounts by factor; non-linear categories (salt/spice/acid/leavening/yeast keyword-matched) get conservative 0.75-0.9 multiplier + scaleNote; pure + unit-tested; validate() still ok."
+  "nextResearchTheme": "Brief v4 item 1 done (scaleRecipe with non-linear seasoning/leavening flagging; 103 tests). NEXT: item 3 - engine/util buildShoppingList(recipes[]): aggregate ingredients across selected recipes by normalized name+unit, sum amounts, record which dishes need each (reuse a small quantity normalization); pure + tested. (UI servings stepper item 2 can follow.) Then items 4-7 (shopping screen, allergen tags+avoid-list, Cook Mode multi-dish color identity, tests)."
 }

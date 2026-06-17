@@ -23,4 +23,5 @@ export { applyEvent } from "./events";
 export { reschedule } from "./reschedule";
 export { updatePace, applyPace, paceCategoryOf, type PaceSample } from "./pace";
 export { scaleRecipe } from "./scale";
+export { buildShoppingList, normalizeIngredientName, type ShoppingItem } from "./shopping";
 export { HANDS, normalizeKitchen, nodeRequirements, capacityOf } from "./resources";
