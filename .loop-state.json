@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 0,
-  "lastTick": "",
-  "lastTickEpoch": 0,
+  "iteration": 1,
+  "lastTick": "2026-06-18T00:48:57.5333722+08:00",
+  "lastTickEpoch": 1781714938,
   "phase": "brief-v1-engine-core",
   "nextResearchTheme": "Scaffold done + committed (engine/ingest/web, green gate, port 5180). NEXT: Brief v1 — build the deterministic scheduler (compile/deriveViewState/applyEvent/reschedule) + six-invariant property tests, replacing the placeholder UI derivation."
 }
