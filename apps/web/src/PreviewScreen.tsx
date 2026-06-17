@@ -1,14 +1,10 @@
 import { formatClock, parseClock, type MasterExecutionPlan } from "@tutti/engine";
+import { colorFor } from "./dishColors";
 
 // Plan preview (Doc 7 §7): a confidence-builder shown once before cooking. The horizontal
 // timeline VISUALIZES interleaving — active tasks sitting inside another dish's passive window —
 // which is exactly what competitors that ignore hands-as-a-resource cannot show.
 
-const DISH_COLORS: Record<string, string> = {
-  rec_rice: "#5aa6ff",
-  rec_kuzhambu: "#ff8a5b",
-  rec_poriyal: "#86cf4d",
-};
 const hhmm = (clock: string) => formatClock(parseClock(clock)).slice(0, 5);
 
 export function PreviewScreen({
@@ -36,7 +32,7 @@ export function PreviewScreen({
           const s = plan.schedule[n.nodeId]!;
           const left = ((parseClock(s.plannedStart) - start) / total) * 100;
           const width = Math.max(2, ((parseClock(s.plannedEnd) - parseClock(s.plannedStart)) / total) * 100);
-          const color = DISH_COLORS[n.recipeId] ?? "var(--accent)";
+          const color = colorFor(n.recipeId);
           return (
             <div className="gantt-row" key={n.nodeId}>
               <span className="gantt-label">{n.title}</span>

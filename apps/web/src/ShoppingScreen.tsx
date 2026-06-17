@@ -1,15 +1,9 @@
 import { buildShoppingList, normalizeIngredientName, type RecipeGraph } from "@tutti/engine";
 import { usePersistentState } from "./state";
+import { colorFor } from "./dishColors";
 
 // Consolidated shopping list (Doc 6; Brief v4 item 4). Combined = one merged list across dishes;
 // Separate = grouped per dish. Check-off persists. Dish color dots show who needs each line.
-
-const DISH_COLORS: Record<string, string> = {
-  rec_rice: "#5aa6ff",
-  rec_kuzhambu: "#ff8a5b",
-  rec_poriyal: "#86cf4d",
-};
-const colorFor = (id: string) => DISH_COLORS[id] ?? "var(--accent)";
 
 const fmtAmount = (amount?: number, unit?: string, toTaste?: boolean) =>
   amount !== undefined ? `${amount}${unit ? ` ${unit}` : ""}` : toTaste ? "to taste" : "";

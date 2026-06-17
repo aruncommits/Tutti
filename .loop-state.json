@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 27,
-  "lastTick": "2026-06-18T02:52:53.9967854+08:00",
-  "lastTickEpoch": 1781722374,
+  "iteration": 28,
+  "lastTick": "2026-06-18T03:01:39.6558564+08:00",
+  "lastTickEpoch": 1781722900,
   "phase": "brief-v4-multi-dish",
-  "nextResearchTheme": "Brief v4 items 1,3,4 done (scaleRecipe, buildShoppingList, Shopping screen verified; 108 tests). NEXT: item 5 - allergens: add optional allergens?:string[] to RecipeGraph; engine detectAllergens(graph) heuristic mapping ingredient-name keywords -> the 14 EU allergens (marked may-contain); a persisted user avoid-set; warn inline in Pick/Preview when a selected dish hits an avoided allergen (red present / amber maybe). Then item 2 (servings stepper) + item 6 (Cook Mode multi-dish color identity) + item 7 (tests)."
+  "nextResearchTheme": "Brief v4 items 1,3,4,5 done (scale, shopping, shopping screen, allergens; verified; 113 tests). NEXT: item 6 - Cook Mode multi-dish color identity (Doc 7 8.1): add a left color-border on each NOW card matching the dish color, ensure NEXT and DONE rows carry the dish color dot, so when several dishes are active at once the cook always knows which pot. Then item 2 (per-dish servings stepper using scaleRecipe before compile) + item 7 (tests). Then research + author Research-Brief-v5-handsfree-voice.md."
 }

@@ -6,20 +6,11 @@ import {
   type MasterExecutionPlan,
   type TaskNode,
 } from "@tutti/engine";
+import { colorFor, dishName } from "./dishColors";
 
 // Pure-ish render of the engine's three-tier ViewState (Doc 2 §5.2, Doc 7 §8). The only local
 // state is UI-only passive countdown timers; all cooking truth comes from the plan via events.
 
-const DISH_COLORS: Record<string, string> = {
-  rec_rice: "#5aa6ff",
-  rec_kuzhambu: "#ff8a5b",
-  rec_poriyal: "#86cf4d",
-};
-const DISH_NAMES: Record<string, string> = {
-  rec_rice: "Rice",
-  rec_kuzhambu: "Kuzhambu",
-  rec_poriyal: "Poriyal",
-};
 const hhmm = (clock: string) => formatClock(parseClock(clock)).slice(0, 5);
 const mmss = (sec: number) => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`;
 
@@ -114,11 +105,11 @@ export function CookScreen({
             const ticking = remaining[n.nodeId];
             const isPassive = n.attention === "passive";
             return (
-              <div className={isPassive ? "now-card passive" : "now-card"} key={n.nodeId}>
+              <div className={isPassive ? "now-card passive" : "now-card"} key={n.nodeId} style={{ borderLeft: `4px solid ${colorFor(n.recipeId)}` }}>
                 <div className="now-head">
                   <span className="tag">
-                    <span className="swatch" style={{ background: DISH_COLORS[n.recipeId] ?? "var(--accent)" }} />
-                    {DISH_NAMES[n.recipeId] ?? n.recipeId}
+                    <span className="swatch" style={{ background: colorFor(n.recipeId) }} />
+                    {dishName(n.recipeId)}
                   </span>
                   <span className="phase">{n.phase}{isPassive ? " · hands-free" : ""}</span>
                 </div>
@@ -153,7 +144,7 @@ export function CookScreen({
         <h2 className="zone-h"><span>NEXT</span><span className="count">{view.queue.length}</span></h2>
         {view.queue.map((n) => (
           <div className="q-item" key={n.nodeId}>
-            <span className="swatch" style={{ background: DISH_COLORS[n.recipeId] ?? "var(--accent)" }} />
+            <span className="swatch" style={{ background: colorFor(n.recipeId) }} />
             <span className="node-title">{n.title}</span>
             <span className="dur">~{n.duration.estMins}m</span>
           </div>
@@ -164,6 +155,7 @@ export function CookScreen({
         <h2 className="zone-h"><span>DONE</span><span className="count">{view.archive.length}</span></h2>
         {view.archive.map((n) => (
           <button className="done-card" key={n.nodeId} onClick={() => onUndo(n.nodeId)} aria-label={`Undo "${n.title}"`}>
+            <span className="swatch" style={{ background: colorFor(n.recipeId) }} />
             <s>{n.title}</s> <span className="undo-hint">tap to undo</span>
           </button>
         ))}
