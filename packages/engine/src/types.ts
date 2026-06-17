@@ -44,6 +44,8 @@ export interface TaskNode {
   reviewerNote?: string;
   /** optional explicit pace-learning category (chop, saute, …); derived from the title if absent. */
   paceCategory?: string;
+  /** set by scaleRecipe() when a node holds an ingredient scaled non-linearly (season to taste). */
+  scaleNote?: string;
 }
 
 export interface RecipeGraph {

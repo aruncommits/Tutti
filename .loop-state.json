@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 23,
-  "lastTick": "2026-06-18T02:36:03.0328533+08:00",
-  "lastTickEpoch": 1781721363,
-  "phase": "brief-v3-recipe-ingestion",
-  "nextResearchTheme": "Brief v3 items 1-6 done (full ingestion: JSON-LD/text/AI/URL + Add-dish UI; pasted Lemon Rice cooks; verified in browser; 92 tests). NEXT: item 7 - tests: a web component test for AddRecipe (paste -> candidate added, rendered) and an ingest contract test asserting any parser output claiming ok passes engine validate(). Then Brief v3 done -> web-research pass -> author Research-Brief-v4-multi-dish.md (multi-dish Cook Mode color-tags, scaling/servings, shopping list, allergens - Doc 6)."
+  "iteration": 24,
+  "lastTick": "2026-06-18T02:40:36.8499054+08:00",
+  "lastTickEpoch": 1781721637,
+  "phase": "brief-v4-multi-dish",
+  "nextResearchTheme": "PHASE 3 COMPLETE (full recipe ingestion; 98 tests). Brief v4 authored. NEXT: Brief v4 item 1 - engine scaleRecipe(graph, factor): multiply ingredient amounts by factor; non-linear categories (salt/spice/acid/leavening/yeast keyword-matched) get conservative 0.75-0.9 multiplier + scaleNote; pure + unit-tested; validate() still ok."
 }
