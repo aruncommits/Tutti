@@ -4,7 +4,8 @@
 //           anchoring are layered on in later items.
 // Pure functions over plain data. No LLM, no UI, no clock on the cooking path.
 
-import type { TaskNode } from "./types";
+import type { KitchenProfile, ResourceRequirement, TaskNode } from "./types";
+import { capacityOf, nodeRequirements, normalizeKitchen } from "./resources";
 
 /** Deterministic topological order (Kahn's, ties broken by nodeId for stable output). */
 export function topoSort(nodes: Pick<TaskNode, "nodeId" | "dependencies">[]): string[] {
@@ -106,6 +107,141 @@ export function criticalPathMethod(nodes: TaskNode[]): CpmResult {
   }
 
   return { entries, makespanMins: makespan, criticalPath: reconstructCriticalPath(byId, es, ef, makespan) };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Resource-aware greedy list scheduling (Doc 2 §4.3) — item 3.
+// RCPSP is NP-hard; we use a deterministic greedy priority heuristic: a feasible,
+// dependency- and resource-correct schedule that beats human juggling (not the optimum).
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface Interval {
+  start: number;
+  end: number;
+}
+
+export interface ForwardScheduleEntry {
+  start: number; // minutes from t0
+  end: number;
+}
+
+export interface ForwardSchedule {
+  entries: Record<string, ForwardScheduleEntry>;
+  makespanMins: number;
+}
+
+/** Peak concurrent usage of one resource category within the half-open window [from, to). */
+function peakUsage(intervals: Interval[], from: number, to: number): number {
+  const deltas: Array<[number, number]> = [];
+  for (const iv of intervals) {
+    const s = Math.max(iv.start, from);
+    const e = Math.min(iv.end, to);
+    if (s < e) {
+      deltas.push([s, 1]);
+      deltas.push([e, -1]);
+    }
+  }
+  // releases (-1) before claims (+1) at the same instant → back-to-back tasks don't collide.
+  deltas.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  let cur = 0;
+  let peak = 0;
+  for (const [, d] of deltas) {
+    cur += d;
+    if (cur > peak) peak = cur;
+  }
+  return peak;
+}
+
+/** Earliest t ≥ minStart where every required resource has room for the whole duration. */
+function earliestFeasibleStart(
+  reqs: ResourceRequirement[],
+  capOf: (c: string) => number,
+  timeline: Map<string, Interval[]>,
+  minStart: number,
+  dur: number,
+): number {
+  // Feasibility only opens at minStart or when some required resource is released.
+  const candidates = new Set<number>([minStart]);
+  for (const req of reqs) {
+    for (const iv of timeline.get(req.category) ?? []) {
+      if (iv.end > minStart) candidates.add(iv.end);
+    }
+  }
+  const sorted = [...candidates].sort((a, b) => a - b);
+  for (const t of sorted) {
+    let ok = true;
+    for (const req of reqs) {
+      // clamp so a node needing more than the kitchen has still schedules (degrade, never hang).
+      const cap = Math.max(capOf(req.category), req.count);
+      if (peakUsage(timeline.get(req.category) ?? [], t, t + dur) + req.count > cap) {
+        ok = false;
+        break;
+      }
+    }
+    if (ok) return t;
+  }
+  return minStart; // unreachable in practice (clamped capacity guarantees a candidate)
+}
+
+/**
+ * Greedy resource-constrained forward schedule (Doc 2 §4.3). Merges all nodes, models hands as
+ * a resource, and slots each node — in priority order — at its earliest feasible start. Cross-
+ * dish interleaving falls out automatically: a one-cook kitchen has one hands unit, so active
+ * tasks never overlap, and they naturally fill another task's passive (hands-free) window.
+ *
+ * Priority among schedulable nodes: on the critical path first, then least slack, then longest
+ * duration, then nodeId (determinism).
+ */
+export function scheduleForward(nodes: TaskNode[], kitchen: KitchenProfile): ForwardSchedule {
+  const k = normalizeKitchen(kitchen);
+  const capOf = (c: string) => capacityOf(k, c);
+  const byId = new Map(nodes.map((n) => [n.nodeId, n]));
+
+  const cpm = criticalPathMethod(nodes);
+  const onCritical = new Set(cpm.criticalPath);
+  const priority = (id: string): [number, number, number, string] => [
+    onCritical.has(id) ? 0 : 1, // critical first
+    cpm.entries[id]!.slackMins, // least slack
+    -byId.get(id)!.duration.estMins, // longest duration
+    id, // stable
+  ];
+  const lessPriority = (a: string, b: string): boolean => {
+    const pa = priority(a);
+    const pb = priority(b);
+    for (let i = 0; i < 3; i++) {
+      if ((pa[i] as number) !== (pb[i] as number)) return (pa[i] as number) < (pb[i] as number);
+    }
+    return (pa[3] as string) < (pb[3] as string);
+  };
+
+  const timeline = new Map<string, Interval[]>();
+  const entries: Record<string, ForwardScheduleEntry> = {};
+  const scheduled = new Set<string>();
+
+  const depsScheduled = (n: TaskNode) => n.dependencies.every((d) => !byId.has(d) || scheduled.has(d));
+
+  while (scheduled.size < nodes.length) {
+    const ready = nodes.filter((n) => !scheduled.has(n.nodeId) && depsScheduled(n)).map((n) => n.nodeId);
+    if (ready.length === 0) throw new Error("scheduleForward: deadlock (cycle?)");
+    ready.sort((a, b) => (lessPriority(a, b) ? -1 : 1));
+    const id = ready[0]!;
+    const node = byId.get(id)!;
+    const reqs = nodeRequirements(node);
+    const minStart = node.dependencies.reduce((mx, d) => Math.max(mx, entries[d]?.end ?? 0), 0);
+    const dur = node.duration.estMins;
+    const start = earliestFeasibleStart(reqs, capOf, timeline, minStart, dur);
+    const end = start + dur;
+    entries[id] = { start, end };
+    for (const req of reqs) {
+      const list = timeline.get(req.category) ?? [];
+      for (let i = 0; i < req.count; i++) list.push({ start, end });
+      timeline.set(req.category, list);
+    }
+    scheduled.add(id);
+  }
+
+  const makespan = Math.max(0, ...Object.values(entries).map((e) => e.end));
+  return { entries, makespanMins: makespan };
 }
 
 /** Trace one longest chain: from a makespan-ending node back through binding dependencies. */

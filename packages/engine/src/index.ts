@@ -8,7 +8,10 @@ export { thaliV1, type SessionFixture } from "./golden";
 export {
   topoSort,
   criticalPathMethod,
+  scheduleForward,
   type CpmEntry,
   type CpmResult,
+  type ForwardSchedule,
+  type ForwardScheduleEntry,
 } from "./schedule";
 export { HANDS, normalizeKitchen, nodeRequirements, capacityOf } from "./resources";

@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 2,
-  "lastTick": "2026-06-18T00:53:10.5094488+08:00",
-  "lastTickEpoch": 1781715191,
+  "iteration": 3,
+  "lastTick": "2026-06-18T00:56:39.6617217+08:00",
+  "lastTickEpoch": 1781715400,
   "phase": "brief-v1-engine-core",
-  "nextResearchTheme": "Brief v1 item 1 done (CPM: topoSort + forward/backward + critical path, thali makespan 30 verified). NEXT: item 2 — hands-as-resource normalization (inject hands=cooks; active nodes need hands:1, passive none); then item 3 resource-aware greedy forward pass."
+  "nextResearchTheme": "Brief v1 items 1-2 done (CPM + hands-as-resource normalization, 19 engine tests). NEXT: item 3 — resource-aware greedy list-scheduling forward pass (priority on-critical-path/least-slack/longest-duration; per-category availability timeline at Level 0; assert thali never exceeds 2 burners and chopping slots into passive windows)."
 }
