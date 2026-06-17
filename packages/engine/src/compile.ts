@@ -5,6 +5,7 @@
 
 import type { KitchenProfile, MasterExecutionPlan, RecipeGraph, TaskNode } from "./types";
 import { anchor, criticalPathMethod, scheduleForward } from "./schedule";
+import { applyPace } from "./pace";
 
 /** Per-category speed multipliers learned from a user's history (Doc 2 §7). Applied in a later
  *  item once nodes carry a pace category; accepted here so the signature is stable. */
@@ -24,11 +25,15 @@ export function compile(
   recipes: RecipeGraph[],
   kitchenProfile: KitchenProfile,
   targetServeTime: string,
-  _paceModel?: PaceModel,
+  paceModel?: PaceModel,
 ): MasterExecutionPlan {
-  // merge: recipes are independent graphs sharing only resources, never dependencies (Doc 2 §4.1)
+  // merge: recipes are independent graphs sharing only resources, never dependencies (Doc 2 §4.1).
+  // Apply the user's pace multipliers to elastic durations before scheduling (Doc 2 §7).
   const nodes: TaskNode[] = recipes.flatMap((r) =>
-    r.nodes.map((n) => ({ ...n, status: "locked" as const })),
+    r.nodes.map((n) => {
+      const withStatus = { ...n, status: "locked" as const };
+      return paceModel ? applyPace(withStatus, paceModel) : withStatus;
+    }),
   );
 
   const forward = scheduleForward(nodes, kitchenProfile);

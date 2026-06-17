@@ -42,6 +42,8 @@ export interface TaskNode {
   /** runtime-only; library content must not set this. */
   status?: NodeStatus;
   reviewerNote?: string;
+  /** optional explicit pace-learning category (chop, saute, …); derived from the title if absent. */
+  paceCategory?: string;
 }
 
 export interface RecipeGraph {

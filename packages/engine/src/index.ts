@@ -21,4 +21,5 @@ export { compile, type PaceModel } from "./compile";
 export { deriveViewState } from "./viewstate";
 export { applyEvent } from "./events";
 export { reschedule } from "./reschedule";
+export { updatePace, applyPace, paceCategoryOf, type PaceSample } from "./pace";
 export { HANDS, normalizeKitchen, nodeRequirements, capacityOf } from "./resources";
