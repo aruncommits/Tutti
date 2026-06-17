@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 16,
-  "lastTick": "2026-06-18T02:01:35.4940582+08:00",
-  "lastTickEpoch": 1781719296,
+  "iteration": 17,
+  "lastTick": "2026-06-18T02:05:41.4832303+08:00",
+  "lastTickEpoch": 1781719541,
   "phase": "brief-v2-single-recipe-ui",
-  "nextResearchTheme": "Brief v2 items 1-6 done (full flow + polished cook view: passive countdowns, wake lock, undo; verified). NEXT: item 7 — verify session persistence across reload (plan + screen restore mid-cook); item 8 — guided-not-gated phase nudge ('prep basically done — start cooking?') + Pro-mode toggle; item 9 — accessibility pass (large type/contrast defaults, >=44px targets, ARIA, reduced-motion) + a gate a11y assertion. Then research + author Brief v3 (recipe ingestion)."
+  "nextResearchTheme": "Brief v2 items 1-8 done (full flow; persistence verified; Pro mode + nudge; reduced-motion). NEXT: item 9 FINAL — accessibility: add a component test gate (vitest + @testing-library/react + jsdom in apps/web) asserting NOW/NEXT/DONE regions + a labelled Done control render from a compiled plan; large-type/contrast/44px polish. Then Brief v2 done -> web-research pass -> author Research-Brief-v3-recipe-ingestion.md (Paste/Find online/Ask AI)."
 }
