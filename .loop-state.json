@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 1,
-  "lastTick": "2026-06-18T00:48:57.5333722+08:00",
-  "lastTickEpoch": 1781714938,
+  "iteration": 2,
+  "lastTick": "2026-06-18T00:53:10.5094488+08:00",
+  "lastTickEpoch": 1781715191,
   "phase": "brief-v1-engine-core",
-  "nextResearchTheme": "Scaffold done + committed (engine/ingest/web, green gate, port 5180). NEXT: Brief v1 — build the deterministic scheduler (compile/deriveViewState/applyEvent/reschedule) + six-invariant property tests, replacing the placeholder UI derivation."
+  "nextResearchTheme": "Brief v1 item 1 done (CPM: topoSort + forward/backward + critical path, thali makespan 30 verified). NEXT: item 2 — hands-as-resource normalization (inject hands=cooks; active nodes need hands:1, passive none); then item 3 resource-aware greedy forward pass."
 }

@@ -11,3 +11,4 @@ export {
   type CpmEntry,
   type CpmResult,
 } from "./schedule";
+export { HANDS, normalizeKitchen, nodeRequirements, capacityOf } from "./resources";
