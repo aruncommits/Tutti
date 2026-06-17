@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DagChef — Cook Mode</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{ --rice:#5aa6ff; --kuzhambu:#ff8a5b; --poriyal:#86cf4d; --ease:cubic-bezier(.22,.61,.36,1); }
+/* ---------- DARK : grainy ember ---------- */
+[data-theme="dark"]{
+  --bg:#100e0c; --bg2:#1a1613; --ink:#f4ece1; --muted:#a89c8c; --faint:#6f6557;
+  --accent:#ffa34d; --accent-deep:#e8623d;
+  --card:rgba(255,255,255,.045); --card-edge:rgba(255,255,255,.085); --card-strong:rgba(255,255,255,.07);
+  --line:rgba(255,255,255,.08); --shadow:0 18px 50px -20px rgba(0,0,0,.8);
+  --display:'Fraunces',serif; --hand:'Caveat',cursive;
+}
+/* ---------- LIGHT : aged paper ---------- */
+[data-theme="light"]{
+  --bg:#f1e6c9; --bg2:#eaddbb; --ink:#3a3324; --muted:#857a5f; --faint:#b3a884;
+  --accent:#bf4d1a; --accent-deep:#8f3a12;
+  --card:#fbf4e1; --card-edge:rgba(120,100,55,.28); --card-strong:#fdf8ea;
+  --line:rgba(120,100,55,.2); --shadow:0 14px 34px -18px rgba(120,95,40,.4);
+  --display:'Fraunces',serif; --hand:'Caveat',cursive;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);background:var(--bg);
+  -webkit-font-smoothing:antialiased;min-height:100%;position:relative;overflow-x:hidden;
+  transition:background .5s var(--ease),color .4s var(--ease)}
+body::before, body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0}
+[data-theme="dark"] body::before{background:
+  radial-gradient(120% 90% at 80% -10%, rgba(232,98,61,.16), transparent 55%),
+  radial-gradient(90% 80% at 0% 110%, rgba(255,163,77,.10), transparent 50%),
+  radial-gradient(60% 50% at 50% 50%, rgba(40,32,26,0), rgba(8,7,6,.55))}
+[data-theme="dark"] body::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:.05;mix-blend-mode:screen}
+[data-theme="light"] body::before{background:
+  radial-gradient(130% 110% at 50% 30%, rgba(0,0,0,0) 52%, rgba(120,90,35,.12) 100%),
+  radial-gradient(80% 60% at 18% 8%, rgba(255,250,230,.5), transparent 60%)}
+[data-theme="light"] body::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:.07;mix-blend-mode:multiply}
+.wrap{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:22px 20px 90px}
+
+header{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.logo{display:flex;align-items:center;gap:11px}
+.mark{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
+  background:linear-gradient(145deg,var(--accent),var(--accent-deep));color:#fff;flex:none;
+  box-shadow:0 6px 18px -6px var(--accent-deep)}
+.mark svg{width:21px;height:21px}
+.brand{font-family:var(--display);font-weight:600;font-size:23px;letter-spacing:-.01em;line-height:1}
+.brand small{display:block;font-family:'Inter';font-weight:500;font-size:10.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--faint);margin-top:3px}
+.spacer{flex:1}
+.icon-btn{width:40px;height:40px;border-radius:11px;border:1px solid var(--card-edge);
+  background:var(--card);color:var(--ink);cursor:pointer;display:grid;place-items:center;transition:.25s var(--ease)}
+.icon-btn:hover{background:var(--card-strong);transform:translateY(-1px)}
+.icon-btn svg{width:19px;height:19px}
+
+/* tabs */
+.tabs{display:flex;gap:6px;padding:5px;border-radius:15px;background:var(--card);
+  border:1px solid var(--card-edge);margin-bottom:20px}
+.tab{flex:1;border:none;cursor:pointer;background:transparent;color:var(--muted);font-family:'Inter';
+  font-weight:600;font-size:13.5px;padding:11px 8px;border-radius:11px;display:flex;align-items:center;
+  justify-content:center;gap:8px;transition:.2s var(--ease)}
+.tab svg{width:17px;height:17px}
+.tab:hover{color:var(--ink)}
+.tab.on{background:linear-gradient(145deg,var(--accent),var(--accent-deep));color:#fff;
+  box-shadow:0 8px 20px -10px var(--accent-deep)}
+
+/* clock */
+.clock{display:flex;align-items:center;gap:14px;margin:0 0 14px;padding:14px 18px;border-radius:16px;
+  background:var(--card);border:1px solid var(--card-edge);box-shadow:var(--shadow)}
+.clock .time{font-family:var(--display);font-weight:600;font-size:30px;line-height:1;letter-spacing:-.02em}
+.clock .lbl{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-bottom:5px}
+.status{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:500}
+.dot{width:8px;height:8px;border-radius:50%;background:#43c478;box-shadow:0 0 0 4px rgba(67,196,120,.18)}
+.status.late .dot{background:var(--accent);box-shadow:0 0 0 4px rgba(255,163,77,.2)}
+.mic{margin-left:auto;display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--muted);
+  padding:8px 13px;border-radius:30px;border:1px solid var(--card-edge);background:var(--card)}
+.mic i{width:9px;height:9px;border-radius:50%;background:var(--accent-deep);animation:pulse 1.6s infinite}
+@keyframes pulse{0%,100%{opacity:.45;transform:scale(.85)}50%{opacity:1;transform:scale(1.15)}}
+.value{display:flex;align-items:center;gap:12px;margin:0 0 22px;padding:11px 16px;border-radius:13px;
+  border:1px dashed var(--card-edge);color:var(--muted);font-size:13.5px;flex-wrap:wrap}
+.value b{color:var(--ink);font-weight:600}.value .arrow{color:var(--accent);font-weight:600}
+.strike{text-decoration:line-through;text-decoration-color:var(--faint);opacity:.7}
+
+.zone-h{display:flex;align-items:center;gap:10px;margin:24px 2px 13px}
+.zone-h span{font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);font-weight:600}
+.zone-h .rule{flex:1;height:1px;background:var(--line)}
+.zone-h .count{font-size:11px;color:var(--faint);background:var(--card);border:1px solid var(--card-edge);border-radius:20px;padding:2px 9px}
+
+/* now card */
+.now-card{position:relative;border-radius:20px;padding:22px 22px 20px;margin-bottom:14px;
+  background:var(--card-strong);border:1px solid var(--card-edge);box-shadow:var(--shadow);animation:rise .45s var(--ease)}
+@keyframes rise{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+.now-card::before{content:"";position:absolute;left:0;top:18px;bottom:18px;width:4px;border-radius:4px;
+  background:linear-gradient(var(--accent),var(--accent-deep))}
+.tagrow{display:flex;align-items:center;gap:9px;margin-bottom:11px}
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:var(--ink);
+  padding:4px 11px;border-radius:30px;background:var(--card);border:1px solid var(--card-edge)}
+.tag .swatch{width:8px;height:8px;border-radius:50%}
+.phase{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint);font-weight:600}
+.now-title{font-family:var(--display);font-weight:600;font-size:25px;line-height:1.15;letter-spacing:-.015em;margin-bottom:13px}
+.measure{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.chip{font-size:14px;font-weight:500;color:var(--ink);padding:7px 13px;border-radius:11px;background:var(--card);border:1px solid var(--card-edge)}
+.chip b{color:var(--accent-deep);font-weight:600}
+.heat{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-bottom:18px}
+.heat svg{width:16px;height:16px;color:var(--accent)}
+.act{display:flex;align-items:center;gap:13px}
+.btn{flex:1;border:none;cursor:pointer;font-family:'Inter';font-weight:600;font-size:16px;color:#fff;
+  padding:16px;border-radius:14px;background:linear-gradient(145deg,var(--accent),var(--accent-deep));
+  box-shadow:0 10px 26px -10px var(--accent-deep);transition:.2s var(--ease);display:flex;align-items:center;justify-content:center;gap:9px}
+.btn:hover{transform:translateY(-2px);filter:brightness(1.05)}.btn:active{transform:translateY(0) scale(.99)}
+.btn svg{width:19px;height:19px}
+.btn.ghost{flex:none;width:54px;background:var(--card);color:var(--muted);border:1px solid var(--card-edge);box-shadow:none}
+.dur{font-size:13px;color:var(--faint);white-space:nowrap}
+
+.cooking{display:flex;align-items:center;gap:14px;padding:15px 18px;border-radius:16px;margin-bottom:12px;
+  background:var(--card);border:1px solid var(--card-edge);animation:rise .4s var(--ease)}
+.ringwrap{position:relative;display:grid;place-items:center}
+.ring{width:42px;height:42px;border-radius:50%;flex:none;display:grid;place-items:center;
+  background:conic-gradient(var(--accent) calc(var(--p,0)*1%), var(--line) 0)}
+.ring::after{content:"";width:32px;height:32px;border-radius:50%;background:var(--bg2)}
+.ringwrap svg{position:absolute;width:17px;height:17px;color:var(--accent)}
+.cooking .info{flex:1}.cooking .info .t{font-weight:600;font-size:15px;display:flex;align-items:center;gap:8px}
+.cooking .info .s{font-size:12.5px;color:var(--muted);margin-top:2px}
+.cooking .left{font-family:var(--display);font-weight:600;font-size:17px;color:var(--accent-deep)}
+.idle{padding:20px;border-radius:16px;border:1px dashed var(--card-edge);text-align:center;color:var(--muted);font-size:14px;margin-bottom:14px;animation:rise .4s var(--ease)}
+.idle b{color:var(--ink);font-family:var(--hand);font-size:22px;font-weight:600}
+
+/* queue */
+.q-item{display:flex;align-items:center;gap:12px;padding:13px 16px;border-radius:13px;margin-bottom:8px;
+  background:var(--card);border:1px solid var(--card-edge);color:var(--muted);font-size:14.5px}
+.q-item .swatch{width:8px;height:8px;border-radius:50%;flex:none}
+.q-item .qd{margin-left:auto;font-size:12px;color:var(--faint)}
+.q-item.locked{opacity:.6}.q-item .lock{width:13px;height:13px;color:var(--faint)}
+
+/* DONE expandable */
+.done-card{border-radius:13px;margin-bottom:8px;background:var(--card);border:1px solid var(--card-edge);overflow:hidden}
+.done-head{display:flex;align-items:center;gap:11px;padding:13px 15px;cursor:pointer;user-select:none}
+.done-head .ck{width:20px;height:20px;border-radius:50%;flex:none;display:grid;place-items:center;
+  background:rgba(67,196,120,.16);color:#43c478}
+.done-head .ck svg{width:13px;height:13px}
+.done-head .dt{font-size:14px;color:var(--muted);text-decoration:line-through;text-decoration-color:var(--faint);flex:1}
+.done-head .sw{width:8px;height:8px;border-radius:50%;flex:none;opacity:.7}
+.done-head .chev{width:16px;height:16px;color:var(--faint);transition:transform .25s var(--ease)}
+.done-card.open .chev{transform:rotate(180deg)}
+.done-body{max-height:0;overflow:hidden;transition:max-height .3s var(--ease)}
+.done-card.open .done-body{max-height:300px}
+.done-inner{padding:0 15px 15px 46px}
+.done-inner .measure{margin-bottom:10px}
+.done-inner .heat{margin-bottom:12px}
+.undo{display:inline-flex;align-items:center;gap:8px;font-family:'Inter';font-weight:600;font-size:13.5px;
+  color:var(--accent-deep);background:var(--card-strong);border:1px solid var(--card-edge);
+  padding:9px 15px;border-radius:11px;cursor:pointer;transition:.2s var(--ease)}
+.undo:hover{transform:translateY(-1px);border-color:var(--accent)}
+.undo svg{width:15px;height:15px}
+
+/* ingredients tab */
+.ing-sec{margin-bottom:22px}
+.ing-title{display:flex;align-items:center;gap:9px;font-family:var(--display);font-weight:600;font-size:18px;margin-bottom:12px}
+.ing-title .sw{width:11px;height:11px;border-radius:50%}
+.ing-row{display:flex;align-items:center;gap:13px;padding:12px 15px;border-radius:12px;margin-bottom:7px;
+  background:var(--card);border:1px solid var(--card-edge);cursor:pointer;transition:.18s var(--ease)}
+.ing-row:hover{background:var(--card-strong)}
+.box{width:21px;height:21px;border-radius:7px;border:1.5px solid var(--card-edge);flex:none;display:grid;place-items:center;transition:.18s var(--ease)}
+.box svg{width:13px;height:13px;color:#fff;opacity:0}
+.ing-row.tick .box{background:linear-gradient(145deg,var(--accent),var(--accent-deep));border-color:transparent}
+.ing-row.tick .box svg{opacity:1}
+.ing-row.tick .nm{text-decoration:line-through;color:var(--faint)}
+.ing-row .nm{font-size:15px;font-weight:500}
+.ing-row .amt{margin-left:auto;font-size:13.5px;color:var(--accent-deep);font-weight:600}
+
+/* recipes tab */
+.r-card{border-radius:18px;padding:20px;margin-bottom:18px;background:var(--card-strong);
+  border:1px solid var(--card-edge);box-shadow:var(--shadow)}
+.r-head{display:flex;align-items:center;gap:11px;margin-bottom:5px}
+.r-head .sw{width:12px;height:12px;border-radius:50%}
+.r-name{font-family:var(--display);font-weight:600;font-size:21px}
+.r-meta{font-size:12.5px;color:var(--faint);margin-bottom:16px;padding-left:23px}
+.step{display:flex;gap:14px;padding:13px 0;border-top:1px solid var(--line)}
+.step .num{width:26px;height:26px;border-radius:8px;flex:none;display:grid;place-items:center;font-size:13px;
+  font-weight:600;color:var(--accent-deep);background:var(--card);border:1px solid var(--card-edge)}
+.step .body .st{font-weight:600;font-size:15.5px;margin-bottom:3px}
+.step .body .sm{font-size:13px;color:var(--muted);line-height:1.5}
+.step .body .pill{display:inline-block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  font-weight:600;color:var(--faint);margin-top:6px;padding:2px 8px;border:1px solid var(--card-edge);border-radius:20px}
+
+.finale{text-align:center;padding:40px 20px;border-radius:22px;background:var(--card-strong);
+  border:1px solid var(--card-edge);box-shadow:var(--shadow);animation:rise .5s var(--ease)}
+.finale .big{font-family:var(--display);font-weight:600;font-size:30px;letter-spacing:-.02em;margin:14px 0 6px}
+.finale p{color:var(--muted);font-size:15px;margin-bottom:20px}
+.finale .hand{font-family:var(--hand);font-size:26px;color:var(--accent-deep);font-weight:600}
+.reset{border:1px solid var(--card-edge);background:var(--card);color:var(--ink);font-weight:600;font-size:14px;
+  padding:12px 22px;border-radius:12px;cursor:pointer;transition:.2s var(--ease)}
+.reset:hover{background:var(--card-strong);transform:translateY(-1px)}
+
+/* toast */
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);z-index:50;
+  display:flex;align-items:center;gap:14px;padding:13px 16px 13px 18px;border-radius:14px;
+  background:var(--card-strong);border:1px solid var(--card-edge);box-shadow:0 20px 50px -16px rgba(0,0,0,.55);
+  opacity:0;pointer-events:none;transition:.3s var(--ease);backdrop-filter:blur(8px);max-width:90vw}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+.toast .tk{width:22px;height:22px;border-radius:50%;background:rgba(67,196,120,.16);color:#43c478;display:grid;place-items:center;flex:none}
+.toast .tk svg{width:13px;height:13px}
+.toast .txt{font-size:14px;font-weight:500}.toast .txt small{display:block;color:var(--muted);font-size:12px;font-weight:400}
+.toast .ub{display:inline-flex;align-items:center;gap:7px;font-weight:600;font-size:13.5px;color:var(--accent-deep);
+  background:var(--card);border:1px solid var(--card-edge);padding:8px 13px;border-radius:10px;cursor:pointer}
+.toast .ub svg{width:14px;height:14px}
+.hide{display:none!important}
+footer{text-align:center;margin-top:30px;font-size:11.5px;color:var(--faint);letter-spacing:.04em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">
+      <div class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.4"/><circle cx="18" cy="6" r="2.4"/><circle cx="12" cy="18" r="2.4"/><path d="M6 8.4v3a3 3 0 0 0 3 3M18 8.4v3a3 3 0 0 1-3 3M12 14.4v1.2"/></svg></div>
+      <div class="brand">DagChef<small>south indian thali</small></div>
+    </div>
+    <div class="spacer"></div>
+    <button class="icon-btn" id="theme" aria-label="Toggle theme"><svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg></button>
+  </header>
+
+  <div class="tabs">
+    <button class="tab" data-tab="ing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h12"/></svg>Ingredients</button>
+    <button class="tab" data-tab="rec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12a2 2 0 0 1 2 2v14l-3-2-3 2-3-2-3 2V4z"/></svg>Recipes</button>
+    <button class="tab on" data-tab="cook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M6 8v2a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3V8M12 16v-3"/></svg>Cook</button>
+  </div>
+
+  <div id="view"></div>
+  <footer>rice + vatha kuzhambu + beans poriyal — a working DagChef prototype</footer>
+</div>
+
+<div class="toast" id="toast">
+  <div class="tk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4L19 6"/></svg></div>
+  <div class="txt" id="toastTxt">Marked done<small>Tap undo if that was a mistake</small></div>
+  <button class="ub" id="toastUndo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11a6 6 0 0 1 6-6h9"/><path d="M18 2l3 3-3 3"/><path d="M21 13a6 6 0 0 1-6 6H6"/><path d="M6 22l-3-3 3-3"/></svg>Undo</button>
+</div>
+
+<script>
+const DISHES={rec_rice:{name:"Rice",color:"var(--rice)"},rec_kuzhambu:{name:"Kuzhambu",color:"var(--kuzhambu)"},rec_poriyal:{name:"Poriyal",color:"var(--poriyal)"}};
+const NODES=[
+ {id:"ri_1",r:"rec_rice",title:"Rinse the rice",phase:"prep",att:"active",dur:3,deps:[],m:["1½ cup rice"]},
+ {id:"ri_2",r:"rec_rice",title:"Start rice in pressure cooker",phase:"cook",att:"passive",dur:20,deps:["ri_1"],m:["+ 3 cup water"],heat:"until 3 whistles, then low"},
+ {id:"ri_3",r:"rec_rice",title:"Rest & fluff the rice",phase:"serve",att:"passive",dur:5,deps:["ri_2"],m:[]},
+ {id:"kz_1",r:"rec_kuzhambu",title:"Soak tamarind, extract pulp",phase:"prep",att:"active",dur:6,deps:[],m:["lime-size tamarind","1½ cup warm water"]},
+ {id:"kz_2",r:"rec_kuzhambu",title:"Slit brinjals & peel shallots",phase:"prep",att:"active",dur:7,deps:[],m:["8 brinjals","10 shallots"]},
+ {id:"kz_3",r:"rec_kuzhambu",title:"Temper the spices",phase:"cook",att:"active",dur:3,deps:[],m:["2 tbsp sesame oil","1 tsp mustard","½ tsp fenugreek","curry leaves"],heat:"medium"},
+ {id:"kz_4",r:"rec_kuzhambu",title:"Fry brinjals & shallots",phase:"cook",att:"active",dur:8,deps:["kz_2","kz_3"],m:[],heat:"medium-high · until skins blister"},
+ {id:"kz_5",r:"rec_kuzhambu",title:"Add tamarind & simmer",phase:"cook",att:"passive",dur:15,deps:["kz_1","kz_4"],m:["2 tbsp sambar powder","1 tsp jaggery"],heat:"low · until oil separates"},
+ {id:"po_1",r:"rec_poriyal",title:"Chop the green beans",phase:"prep",att:"active",dur:9,deps:[],m:["250 g beans, fine"]},
+ {id:"po_2",r:"rec_poriyal",title:"Temper mustard & urad dal",phase:"cook",att:"active",dur:3,deps:[],m:["1 tbsp coconut oil","1 tsp mustard","2 red chili"],heat:"medium"},
+ {id:"po_3",r:"rec_poriyal",title:"Sauté beans till tender",phase:"cook",att:"active",dur:10,deps:["po_1","po_2"],m:["¼ tsp turmeric","salt"],heat:"medium"},
+ {id:"po_4",r:"rec_poriyal",title:"Toss with grated coconut",phase:"cook",att:"active",dur:2,deps:["po_3"],m:["3 tbsp coconut"]}
+];
+const PRIORITY=["ri_1","ri_2","po_1","kz_2","kz_1","kz_3","kz_4","po_2","po_3","kz_5","po_4","ri_3"];
+const MS_PER_MIN=320;
+let state={},activeTab="cook",openDone={},ticked={},toastTimer=null;
+
+const node=id=>NODES.find(n=>n.id===id);
+const done=id=>state[id].status==="completed";
+const depsMet=n=>n.deps.every(d=>done(d));
+
+function reset(){
+  state={};openDone={};ticked={};
+  NODES.forEach(n=>state[n.id]={status:n.deps.length?"locked":"available",remaining:n.dur*MS_PER_MIN,timer:null});
+  render();
+}
+function recompute(){
+  NODES.forEach(n=>{
+    if(state[n.id].status==="completed"||state[n.id].status==="running")return;
+    state[n.id].status=depsMet(n)?"available":"locked";
+  });
+}
+function focusNode(){for(const id of PRIORITY){if(state[id].status==="available")return id;}return null;}
+const running=()=>NODES.filter(n=>state[n.id].status==="running");
+
+function complete(id){
+  if(state[id].timer){clearInterval(state[id].timer);state[id].timer=null;}
+  state[id].status="completed";recompute();
+  if(node(id).att==="active") showToast(node(id).title,id);
+  render();
+}
+function undo(id){
+  if(state[id].timer){clearInterval(state[id].timer);state[id].timer=null;}
+  state[id].status="available";
+  // re-lock dependents that are no longer fully unblocked (skip ones the user explicitly completed)
+  NODES.forEach(n=>{ if(state[n.id].status!=="completed"&&state[n.id].status!=="running" && !depsMet(n)) state[n.id].status="locked"; });
+  recompute();hideToast();render();
+}
+function startPassive(id){
+  const n=node(id);state[id].status="running";state[id].remaining=n.dur*MS_PER_MIN;
+  state[id].timer=setInterval(()=>{state[id].remaining-=200;if(state[id].remaining<=0)complete(id);else updateRings();},200);
+  render();
+}
+function showToast(title,id){
+  document.getElementById("toastTxt").innerHTML=`Marked &ldquo;${title}&rdquo; done<small>Tap undo if that was a mistake</small>`;
+  document.getElementById("toastUndo").onclick=()=>undo(id);
+  const t=document.getElementById("toast");t.classList.add("show");
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove("show"),5000);
+}
+const hideToast=()=>document.getElementById("toast").classList.remove("show");
+
+const sw=r=>`<span class="swatch" style="background:${DISHES[r].color}"></span>`;
+const swCls=(r,c)=>`<span class="${c}" style="background:${DISHES[r].color}"></span>`;
+function chips(n){return n.m.length?`<div class="measure">${n.m.map(x=>`<span class="chip">${x.replace(/^([\d¼½¾⅓⅔\.]+\s?\w*)/,'<b>$1</b>')}</span>`).join("")}</div>`:"";}
+
+function render(){
+  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.tab===activeTab));
+  document.getElementById("view").innerHTML = activeTab==="cook"?renderCook() : activeTab==="ing"?renderIng() : renderRec();
+}
+
+function renderCook(){
+  recompute();
+  const total=NODES.length,comp=NODES.filter(n=>done(n.id)).length;
+  let head=`<div class="clock"><div><div class="lbl">Serving at</div><div class="time">7:30</div></div>
+    <div style="align-self:flex-end;padding-bottom:3px"><div class="status"><span class="dot"></span>On track</div></div>
+    <div class="mic" aria-hidden="true"><i></i> &ldquo;done&rdquo; / &ldquo;next&rdquo;</div></div>
+    <div class="value"><span><b>3 dishes</b></span><span class="strike">91 min separately</span><span class="arrow">&rarr;</span><b>45 min with DagChef</b></div>`;
+  if(comp===total) return head+`<div class="finale"><div class="hand">all three, hot, together</div>
+    <div class="big">Dinner is served</div><p>Finished at the same moment &mdash; about <b>45 minutes</b>, not 91.</p>
+    <button class="reset" onclick="reset()">Cook it again</button></div>`;
+
+  const fid=focusNode(),runs=running();let h=head;
+  h+=`<div class="zone-h"><span>Now</span><div class="rule"></div></div>`;
+  if(fid){const n=node(fid),pas=n.att==="passive";
+    h+=`<div class="now-card"><div class="tagrow"><span class="tag">${sw(n.r)} ${DISHES[n.r].name}</span><span class="phase">${n.phase}${pas?" &middot; hands-free":""}</span></div>
+      <div class="now-title">${n.title}</div>${chips(n)}${n.heat?`<div class="heat">${ic('flame')} ${n.heat}</div>`:""}
+      <div class="act">${pas?`<button class="btn" onclick="startPassive('${fid}')">${ic('play')} Start &mdash; it cooks itself</button>`
+        :`<button class="btn" onclick="complete('${fid}')">${ic('check')} Done</button><button class="btn ghost" aria-label="repeat">${ic('repeat')}</button>`}
+        <span class="dur">~${n.dur} min</span></div></div>`;
+  } else if(runs.length){h+=`<div class="idle"><b>Hands free.</b><br>While that cooks, there's nothing to do &mdash; relax a moment.</div>`;}
+
+  runs.forEach(n=>{const pct=Math.max(0,Math.min(100,100-(state[n.id].remaining/(n.dur*MS_PER_MIN))*100));
+    const left=Math.max(0,Math.ceil(state[n.id].remaining/MS_PER_MIN));
+    h+=`<div class="cooking" data-ring="${n.id}"><div class="ringwrap"><div class="ring" style="--p:${pct}"></div>${ic('flame')}</div>
+      <div class="info"><div class="t">${sw(n.r)} ${n.title.replace(/^Start /,'')}</div><div class="s">${n.heat||"cooking"}</div></div>
+      <div class="left"><span data-left="${n.id}">${left}</span>m</div></div>`;});
+
+  const q=PRIORITY.map(id=>node(id)).filter(n=>{const s=state[n.id].status;return(s==="available"&&n.id!==fid)||s==="locked";});
+  if(q.length){h+=`<div class="zone-h"><span>Next</span><div class="rule"></div><span class="count">${q.length}</span></div>`;
+    q.forEach(n=>{const lk=state[n.id].status==="locked";
+      h+=`<div class="q-item ${lk?'locked':''}">${sw(n.r)} ${n.title}<span class="qd">${lk?ic('lock'):''} ~${n.dur}m</span></div>`;});}
+
+  const d=NODES.filter(n=>done(n.id));
+  if(d.length){h+=`<div class="zone-h"><span>Done</span><div class="rule"></div><span class="count">${d.length}</span></div>`;
+    d.forEach(n=>{const op=openDone[n.id]?"open":"";
+      h+=`<div class="done-card ${op}"><div class="done-head" onclick="toggleDone('${n.id}')">
+        <span class="ck">${ic('check')}</span><span class="sw" style="background:${DISHES[n.r].color}"></span>
+        <span class="dt">${n.title}</span>${ic('chev','chev')}</div>
+        <div class="done-body"><div class="done-inner">${chips(n)}${n.heat?`<div class="heat">${ic('flame')} ${n.heat}</div>`:""}
+          <button class="undo" onclick="undo('${n.id}')">${ic('repeat')} Undo &mdash; move back to Now</button></div></div></div>`;});}
+  return h;
+}
+function toggleDone(id){openDone[id]=!openDone[id];render();}
+function updateRings(){running().forEach(n=>{const pct=Math.max(0,Math.min(100,100-(state[n.id].remaining/(n.dur*MS_PER_MIN))*100));
+  const r=document.querySelector(`[data-ring="${n.id}"] .ring`),l=document.querySelector(`[data-left="${n.id}"]`);
+  if(r)r.style.setProperty("--p",pct);if(l)l.textContent=Math.max(0,Math.ceil(state[n.id].remaining/MS_PER_MIN));});}
+
+function renderIng(){
+  let h=`<div class="value" style="margin-bottom:20px"><span>Tick items as you gather or prep them &mdash; your mise en place.</span></div>`;
+  Object.keys(DISHES).forEach(r=>{
+    const items=[];NODES.filter(n=>n.r===r).forEach(n=>n.m.forEach(x=>{if(x&&!x.startsWith("+")&&!items.find(i=>i.t===x))items.push({t:x,id:n.id});}));
+    h+=`<div class="ing-sec"><div class="ing-title">${swCls(r,'sw')} ${DISHES[r].name}</div>`;
+    items.forEach((it,i)=>{const key=r+i,tk=ticked[key]?"tick":"";
+      const parts=it.t.match(/^([\d¼½¾⅓⅔\.\s]*\w*)\s*(.*)$/);
+      const amt=parts&&parts[2]?parts[1].trim():"";const nm=parts&&parts[2]?parts[2]:it.t;
+      h+=`<div class="ing-row ${tk}" onclick="tick('${key}')"><span class="box">${ic('check')}</span>
+        <span class="nm">${nm}</span>${amt?`<span class="amt">${amt}</span>`:""}</div>`;});
+    h+=`</div>`;});
+  return h;
+}
+function tick(k){ticked[k]=!ticked[k];render();}
+
+function renderRec(){
+  let h=`<div class="value" style="margin-bottom:20px"><span>Each dish on its own &mdash; the classic linear view. DagChef weaves these together in the <b>Cook</b> tab.</span></div>`;
+  Object.keys(DISHES).forEach(r=>{
+    const ns=NODES.filter(n=>n.r===r);const tot=ns.reduce((a,n)=>a+n.dur,0);
+    h+=`<div class="r-card"><div class="r-head">${swCls(r,'sw')}<span class="r-name">${DISHES[r].name}</span></div>
+      <div class="r-meta">${ns.length} steps &middot; about ${tot} min on its own &middot; serves 4</div>`;
+    ns.forEach((n,i)=>{const meas=n.m.length?n.m.join(" &middot; "):"";
+      h+=`<div class="step"><div class="num">${i+1}</div><div class="body"><div class="st">${n.title}</div>
+        ${meas?`<div class="sm">${meas}${n.heat?" &mdash; "+n.heat:""}</div>`:n.heat?`<div class="sm">${n.heat}</div>`:""}
+        <span class="pill">${n.phase} &middot; ${n.att}</span></div></div>`;});
+    h+=`</div>`;});
+  return h;
+}
+
+function ic(k,cls){const m={
+  check:`<path d="M5 12l4 4L19 6"/>`,play:`<path d="M8 5v14l11-7z" fill="currentColor" stroke="none"/>`,
+  flame:`<path d="M12 3c1 3 4 4 4 8a4 4 0 0 1-8 0c0-1 .4-2 1-2.5C9 10 9 8 12 3z"/><path d="M12 21a6 6 0 0 0 6-6c0-2-1-3.5-2-5"/>`,
+  repeat:`<path d="M3 11a6 6 0 0 1 6-6h9"/><path d="M18 2l3 3-3 3"/><path d="M21 13a6 6 0 0 1-6 6H6"/><path d="M6 22l-3-3 3-3"/>`,
+  lock:`<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>`,
+  chev:`<path d="M6 9l6 6 6-6"/>`};
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"${cls?` class="${cls}"`:''}>${m[k]}</svg>`;}
+
+const sun=`<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>`;
+const moon=`<path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.6 6.6 0 0 0 9.8 9.8z"/>`;
+document.getElementById("theme").onclick=()=>{const r=document.documentElement,nx=r.dataset.theme==="dark"?"light":"dark";
+  r.dataset.theme=nx;document.getElementById("themeIcon").innerHTML=nx==="dark"?sun:moon;};
+document.getElementById("themeIcon").innerHTML=sun;
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{activeTab=t.dataset.tab;hideToast();render();});
+
+reset();
+</script>
+</body>
+</html>
