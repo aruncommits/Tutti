@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 29,
-  "lastTick": "2026-06-18T03:07:00.6540183+08:00",
-  "lastTickEpoch": 1781723221,
+  "iteration": 30,
+  "lastTick": "2026-06-18T03:12:19.6245931+08:00",
+  "lastTickEpoch": 1781723540,
   "phase": "brief-v4-multi-dish",
-  "nextResearchTheme": "Brief v4 items 1,3,4,5,6 done (scale, shopping, shopping screen, allergens, multi-dish color identity; verified; 113 tests). NEXT: item 2 - per-dish servings stepper: persist a per-recipe factor map (tutti.servingsFactor), App applies scaleRecipe(recipe, factor) before building selectedRecipes so amounts + shopping list reflect it; UI stepper on each Pick row (1/2x, 1.5x, 2x or +/- servings). Then item 7 - a web test (allergen warning shows when avoided; shopping list renders). Then research + author Research-Brief-v5-handsfree-voice.md."
+  "nextResearchTheme": "Brief v4 items 1,2,3,4,5,6 done (scale + servings UI, shopping + screen, allergens, multi-dish color; all verified; 113 tests). NEXT: item 7 (FINAL v4) - web component tests: PickScreen shows the allergen warning for an avoided allergen, and ShoppingScreen renders a merged line; keep gate green. Then Brief v4 DONE -> web-research (Web Speech reliability/wake-word, pace UX) -> author Research-Brief-v5-handsfree-voice.md (Doc 3 Phase 4)."
 }
