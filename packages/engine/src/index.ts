@@ -9,9 +9,12 @@ export {
   topoSort,
   criticalPathMethod,
   scheduleForward,
+  anchor,
   type CpmEntry,
   type CpmResult,
   type ForwardSchedule,
   type ForwardScheduleEntry,
+  type AnchoredSchedule,
 } from "./schedule";
+export { parseClock, formatClock } from "./time";
 export { HANDS, normalizeKitchen, nodeRequirements, capacityOf } from "./resources";

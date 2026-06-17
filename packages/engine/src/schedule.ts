@@ -4,8 +4,9 @@
 //           anchoring are layered on in later items.
 // Pure functions over plain data. No LLM, no UI, no clock on the cooking path.
 
-import type { KitchenProfile, ResourceRequirement, TaskNode } from "./types";
+import type { KitchenProfile, ResourceRequirement, ScheduleEntry, TaskNode } from "./types";
 import { capacityOf, nodeRequirements, normalizeKitchen } from "./resources";
+import { formatClock, parseClock } from "./time";
 
 /** Deterministic topological order (Kahn's, ties broken by nodeId for stable output). */
 export function topoSort(nodes: Pick<TaskNode, "nodeId" | "dependencies">[]): string[] {
@@ -242,6 +243,91 @@ export function scheduleForward(nodes: TaskNode[], kitchen: KitchenProfile): For
 
   const makespan = Math.max(0, ...Object.values(entries).map((e) => e.end));
   return { entries, makespanMins: makespan };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Reverse target-time anchoring (Doc 2 §4.5) — item 4.
+// "Serve at 19:30" anchors the schedule to END there: startTime = target - makespan.
+// Honest about infeasible deadlines (P7): never fake a serve time that can't be met.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface AnchoredSchedule {
+  startTimeMins: number; // minutes since midnight to begin
+  startTime: string; // clock
+  targetServeTime: string;
+  projectedServeTime: string; // == target when feasible; later when not
+  makespanMins: number;
+  schedule: Record<string, ScheduleEntry>;
+  feasible: boolean; // false when the start time is already in the past vs `now`
+  earliestServeTime: string; // soonest realistic serve given `now` (== projected when feasible)
+}
+
+/**
+ * Anchor a resource forward schedule to a wall-clock target serve time. Shifts every node so the
+ * last finishes at `targetServeTime`, runs a dependency backward pass for latest-start/slack, and
+ * — if `nowClock` is given and the required start is already past — reports the earliest realistic
+ * serve time instead of pretending the deadline holds.
+ */
+export function anchor(
+  nodes: TaskNode[],
+  forward: ForwardSchedule,
+  targetServeTime: string,
+  nowClock?: string,
+): AnchoredSchedule {
+  const byId = new Map(nodes.map((n) => [n.nodeId, n]));
+  const makespan = forward.makespanMins;
+  const targetMins = parseClock(targetServeTime);
+  let startMins = targetMins - makespan;
+
+  let feasible = true;
+  let projectedMins = targetMins;
+  if (nowClock !== undefined) {
+    const nowMins = parseClock(nowClock);
+    if (startMins < nowMins) {
+      // can't start in the past — begin now and serve as soon as the makespan allows.
+      feasible = false;
+      startMins = nowMins;
+      projectedMins = nowMins + makespan;
+    }
+  }
+
+  // dependency backward pass (latest start / slack) over the resource earliest times.
+  const ef = new Map(Object.entries(forward.entries).map(([id, e]) => [id, e.end]));
+  const dependents = new Map<string, string[]>();
+  for (const n of nodes) for (const dep of n.dependencies) {
+    if (byId.has(dep)) dependents.set(dep, [...(dependents.get(dep) ?? []), n.nodeId]);
+  }
+  const order = topoSort(nodes);
+  const latestStart = new Map<string, number>();
+  for (const id of [...order].reverse()) {
+    const dur = byId.get(id)!.duration.estMins;
+    const deps = dependents.get(id) ?? [];
+    const latestFinish = deps.length ? Math.min(...deps.map((m) => latestStart.get(m)!)) : makespan;
+    latestStart.set(id, latestFinish - dur);
+  }
+
+  const schedule: Record<string, ScheduleEntry> = {};
+  for (const id of order) {
+    const e = forward.entries[id]!;
+    schedule[id] = {
+      plannedStart: formatClock(startMins + e.start),
+      plannedEnd: formatClock(startMins + e.end),
+      earliestStart: e.start,
+      latestStart: latestStart.get(id)!,
+      slackMins: latestStart.get(id)! - e.start,
+    };
+  }
+
+  return {
+    startTimeMins: startMins,
+    startTime: formatClock(startMins),
+    targetServeTime,
+    projectedServeTime: formatClock(projectedMins),
+    makespanMins: makespan,
+    schedule,
+    feasible,
+    earliestServeTime: formatClock(projectedMins),
+  };
 }
 
 /** Trace one longest chain: from a makespan-ending node back through binding dependencies. */
