@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import {
+  applyEvent,
   compile,
   deriveViewState,
   formatClock,
@@ -57,10 +58,7 @@ export function App() {
   const view = deriveViewState(plan);
 
   const complete = (id: string) =>
-    setPlan((prev) => ({
-      ...prev,
-      nodes: prev.nodes.map((n) => (n.nodeId === id ? { ...n, status: "completed" as const } : n)),
-    }));
+    setPlan((prev) => applyEvent(prev, { type: "complete", nodeId: id, at: "" }));
   const reset = () => setPlan(initial);
 
   const allDone = view.active.length === 0 && view.queue.length === 0;

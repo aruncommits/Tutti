@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 6,
-  "lastTick": "2026-06-18T01:11:59.6456236+08:00",
-  "lastTickEpoch": 1781716320,
+  "iteration": 7,
+  "lastTick": "2026-06-18T01:17:09.5260675+08:00",
+  "lastTickEpoch": 1781716630,
   "phase": "brief-v1-engine-core",
-  "nextResearchTheme": "Brief v1 items 1-5 done (CPM, hands, forward, anchor, compile -> MasterExecutionPlan; 38 engine tests, thali start 18:39 -> serve 19:30). NEXT: item 6 — deriveViewState(plan) (active = not-completed AND deps all completed; archive = completed; queue = rest; sort active/queue by plannedStart; nextStartAlert) AND replace the web app placeholder derivation with deriveViewState(compile([...]))."
+  "nextResearchTheme": "Brief v1 items 1-6 done (engine produces real plans; web Cook Mode renders compile->deriveViewState, tap-to-Done auto-promotes, verified in browser; 43 engine tests). NEXT: item 7 — applyEvent(plan, event) (complete -> mark completed + record actualDuration + promote newly-unblocked; undo -> revert + re-lock dependents whose deps no longer met); then item 8 reschedule(plan, now)."
 }
