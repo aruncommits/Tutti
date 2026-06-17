@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 5,
-  "lastTick": "2026-06-18T01:08:20.5598478+08:00",
-  "lastTickEpoch": 1781716101,
+  "iteration": 6,
+  "lastTick": "2026-06-18T01:11:59.6456236+08:00",
+  "lastTickEpoch": 1781716320,
   "phase": "brief-v1-engine-core",
-  "nextResearchTheme": "Brief v1 items 1-4 done (CPM, hands, forward pass, reverse anchoring; 32 engine tests). NEXT: item 5 — compile(recipes, kitchen, targetServeTime, paceModel?) assembling MasterExecutionPlan (merge nodes, scheduleForward, anchor, fill schedule{}/criticalPath/criticalPathMins/startTime/projectedServeTime) + golden thali snapshot test."
+  "nextResearchTheme": "Brief v1 items 1-5 done (CPM, hands, forward, anchor, compile -> MasterExecutionPlan; 38 engine tests, thali start 18:39 -> serve 19:30). NEXT: item 6 — deriveViewState(plan) (active = not-completed AND deps all completed; archive = completed; queue = rest; sort active/queue by plannedStart; nextStartAlert) AND replace the web app placeholder derivation with deriveViewState(compile([...]))."
 }

@@ -1,58 +1,69 @@
 import { useMemo, useState } from "react";
-import { thaliV1, validate, type TaskNode } from "@tutti/engine";
+import {
+  compile,
+  deriveViewState,
+  formatClock,
+  parseClock,
+  thaliV1,
+  type MasterExecutionPlan,
+  type TaskNode,
+} from "@tutti/engine";
 
-// SCAFFOLD seed of Cook Mode. It renders the three-tier NOW / NEXT / DONE structure
-// (Doc 7 §8) from the golden thali so the UX shell + gate markers exist from turn 1.
-// Brief v2 replaces this with a real render of engine deriveViewState().
+// Cook Mode now renders genuine engine output: compile() -> MasterExecutionPlan ->
+// deriveViewState() three-tier NOW / NEXT / DONE (Doc 2 §5.2, Doc 7 §8). Tap-to-Done sets a
+// node completed and re-derives. (applyEvent + live reschedule arrive in Brief v1 items 7-8.)
 
 const DISH_COLORS: Record<string, string> = {
   rec_rice: "#5aa6ff",
   rec_kuzhambu: "#ff8a5b",
   rec_poriyal: "#86cf4d",
 };
+const DISH_NAMES: Record<string, string> = {
+  rec_rice: "Rice",
+  rec_kuzhambu: "Kuzhambu",
+  rec_poriyal: "Poriyal",
+};
 
-function Zone({ label, count, children }: { label: string; count?: number; children: React.ReactNode }) {
-  return (
-    <section className="zone" aria-label={label}>
-      <h2 className="zone-h">
-        <span>{label}</span>
-        {count !== undefined && <span className="count">{count}</span>}
-      </h2>
-      {children}
-    </section>
-  );
-}
+const hhmm = (clock: string) => formatClock(parseClock(clock)).slice(0, 5);
 
-function NodeCard({ node, active, onDone }: { node: TaskNode; active: boolean; onDone: () => void }) {
-  const color = DISH_COLORS[node.recipeId] ?? "var(--accent)";
+function Measures({ node }: { node: TaskNode }) {
+  if (!node.ingredients.length) return null;
   return (
-    <div className={active ? "now-card" : "q-item"}>
-      <span className="swatch" style={{ background: color }} />
-      <span className="node-title">{node.title}</span>
-      <span className="dur">~{node.duration.estMins}m</span>
-      {active && (
-        <button className="btn" onClick={onDone} aria-label={`Mark "${node.title}" done`}>
-          ✓ Done
-        </button>
-      )}
+    <div className="measure">
+      {node.ingredients.map((ing, i) => (
+        <span className="chip" key={i}>
+          {ing.amount !== undefined && <b>{ing.amount}{ing.unit ? ` ${ing.unit}` : ""}</b>} {ing.name}
+        </span>
+      ))}
     </div>
   );
 }
 
+function Tag({ node }: { node: TaskNode }) {
+  return (
+    <span className="tag">
+      <span className="swatch" style={{ background: DISH_COLORS[node.recipeId] ?? "var(--accent)" }} />
+      {DISH_NAMES[node.recipeId] ?? node.recipeId}
+    </span>
+  );
+}
+
 export function App() {
-  const allNodes = useMemo<TaskNode[]>(() => thaliV1.recipes.flatMap((r) => r.nodes), []);
-  const validations = useMemo(() => thaliV1.recipes.map((r) => validate(r)), []);
-  const allValid = validations.every((v) => v.ok);
-  const [done, setDone] = useState<Set<string>>(new Set());
+  const initial = useMemo<MasterExecutionPlan>(
+    () => compile(thaliV1.recipes, thaliV1.kitchenProfile, thaliV1.targetServeTime),
+    [],
+  );
+  const [plan, setPlan] = useState<MasterExecutionPlan>(initial);
+  const view = deriveViewState(plan);
 
-  // Placeholder derivation until the scheduler lands: a node is "active" when all its
-  // dependencies are done; "done" when completed; otherwise it waits in the queue.
-  const isDone = (id: string) => done.has(id);
-  const active = allNodes.filter((n) => !isDone(n.nodeId) && n.dependencies.every(isDone));
-  const queue = allNodes.filter((n) => !isDone(n.nodeId) && !n.dependencies.every(isDone));
-  const archive = allNodes.filter((n) => isDone(n.nodeId));
+  const complete = (id: string) =>
+    setPlan((prev) => ({
+      ...prev,
+      nodes: prev.nodes.map((n) => (n.nodeId === id ? { ...n, status: "completed" as const } : n)),
+    }));
+  const reset = () => setPlan(initial);
 
-  const complete = (id: string) => setDone((prev) => new Set(prev).add(id));
+  const allDone = view.active.length === 0 && view.queue.length === 0;
 
   return (
     <div className="wrap">
@@ -69,43 +80,74 @@ export function App() {
       <div className="clock" role="status">
         <div>
           <div className="lbl">Serving at</div>
-          <div className="time">7:30</div>
+          <div className="time">{hhmm(view.projectedServeTime)}</div>
         </div>
         <div className="status">
-          <span className="dot" /> {allValid ? "On track" : "Check recipes"}
+          <span className="dot" /> start {hhmm(plan.startTime)}
         </div>
       </div>
 
       <p className="value">
-        <b>3 dishes</b> · <span className="strike">91 min separately</span> →{" "}
-        <b>~45 min with Tutti</b>
+        <b>{thaliV1.recipes.length} dishes</b> · <span className="strike">91 min separately</span> →{" "}
+        <b>{plan.criticalPathMins}+ min interleaved</b>
       </p>
 
-      <Zone label="NOW">
-        {active.length ? (
-          active.map((n) => <NodeCard key={n.nodeId} node={n} active onDone={() => complete(n.nodeId)} />)
+      <section className="zone" aria-label="NOW">
+        <h2 className="zone-h"><span>NOW</span></h2>
+        {allDone ? (
+          <div className="finale">
+            <div className="big">Dinner is served</div>
+            <button className="btn" onClick={reset}>Cook it again</button>
+          </div>
+        ) : view.active.length ? (
+          view.active.map((n) => (
+            <div className={n.attention === "passive" ? "now-card passive" : "now-card"} key={n.nodeId}>
+              <div className="now-head">
+                <Tag node={n} />
+                <span className="phase">{n.phase}{n.attention === "passive" ? " · hands-free" : ""}</span>
+              </div>
+              <div className="now-title">{n.title}</div>
+              <Measures node={n} />
+              <div className="act">
+                {n.attention === "passive" ? (
+                  <span className="cooking-label">⏲ runs itself · ~{n.duration.estMins}m</span>
+                ) : (
+                  <button className="btn" onClick={() => complete(n.nodeId)} aria-label={`Mark "${n.title}" done`}>
+                    ✓ Done
+                  </button>
+                )}
+                <span className="dur">~{n.duration.estMins} min</span>
+              </div>
+            </div>
+          ))
         ) : (
-          <div className="idle">All done — dinner is served.</div>
+          <div className="idle"><b>Hands free.</b> Something's cooking — relax a moment.</div>
         )}
-      </Zone>
+      </section>
 
-      <Zone label="NEXT" count={queue.length}>
-        {queue.map((n) => (
-          <NodeCard key={n.nodeId} node={n} active={false} onDone={() => {}} />
+      <section className="zone" aria-label="NEXT">
+        <h2 className="zone-h"><span>NEXT</span><span className="count">{view.queue.length}</span></h2>
+        {view.queue.map((n) => (
+          <div className="q-item" key={n.nodeId}>
+            <span className="swatch" style={{ background: DISH_COLORS[n.recipeId] ?? "var(--accent)" }} />
+            <span className="node-title">{n.title}</span>
+            <span className="dur">~{n.duration.estMins}m</span>
+          </div>
         ))}
-      </Zone>
+      </section>
 
-      <Zone label="DONE" count={archive.length}>
-        {archive.map((n) => (
-          <div key={n.nodeId} className="done-card">
+      <section className="zone" aria-label="DONE">
+        <h2 className="zone-h"><span>DONE</span><span className="count">{view.archive.length}</span></h2>
+        {view.archive.map((n) => (
+          <div className="done-card" key={n.nodeId}>
             <s>{n.title}</s>
           </div>
         ))}
-      </Zone>
+      </section>
 
       <footer className="scaffold-note">
-        Scaffold build · engine validation {allValid ? "passing" : "failing"} · the scheduler &amp; full
-        Cook Mode arrive with Brief v1–v2.
+        Rendering real engine output · compile() → deriveViewState() · live reschedule &amp; voice
+        arrive in later briefs.
       </footer>
     </div>
   );
