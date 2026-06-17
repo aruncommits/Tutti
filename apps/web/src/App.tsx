@@ -4,6 +4,7 @@ import { CookScreen } from "./CookScreen";
 import { KitchenScreen, DEFAULT_KITCHEN, toKitchenProfile, type KitchenUi } from "./KitchenScreen";
 import { OnboardingScreen } from "./OnboardingScreen";
 import { PickScreen, ServeTimeScreen } from "./PlanFlow";
+import { PreviewScreen } from "./PreviewScreen";
 
 const ALL_DISHES = thaliV1.recipes.map((r) => r.recipeId);
 
@@ -36,6 +37,10 @@ export function App() {
   const complete = (id: string) => setPlan((prev) => applyEvent(prev, { type: "complete", nodeId: id, at: "" }));
   const toggleDish = (id: string) =>
     setDishes((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  const buildPlan = () => {
+    setPlan(previewPlan ?? compile(thaliV1.recipes, toKitchenProfile(kitchen), target));
+    setScreen("preview");
+  };
   const startCooking = () => {
     setPlan(previewPlan ?? compile(thaliV1.recipes, toKitchenProfile(kitchen), target));
     setScreen("cook");
@@ -82,8 +87,10 @@ export function App() {
           startTime={previewPlan?.startTime ?? target}
           feasible={feasible}
           earliestServe={earliestServe}
-          onBuild={startCooking}
+          onBuild={buildPlan}
         />
+      ) : screen === "preview" ? (
+        <PreviewScreen plan={plan} onStart={() => setScreen("cook")} onEdit={() => setScreen("pick")} />
       ) : screen === "home" ? (
         <Home onStart={startCooking} onPick={() => setScreen("pick")} onKitchen={() => setScreen("kitchen")} />
       ) : (

@@ -410,6 +410,57 @@ header {
 }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
+/* plan preview gantt */
+.gantt {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 14px 0;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid var(--card-edge);
+  background: var(--card);
+}
+.gantt-row {
+  display: grid;
+  grid-template-columns: 40% 1fr;
+  align-items: center;
+  gap: 10px;
+}
+.gantt-label {
+  font-size: 12.5px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.gantt-track {
+  position: relative;
+  height: 16px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+}
+.gantt-bar {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  border-radius: 5px;
+  min-width: 4px;
+}
+.gantt-bar.passive {
+  opacity: 0.45;
+  background-image: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.25) 0 4px, transparent 4px 8px);
+}
+.finale-line {
+  color: var(--poriyal);
+  font-weight: 500;
+}
+.btn.ghost {
+  flex: 0 0 auto;
+  background: none;
+  border: 1px solid var(--card-edge);
+  color: var(--ink);
+}
 .scaffold-note {
   margin-top: 32px;
   color: var(--faint);
