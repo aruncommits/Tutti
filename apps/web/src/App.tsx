@@ -1,4 +1,4 @@
-import { applyEvent, compile, formatClock, parseClock, thaliV1, type MasterExecutionPlan, type RecipeGraph } from "@tutti/engine";
+import { applyEvent, compile, formatClock, parseClock, scaleRecipe, thaliV1, type MasterExecutionPlan, type RecipeGraph } from "@tutti/engine";
 import { usePersistentState, type Screen } from "./state";
 import { CookScreen } from "./CookScreen";
 import { KitchenScreen, DEFAULT_KITCHEN, toKitchenProfile, type KitchenUi } from "./KitchenScreen";
@@ -19,15 +19,19 @@ export function App() {
   const [pro, setPro] = usePersistentState<boolean>("tutti.pro", false);
   const [candidates, setCandidates] = usePersistentState<RecipeGraph[]>("tutti.candidates", []);
   const [avoid, setAvoid] = usePersistentState<string[]>("tutti.avoid", []);
+  const [servingsFactor, setServingsFactor] = usePersistentState<Record<string, number>>("tutti.servingsFactor", {});
   const allRecipes = [...thaliV1.recipes, ...candidates];
   const toggleAvoid = (a: string) => setAvoid((p) => (p.includes(a) ? p.filter((x) => x !== a) : [...p, a]));
+  const factorOf = (id: string) => servingsFactor[id] ?? 1;
+  const setFactor = (id: string, f: number) => setServingsFactor((p) => ({ ...p, [id]: f }));
+  const scaled = (r: RecipeGraph) => (factorOf(r.recipeId) === 1 ? r : scaleRecipe(r, factorOf(r.recipeId)));
   const [plan, setPlan] = usePersistentState<MasterExecutionPlan>(
     "tutti.plan",
     compile(thaliV1.recipes, thaliV1.kitchenProfile, thaliV1.targetServeTime),
   );
 
   // live preview for the pick/serve-time screens (pure, cheap to recompute)
-  const selectedRecipes = allRecipes.filter((r) => dishes.includes(r.recipeId));
+  const selectedRecipes = allRecipes.filter((r) => dishes.includes(r.recipeId)).map(scaled);
   const previewPlan = selectedRecipes.length
     ? compile(selectedRecipes, toKitchenProfile(kitchen), target)
     : null;
@@ -98,6 +102,8 @@ export function App() {
           onAdd={() => setScreen("addRecipe")}
           onShopping={() => setScreen("shopping")}
           avoid={avoid}
+          factorOf={factorOf}
+          onSetFactor={setFactor}
           onNext={() => setScreen("serveTime")}
         />
       ) : screen === "serveTime" ? (

@@ -15,6 +15,8 @@ export function PickScreen({
   onAdd,
   onShopping,
   avoid,
+  factorOf,
+  onSetFactor,
   onNext,
 }: {
   recipes: RecipeGraph[];
@@ -25,28 +27,39 @@ export function PickScreen({
   onAdd: () => void;
   onShopping: () => void;
   avoid: string[];
+  factorOf: (id: string) => number;
+  onSetFactor: (id: string, f: number) => void;
   onNext: () => void;
 }) {
+  const FACTORS = [1, 2, 3];
   return (
     <section className="zone" aria-label="Pick your dishes">
       <h2 className="zone-h"><span>Pick your dishes</span><span className="count">{selected.length}</span></h2>
       {recipes.map((r) => {
         const on = selected.includes(r.recipeId);
         const hits = avoid.length ? allergensOf(r).filter((a) => avoid.includes(a)) : [];
+        const factor = factorOf(r.recipeId);
         return (
-          <button
-            key={r.recipeId}
-            className={`pick-row${on ? " on" : ""}`}
-            role="checkbox"
-            aria-checked={on}
-            onClick={() => onToggle(r.recipeId)}
-          >
-            <span className="pick-box">{on ? "✓" : ""}</span>
-            <span className="node-title">{r.name}</span>
-            {hits.length > 0 && <span className="badge-allergen" title="may contain">⚠ {hits.join(", ")}</span>}
-            {!r.verified && <span className="badge-unverified">unverified</span>}
-            <span className="dur">{soloMinutes(r)}m</span>
-          </button>
+          <div key={r.recipeId} className={`pick-row${on ? " on" : ""}`}>
+            <button className="pick-main" role="checkbox" aria-checked={on} onClick={() => onToggle(r.recipeId)}>
+              <span className="pick-box">{on ? "✓" : ""}</span>
+              <span className="node-title">{r.name}</span>
+              {hits.length > 0 && <span className="badge-allergen" title="may contain">⚠ {hits.join(", ")}</span>}
+              {!r.verified && <span className="badge-unverified">unverified</span>}
+              <span className="dur">{soloMinutes(r)}m</span>
+            </button>
+            <div className="serve-scale" aria-label={`Servings for ${r.name}`}>
+              <span className="serve-label">serves {Math.round(r.servings * factor)}{factor !== 1 ? " · seasoning adjusted" : ""}</span>
+              <span className="scale-btns">
+                {FACTORS.map((f) => (
+                  <button key={f} className={`scale-btn${factor === f ? " on" : ""}`} aria-pressed={factor === f}
+                    onClick={(e) => { e.stopPropagation(); onSetFactor(r.recipeId, f); }}>
+                    {f}×
+                  </button>
+                ))}
+              </span>
+            </div>
+          </div>
         );
       })}
       <button className="add-dish" onClick={onAdd}>+ Add a dish (paste · find online · AI)</button>
