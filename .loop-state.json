@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 33,
-  "lastTick": "2026-06-18T03:22:39.3915220+08:00",
-  "lastTickEpoch": 1781724159,
+  "iteration": 34,
+  "lastTick": "2026-06-18T03:27:35.1970457+08:00",
+  "lastTickEpoch": 1781724455,
   "phase": "brief-v5-handsfree-voice",
-  "nextResearchTheme": "Brief v5 items 1-2 done (parseVoiceCommand + useSpeech; 123 tests). NEXT: item 3 - wire voice into CookScreen: a tap-to-talk mic toggle in the header (only when useSpeech.supported); onCommand -> parseVoiceCommand; complete/next -> onComplete(first active non-passive NOW task, or ask if 2+ active); status -> speechSynthesis speak NOW + serve time; howLong/repeat -> speak; pause -> stop; spoken confirmation on complete; big Done button always remains; aria-live listening indicator. Then item 4 (surface adaptive pace) + item 5 (tests)."
+  "nextResearchTheme": "Brief v5 items 1-3 done (parseVoiceCommand, useSpeech, voice wired into Cook Mode w/ fallback; 123 tests). NEXT: item 4 - surface adaptive pace model: persist a PaceModel (tutti.pace), on each completion record actual-vs-planned and updatePace(category from paceCategoryOf), pass the model into compile() so elastic estimates adjust; show a small explainable line (e.g. 'Padding prep ~20% - you run a little slow') in the cook header or a settings line. Then item 5 - tests (CookScreen mic renders with mocked SpeechRecognition; fallback Done present)."
 }

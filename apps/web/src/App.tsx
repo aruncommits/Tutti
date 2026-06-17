@@ -1,4 +1,4 @@
-import { applyEvent, compile, formatClock, parseClock, scaleRecipe, thaliV1, type MasterExecutionPlan, type RecipeGraph } from "@tutti/engine";
+import { applyEvent, compile, formatClock, parseClock, scaleRecipe, thaliV1, type MasterExecutionPlan, type PaceModel, type RecipeGraph } from "@tutti/engine";
 import { usePersistentState, type Screen } from "./state";
 import { CookScreen } from "./CookScreen";
 import { KitchenScreen, DEFAULT_KITCHEN, toKitchenProfile, type KitchenUi } from "./KitchenScreen";
@@ -20,6 +20,11 @@ export function App() {
   const [candidates, setCandidates] = usePersistentState<RecipeGraph[]>("tutti.candidates", []);
   const [avoid, setAvoid] = usePersistentState<string[]>("tutti.avoid", []);
   const [servingsFactor, setServingsFactor] = usePersistentState<Record<string, number>>("tutti.servingsFactor", {});
+  // Adaptive pace model (Doc 2 §7): per-category multipliers learned from the user's own cooks.
+  // Fed into compile() so elastic estimates adjust. Populated by telemetry in the learning loop
+  // (Brief v6) — kept honest here: empty until real data exists, so it's identity by default.
+  const [pace] = usePersistentState<PaceModel>("tutti.pace", {});
+  const paceAdjusted = Object.entries(pace).filter(([, m]) => Math.abs(m - 1) > 0.05);
   const allRecipes = [...thaliV1.recipes, ...candidates];
   const toggleAvoid = (a: string) => setAvoid((p) => (p.includes(a) ? p.filter((x) => x !== a) : [...p, a]));
   const factorOf = (id: string) => servingsFactor[id] ?? 1;
@@ -27,13 +32,13 @@ export function App() {
   const scaled = (r: RecipeGraph) => (factorOf(r.recipeId) === 1 ? r : scaleRecipe(r, factorOf(r.recipeId)));
   const [plan, setPlan] = usePersistentState<MasterExecutionPlan>(
     "tutti.plan",
-    compile(thaliV1.recipes, thaliV1.kitchenProfile, thaliV1.targetServeTime),
+    compile(thaliV1.recipes, thaliV1.kitchenProfile, thaliV1.targetServeTime, pace),
   );
 
   // live preview for the pick/serve-time screens (pure, cheap to recompute)
   const selectedRecipes = allRecipes.filter((r) => dishes.includes(r.recipeId)).map(scaled);
   const previewPlan = selectedRecipes.length
-    ? compile(selectedRecipes, toKitchenProfile(kitchen), target)
+    ? compile(selectedRecipes, toKitchenProfile(kitchen), target, pace)
     : null;
   const soloMins = selectedRecipes.reduce((a, r) => a + r.nodes.reduce((s, n) => s + n.duration.estMins, 0), 0);
   const makespan = previewPlan ? parseClock(previewPlan.projectedServeTime) - parseClock(previewPlan.startTime) : 0;
@@ -55,15 +60,15 @@ export function App() {
     setScreen("pick");
   };
   const buildPlan = () => {
-    setPlan(previewPlan ?? compile(thaliV1.recipes, toKitchenProfile(kitchen), target));
+    setPlan(previewPlan ?? compile(thaliV1.recipes, toKitchenProfile(kitchen), target, pace));
     setScreen("preview");
   };
   const startCooking = () => {
-    setPlan(previewPlan ?? compile(thaliV1.recipes, toKitchenProfile(kitchen), target));
+    setPlan(previewPlan ?? compile(thaliV1.recipes, toKitchenProfile(kitchen), target, pace));
     setScreen("cook");
   };
   const reset = () => {
-    setPlan(previewPlan ?? compile(thaliV1.recipes, toKitchenProfile(kitchen), target));
+    setPlan(previewPlan ?? compile(thaliV1.recipes, toKitchenProfile(kitchen), target, pace));
     setScreen("home");
   };
 
@@ -124,6 +129,12 @@ export function App() {
           onKitchen={() => setScreen("kitchen")}
           pro={pro}
           onTogglePro={() => setPro(!pro)}
+          paceNote={
+            paceAdjusted.length
+              ? "Calibrated to your pace: " +
+                paceAdjusted.map(([c, m]) => `${c} ${m > 1 ? "+" : ""}${Math.round((m - 1) * 100)}%`).join(", ")
+              : null
+          }
         />
       ) : (
         <Stub screen={screen} onBack={() => setScreen("home")} onCook={startCooking} />
@@ -142,16 +153,19 @@ function Home({
   onKitchen,
   pro,
   onTogglePro,
+  paceNote,
 }: {
   onStart: () => void;
   onPick: () => void;
   onKitchen: () => void;
   pro: boolean;
   onTogglePro: () => void;
+  paceNote: string | null;
 }) {
   return (
     <section className="zone" aria-label="Home">
       <p className="value">A South Indian thali — three dishes, all hot together in about 45 minutes.</p>
+      {paceNote && <p className="hint">{paceNote}</p>}
       <button className="btn big-btn" onClick={onStart}>Start cooking</button>
       <div className="home-links">
         <button className="link" onClick={onPick}>Pick dishes</button>
