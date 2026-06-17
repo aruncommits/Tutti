@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 11,
-  "lastTick": "2026-06-18T01:37:13.5765445+08:00",
-  "lastTickEpoch": 1781717834,
+  "iteration": 12,
+  "lastTick": "2026-06-18T01:42:43.1395009+08:00",
+  "lastTickEpoch": 1781718163,
   "phase": "brief-v2-single-recipe-ui",
-  "nextResearchTheme": "PHASE 1 COMPLETE (full engine, 67 tests, six invariants). Research pass done; Brief v2 authored. NEXT: Brief v2 item 1 — app shell/screen state machine (onboarding->kitchen->home->pick->serveTime->preview->cook->done) with localStorage persistence, keeping deriveViewState as the cook-screen source."
+  "nextResearchTheme": "Brief v2 item 1 done (app shell + screen state machine + localStorage persistence; cook view extracted to CookScreen, surfaces nextStartAlert/runningLate; verified in browser). Also fixed a masked-gate typecheck regression. NEXT: Brief v2 item 2 — Kitchen Profile screen (Level-0 +/- steppers + toggles for cooks/burners/oven/pressure cooker/microwave/blender/cutting boards/counter), persist to localStorage, feed into compile()."
 }

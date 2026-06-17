@@ -1,27 +1,28 @@
-import { useMemo } from "react";
 import { applyEvent, compile, thaliV1, type MasterExecutionPlan } from "@tutti/engine";
 import { usePersistentState, type Screen } from "./state";
 import { CookScreen } from "./CookScreen";
+import { KitchenScreen, DEFAULT_KITCHEN, toKitchenProfile, type KitchenUi } from "./KitchenScreen";
 
 // App shell + screen state machine (Brief v2 item 1). Screen + plan persist to localStorage so an
 // in-progress cook survives reload (Doc 1 P4). Most screens are stubs filled by items 2-9; the
 // cook screen is already the real engine render.
 
 export function App() {
-  const initialPlan = useMemo<MasterExecutionPlan>(
-    () => compile(thaliV1.recipes, thaliV1.kitchenProfile, thaliV1.targetServeTime),
-    [],
-  );
   const [screen, setScreen] = usePersistentState<Screen>("tutti.screen", "home");
-  const [plan, setPlan] = usePersistentState<MasterExecutionPlan>("tutti.plan", initialPlan);
+  const [kitchen, setKitchen] = usePersistentState<KitchenUi>("tutti.kitchen", DEFAULT_KITCHEN);
+  const [plan, setPlan] = usePersistentState<MasterExecutionPlan>(
+    "tutti.plan",
+    compile(thaliV1.recipes, thaliV1.kitchenProfile, thaliV1.targetServeTime),
+  );
 
   const complete = (id: string) => setPlan((prev) => applyEvent(prev, { type: "complete", nodeId: id, at: "" }));
   const startCooking = () => {
-    setPlan(initialPlan);
+    // compile with the user's current kitchen so changes (e.g. burner count) take effect.
+    setPlan(compile(thaliV1.recipes, toKitchenProfile(kitchen), thaliV1.targetServeTime));
     setScreen("cook");
   };
   const reset = () => {
-    setPlan(initialPlan);
+    setPlan(compile(thaliV1.recipes, toKitchenProfile(kitchen), thaliV1.targetServeTime));
     setScreen("home");
   };
 
@@ -39,6 +40,8 @@ export function App() {
 
       {screen === "cook" ? (
         <CookScreen plan={plan} onComplete={complete} onReset={reset} />
+      ) : screen === "kitchen" ? (
+        <KitchenScreen kitchen={kitchen} onChange={setKitchen} onDone={() => setScreen("home")} />
       ) : screen === "home" ? (
         <Home onStart={startCooking} onPick={() => setScreen("pick")} onKitchen={() => setScreen("kitchen")} />
       ) : (
