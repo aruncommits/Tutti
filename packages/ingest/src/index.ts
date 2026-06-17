@@ -3,3 +3,4 @@ export * from "./parser.interface";
 export { MockParser } from "./mock.parser";
 export { buildDraftGraph, parseIngredient } from "./draft";
 export { extractJsonLdRecipe, type JsonLdResult } from "./jsonld";
+export { draftFromText, PasteParser } from "./text";

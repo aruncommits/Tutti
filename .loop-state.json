@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 18,
-  "lastTick": "2026-06-18T02:12:23.1414815+08:00",
-  "lastTickEpoch": 1781719943,
+  "iteration": 19,
+  "lastTick": "2026-06-18T02:16:17.6333418+08:00",
+  "lastTickEpoch": 1781720178,
   "phase": "brief-v3-recipe-ingestion",
-  "nextResearchTheme": "PHASE 2 COMPLETE (full single-recipe flow, 72 tests incl. web a11y gate). Brief v3 authored (recipe ingestion). NEXT: Brief v3 item 1 — JSON-LD recipe extractor in @tutti/ingest (extractJsonLdRecipe(html): parse application/ld+json, map Recipe name/recipeIngredient/recipeInstructions to draft nodes), unit-tested against a fixture. Key-free."
+  "nextResearchTheme": "Brief v3 item 1 done (JSON-LD extractor + draft builder; 78 tests). NEXT: item 2 — heuristic text->draft parser: draftFromText(text) splitting pasted recipe text into ingredient lines vs step lines (e.g. detect an 'Ingredients:'/'Method:' split or bullet/number lists), then buildDraftGraph + validate(); upgrade MockParser/add a real PasteParser. Key-free."
 }
