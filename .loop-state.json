@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 20,
-  "lastTick": "2026-06-18T02:20:31.1944852+08:00",
-  "lastTickEpoch": 1781720431,
+  "iteration": 21,
+  "lastTick": "2026-06-18T02:26:37.9080269+08:00",
+  "lastTickEpoch": 1781720798,
   "phase": "brief-v3-recipe-ingestion",
-  "nextResearchTheme": "Brief v3 items 1-2 done (JSON-LD extractor + heuristic text parser/PasteParser; 84 tests). NEXT: item 3 — AiParser behind ANTHROPIC_API_KEY (Doc 5 §3 prompt + tool/structured output bound to RecipeGraph schema; validate() repair loop, one retry then manual; if no key, AiParser.available=false and UI uses paste/JSON-LD). Keep all network/LLM out of @tutti/engine; gate must not need a key (mock the call in tests)."
+  "nextResearchTheme": "Brief v3 items 1-3 done (JSON-LD extractor, text PasteParser, AiParser behind .env w/ repair loop, SDK kept out of browser bundle; 88 tests). NEXT: item 4 — URL fetch pipeline fetchRecipeFromUrl(url): fetch HTML, try extractJsonLdRecipe, else draftFromText (or AiParser if key); robots/ToS caveat in comments. Node-only (in @tutti/ingest/ai or a url module). Then item 5 Add-dish UI (Paste/Find online/Ask AI), item 6 validation feedback, item 7 tests."
 }
