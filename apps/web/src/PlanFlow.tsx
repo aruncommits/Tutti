@@ -1,4 +1,4 @@
-import { formatClock, parseClock, type RecipeGraph } from "@tutti/engine";
+import { allergensOf, formatClock, parseClock, type RecipeGraph } from "@tutti/engine";
 
 // Pick dishes (Doc 7 §5) + Set serve time (Doc 7 §6). The "X min separately -> Y min with Tutti"
 // delta is the value proposition shown before the user commits.
@@ -14,6 +14,7 @@ export function PickScreen({
   interleavedMins,
   onAdd,
   onShopping,
+  avoid,
   onNext,
 }: {
   recipes: RecipeGraph[];
@@ -23,6 +24,7 @@ export function PickScreen({
   interleavedMins: number;
   onAdd: () => void;
   onShopping: () => void;
+  avoid: string[];
   onNext: () => void;
 }) {
   return (
@@ -30,6 +32,7 @@ export function PickScreen({
       <h2 className="zone-h"><span>Pick your dishes</span><span className="count">{selected.length}</span></h2>
       {recipes.map((r) => {
         const on = selected.includes(r.recipeId);
+        const hits = avoid.length ? allergensOf(r).filter((a) => avoid.includes(a)) : [];
         return (
           <button
             key={r.recipeId}
@@ -40,6 +43,7 @@ export function PickScreen({
           >
             <span className="pick-box">{on ? "✓" : ""}</span>
             <span className="node-title">{r.name}</span>
+            {hits.length > 0 && <span className="badge-allergen" title="may contain">⚠ {hits.join(", ")}</span>}
             {!r.verified && <span className="badge-unverified">unverified</span>}
             <span className="dur">{soloMinutes(r)}m</span>
           </button>

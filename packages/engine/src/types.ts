@@ -56,6 +56,8 @@ export interface RecipeGraph {
   verified: boolean;
   cuisine?: string;
   source?: string;
+  /** explicit allergen tags (14 EU vocabulary); when absent, detectAllergens() infers them. */
+  allergens?: string[];
   nodes: TaskNode[];
 }
 

@@ -18,7 +18,9 @@ export function App() {
   const [target, setTarget] = usePersistentState<string>("tutti.target", thaliV1.targetServeTime);
   const [pro, setPro] = usePersistentState<boolean>("tutti.pro", false);
   const [candidates, setCandidates] = usePersistentState<RecipeGraph[]>("tutti.candidates", []);
+  const [avoid, setAvoid] = usePersistentState<string[]>("tutti.avoid", []);
   const allRecipes = [...thaliV1.recipes, ...candidates];
+  const toggleAvoid = (a: string) => setAvoid((p) => (p.includes(a) ? p.filter((x) => x !== a) : [...p, a]));
   const [plan, setPlan] = usePersistentState<MasterExecutionPlan>(
     "tutti.plan",
     compile(thaliV1.recipes, thaliV1.kitchenProfile, thaliV1.targetServeTime),
@@ -81,7 +83,7 @@ export function App() {
       {screen === "cook" ? (
         <CookScreen plan={plan} pro={pro} onComplete={complete} onUndo={undo} onReset={reset} />
       ) : screen === "kitchen" ? (
-        <KitchenScreen kitchen={kitchen} onChange={setKitchen} onDone={() => setScreen("home")} />
+        <KitchenScreen kitchen={kitchen} onChange={setKitchen} avoid={avoid} onToggleAvoid={toggleAvoid} onDone={() => setScreen("home")} />
       ) : screen === "addRecipe" ? (
         <AddRecipe onAdd={addCandidate} onBack={() => setScreen("home")} />
       ) : screen === "shopping" ? (
@@ -95,6 +97,7 @@ export function App() {
           interleavedMins={makespan}
           onAdd={() => setScreen("addRecipe")}
           onShopping={() => setScreen("shopping")}
+          avoid={avoid}
           onNext={() => setScreen("serveTime")}
         />
       ) : screen === "serveTime" ? (

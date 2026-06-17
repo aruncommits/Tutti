@@ -452,6 +452,16 @@ header {
   font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--accent-deep);
   border: 1px solid var(--accent-deep); border-radius: 20px; padding: 1px 8px;
 }
+.badge-allergen {
+  font-size: 11px; color: var(--accent-deep); background: rgba(232,98,61,.12);
+  border: 1px solid var(--accent-deep); border-radius: 20px; padding: 1px 8px; white-space: nowrap;
+}
+.allergen-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 4px; }
+.chip-toggle {
+  padding: 6px 11px; border-radius: 20px; border: 1px solid var(--card-edge);
+  background: var(--bg2); color: var(--muted); cursor: pointer; font-size: 13px; text-transform: capitalize;
+}
+.chip-toggle.on { background: rgba(232,98,61,.15); color: var(--accent); border-color: var(--accent-deep); }
 .add-dish {
   width: 100%; margin: 6px 0 4px; padding: 13px; border-radius: 12px; cursor: pointer;
   border: 1px dashed var(--card-edge); background: none; color: var(--accent); font-size: 14px;

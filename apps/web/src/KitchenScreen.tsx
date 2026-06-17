@@ -1,4 +1,4 @@
-import type { KitchenProfile } from "@tutti/engine";
+import { ALLERGENS, type KitchenProfile } from "@tutti/engine";
 
 // Kitchen Profile (Doc 7 §3) — Level-0 coarse counts the resource allocator reads. Fast taps,
 // no typing. Sensible defaults so a user can skip and cook immediately.
@@ -68,10 +68,14 @@ function Toggle({ label, on, onToggle }: { label: string; on: boolean; onToggle:
 export function KitchenScreen({
   kitchen,
   onChange,
+  avoid,
+  onToggleAvoid,
   onDone,
 }: {
   kitchen: KitchenUi;
   onChange: (k: KitchenUi) => void;
+  avoid: string[];
+  onToggleAvoid: (allergen: string) => void;
   onDone: () => void;
 }) {
   const set = <K extends keyof KitchenUi>(key: K, value: KitchenUi[K]) => onChange({ ...kitchen, [key]: value });
@@ -98,6 +102,17 @@ export function KitchenScreen({
           </div>
         </div>
       </div>
+
+      <h2 className="zone-h" style={{ marginTop: 18 }}><span>Allergens to avoid</span></h2>
+      <p className="hint">We'll warn you when a chosen dish may contain one of these.</p>
+      <div className="allergen-chips">
+        {ALLERGENS.map((a) => (
+          <button key={a} className={`chip-toggle${avoid.includes(a) ? " on" : ""}`} role="switch" aria-checked={avoid.includes(a)} aria-label={`avoid ${a}`} onClick={() => onToggleAvoid(a)}>
+            {a}
+          </button>
+        ))}
+      </div>
+
       <button className="btn big-btn" onClick={onDone}>Save kitchen</button>
     </section>
   );
