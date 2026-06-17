@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 19,
-  "lastTick": "2026-06-18T02:16:17.6333418+08:00",
-  "lastTickEpoch": 1781720178,
+  "iteration": 20,
+  "lastTick": "2026-06-18T02:20:31.1944852+08:00",
+  "lastTickEpoch": 1781720431,
   "phase": "brief-v3-recipe-ingestion",
-  "nextResearchTheme": "Brief v3 item 1 done (JSON-LD extractor + draft builder; 78 tests). NEXT: item 2 — heuristic text->draft parser: draftFromText(text) splitting pasted recipe text into ingredient lines vs step lines (e.g. detect an 'Ingredients:'/'Method:' split or bullet/number lists), then buildDraftGraph + validate(); upgrade MockParser/add a real PasteParser. Key-free."
+  "nextResearchTheme": "Brief v3 items 1-2 done (JSON-LD extractor + heuristic text parser/PasteParser; 84 tests). NEXT: item 3 — AiParser behind ANTHROPIC_API_KEY (Doc 5 §3 prompt + tool/structured output bound to RecipeGraph schema; validate() repair loop, one retry then manual; if no key, AiParser.available=false and UI uses paste/JSON-LD). Keep all network/LLM out of @tutti/engine; gate must not need a key (mock the call in tests)."
 }
