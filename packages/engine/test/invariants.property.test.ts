@@ -13,8 +13,10 @@ import {
   nodeRequirements,
   capacityOf,
   parseClock,
+  type Attention,
   type KitchenProfile,
   type MasterExecutionPlan,
+  type Phase,
   type RecipeGraph,
   type TaskNode,
 } from "../src/index";
@@ -26,8 +28,8 @@ const TARGET = "20:00:00";
 // ── Generators: random VALID (acyclic) graphs + feasible kitchens ────────────
 // A node only depends on earlier-indexed nodes (depSeed bitmask) → guaranteed acyclic.
 const nodeSpec = fc.record({
-  phase: fc.constantFrom("prep", "cook", "serve"),
-  attention: fc.constantFrom("active", "passive"),
+  phase: fc.constantFrom<Phase[]>("prep", "cook", "serve"),
+  attention: fc.constantFrom<Attention[]>("active", "passive"),
   est: fc.integer({ min: 1, max: 20 }),
   elastic: fc.boolean(),
   cats: fc.subarray([...CATS]),
