@@ -477,6 +477,21 @@ header {
   color: var(--poriyal);
   font-weight: 500;
 }
+.nudge {
+  margin: 12px 0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(134, 207, 77, 0.1);
+  border: 1px solid rgba(134, 207, 77, 0.4);
+  color: var(--ink);
+  font-size: 14px;
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
 .btn.ghost {
   flex: 0 0 auto;
   background: none;

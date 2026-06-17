@@ -14,6 +14,7 @@ export function App() {
   const [kitchen, setKitchen] = usePersistentState<KitchenUi>("tutti.kitchen", DEFAULT_KITCHEN);
   const [dishes, setDishes] = usePersistentState<string[]>("tutti.dishes", ALL_DISHES);
   const [target, setTarget] = usePersistentState<string>("tutti.target", thaliV1.targetServeTime);
+  const [pro, setPro] = usePersistentState<boolean>("tutti.pro", false);
   const [plan, setPlan] = usePersistentState<MasterExecutionPlan>(
     "tutti.plan",
     compile(thaliV1.recipes, thaliV1.kitchenProfile, thaliV1.targetServeTime),
@@ -69,7 +70,7 @@ export function App() {
       </header>
 
       {screen === "cook" ? (
-        <CookScreen plan={plan} onComplete={complete} onUndo={undo} onReset={reset} />
+        <CookScreen plan={plan} pro={pro} onComplete={complete} onUndo={undo} onReset={reset} />
       ) : screen === "kitchen" ? (
         <KitchenScreen kitchen={kitchen} onChange={setKitchen} onDone={() => setScreen("home")} />
       ) : screen === "pick" ? (
@@ -93,7 +94,13 @@ export function App() {
       ) : screen === "preview" ? (
         <PreviewScreen plan={plan} onStart={() => setScreen("cook")} onEdit={() => setScreen("pick")} />
       ) : screen === "home" ? (
-        <Home onStart={startCooking} onPick={() => setScreen("pick")} onKitchen={() => setScreen("kitchen")} />
+        <Home
+          onStart={startCooking}
+          onPick={() => setScreen("pick")}
+          onKitchen={() => setScreen("kitchen")}
+          pro={pro}
+          onTogglePro={() => setPro(!pro)}
+        />
       ) : (
         <Stub screen={screen} onBack={() => setScreen("home")} onCook={startCooking} />
       )}
@@ -105,7 +112,19 @@ export function App() {
   );
 }
 
-function Home({ onStart, onPick, onKitchen }: { onStart: () => void; onPick: () => void; onKitchen: () => void }) {
+function Home({
+  onStart,
+  onPick,
+  onKitchen,
+  pro,
+  onTogglePro,
+}: {
+  onStart: () => void;
+  onPick: () => void;
+  onKitchen: () => void;
+  pro: boolean;
+  onTogglePro: () => void;
+}) {
   return (
     <section className="zone" aria-label="Home">
       <p className="value">A South Indian thali — three dishes, all hot together in about 45 minutes.</p>
@@ -113,6 +132,12 @@ function Home({ onStart, onPick, onKitchen }: { onStart: () => void; onPick: () 
       <div className="home-links">
         <button className="link" onClick={onPick}>Pick dishes</button>
         <button className="link" onClick={onKitchen}>Your kitchen</button>
+      </div>
+      <div className="kp-row" style={{ marginTop: 16 }}>
+        <span className="kp-label">Pro mode<br /><small style={{ color: "var(--faint)" }}>interleave prep &amp; cook freely; no nudges</small></span>
+        <button className={`kp-toggle${pro ? " on" : ""}`} role="switch" aria-checked={pro} aria-label="Pro mode" onClick={onTogglePro}>
+          {pro ? "On" : "Off"}
+        </button>
       </div>
     </section>
   );

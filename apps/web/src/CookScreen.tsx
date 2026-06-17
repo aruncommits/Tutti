@@ -38,17 +38,24 @@ function Measures({ node }: { node: TaskNode }) {
 
 export function CookScreen({
   plan,
+  pro = false,
   onComplete,
   onUndo,
   onReset,
 }: {
   plan: MasterExecutionPlan;
+  pro?: boolean;
   onComplete: (id: string) => void;
   onUndo: (id: string) => void;
   onReset: () => void;
 }) {
   const view = deriveViewState(plan);
   const allDone = view.active.length === 0 && view.queue.length === 0;
+
+  // Guided-not-gated (Doc 7 §9): a gentle nudge — never a wall — when cook steps are ready while
+  // prep tasks remain. Pro mode silences it and lets prep/cook interleave without commentary.
+  const showNudge =
+    !pro && view.active.some((n) => n.phase === "cook") && view.queue.concat(view.active).some((n) => n.phase === "prep");
 
   // UI-only countdowns for passive tasks the cook has started (seconds remaining, floored at 0).
   const [remaining, setRemaining] = useState<Record<string, number>>({});
@@ -91,6 +98,9 @@ export function CookScreen({
       </div>
 
       {view.nextStartAlert && <p className="alert">{view.nextStartAlert}</p>}
+      {showNudge && (
+        <p className="nudge">Prep's basically done 👍 cook steps are ready — you can keep prepping as you go.</p>
+      )}
 
       <section className="zone" aria-label="NOW">
         <h2 className="zone-h"><span>NOW</span></h2>

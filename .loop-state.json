@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 15,
-  "lastTick": "2026-06-18T01:57:04.0700941+08:00",
-  "lastTickEpoch": 1781719024,
+  "iteration": 16,
+  "lastTick": "2026-06-18T02:01:35.4940582+08:00",
+  "lastTickEpoch": 1781719296,
   "phase": "brief-v2-single-recipe-ui",
-  "nextResearchTheme": "Brief v2 items 1-5 done (full pre-cook flow + plan-preview Gantt visualizing interleaving, verified). NEXT: item 6 — polished cook view: passive tasks as live countdown timers (start -> ticking remaining), nextStartAlert prominent, amber clock when runningLate, Screen Wake Lock API to keep screen awake, undo from archive (long-press/tap -> applyEvent undo). Then items 7-9 (session persistence verify, guided-not-gated, a11y)."
+  "nextResearchTheme": "Brief v2 items 1-6 done (full flow + polished cook view: passive countdowns, wake lock, undo; verified). NEXT: item 7 — verify session persistence across reload (plan + screen restore mid-cook); item 8 — guided-not-gated phase nudge ('prep basically done — start cooking?') + Pro-mode toggle; item 9 — accessibility pass (large type/contrast defaults, >=44px targets, ARIA, reduced-motion) + a gate a11y assertion. Then research + author Brief v3 (recipe ingestion)."
 }
