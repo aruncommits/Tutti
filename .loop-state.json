@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 30,
-  "lastTick": "2026-06-18T03:12:19.6245931+08:00",
-  "lastTickEpoch": 1781723540,
-  "phase": "brief-v4-multi-dish",
-  "nextResearchTheme": "Brief v4 items 1,2,3,4,5,6 done (scale + servings UI, shopping + screen, allergens, multi-dish color; all verified; 113 tests). NEXT: item 7 (FINAL v4) - web component tests: PickScreen shows the allergen warning for an avoided allergen, and ShoppingScreen renders a merged line; keep gate green. Then Brief v4 DONE -> web-research (Web Speech reliability/wake-word, pace UX) -> author Research-Brief-v5-handsfree-voice.md (Doc 3 Phase 4)."
+  "iteration": 31,
+  "lastTick": "2026-06-18T03:16:14.3104176+08:00",
+  "lastTickEpoch": 1781723774,
+  "phase": "brief-v5-handsfree-voice",
+  "nextResearchTheme": "PHASE complete: Brief v4 done (multi-dish/scaling/shopping/allergens; 116 tests). Brief v5 authored (voice + pace). NEXT: Brief v5 item 1 - parseVoiceCommand(transcript) pure parser mapping done/next/finished->complete, whats next->status, how long->howLong, again/repeat->repeat, hold on/pause->pause, else unknown; unit-tested. Then useSpeech hook, wire voice into Cook Mode, surface pace model, tests."
 }
