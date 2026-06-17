@@ -457,6 +457,25 @@ header {
   border: 1px dashed var(--card-edge); background: none; color: var(--accent); font-size: 14px;
 }
 
+/* shopping list */
+.ing-sec { margin-bottom: 18px; }
+.ing-title { display: flex; align-items: center; gap: 8px; font-weight: 600; margin: 6px 2px 8px; }
+.ing-title .sw { width: 12px; height: 12px; border-radius: 4px; }
+.ing-row {
+  display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+  padding: 11px 14px; border-bottom: 1px solid var(--line); background: none; border-left: none;
+  border-right: none; border-top: none; color: var(--ink); cursor: pointer; font-size: 15px;
+}
+.ing-row .box {
+  width: 22px; height: 22px; border-radius: 6px; border: 1px solid var(--card-edge);
+  display: grid; place-items: center; color: var(--poriyal); font-weight: 700; flex: none;
+}
+.ing-row.tick .nm { text-decoration: line-through; color: var(--faint); }
+.ing-row .nm { flex: 1; }
+.ing-row .for { display: flex; gap: 4px; }
+.ing-row .for .d { width: 9px; height: 9px; border-radius: 50%; }
+.ing-row .amt { color: var(--muted); font-size: 13.5px; white-space: nowrap; }
+
 /* plan preview gantt */
 .gantt {
   display: flex;

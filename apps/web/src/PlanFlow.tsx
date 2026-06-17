@@ -13,6 +13,7 @@ export function PickScreen({
   soloMins,
   interleavedMins,
   onAdd,
+  onShopping,
   onNext,
 }: {
   recipes: RecipeGraph[];
@@ -21,6 +22,7 @@ export function PickScreen({
   soloMins: number;
   interleavedMins: number;
   onAdd: () => void;
+  onShopping: () => void;
   onNext: () => void;
 }) {
   return (
@@ -54,6 +56,9 @@ export function PickScreen({
       <button className="btn big-btn" disabled={selected.length === 0} onClick={onNext}>
         Set serve time
       </button>
+      <div className="home-links">
+        <button className="link" onClick={onShopping}>🛒 Shopping list</button>
+      </div>
     </section>
   );
 }

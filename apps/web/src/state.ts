@@ -7,6 +7,7 @@ export type Screen =
   | "kitchen"
   | "home"
   | "addRecipe"
+  | "shopping"
   | "pick"
   | "serveTime"
   | "preview"

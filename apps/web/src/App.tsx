@@ -6,6 +6,7 @@ import { OnboardingScreen } from "./OnboardingScreen";
 import { PickScreen, ServeTimeScreen } from "./PlanFlow";
 import { PreviewScreen } from "./PreviewScreen";
 import { AddRecipe } from "./AddRecipe";
+import { ShoppingScreen } from "./ShoppingScreen";
 
 const ALL_DISHES = thaliV1.recipes.map((r) => r.recipeId);
 
@@ -83,6 +84,8 @@ export function App() {
         <KitchenScreen kitchen={kitchen} onChange={setKitchen} onDone={() => setScreen("home")} />
       ) : screen === "addRecipe" ? (
         <AddRecipe onAdd={addCandidate} onBack={() => setScreen("home")} />
+      ) : screen === "shopping" ? (
+        <ShoppingScreen recipes={selectedRecipes.length ? selectedRecipes : allRecipes} onBack={() => setScreen("pick")} />
       ) : screen === "pick" ? (
         <PickScreen
           recipes={allRecipes}
@@ -91,6 +94,7 @@ export function App() {
           soloMins={soloMins}
           interleavedMins={makespan}
           onAdd={() => setScreen("addRecipe")}
+          onShopping={() => setScreen("shopping")}
           onNext={() => setScreen("serveTime")}
         />
       ) : screen === "serveTime" ? (
