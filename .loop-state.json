@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 9,
-  "lastTick": "2026-06-18T01:28:35.9580544+08:00",
-  "lastTickEpoch": 1781717316,
+  "iteration": 10,
+  "lastTick": "2026-06-18T01:32:19.6907246+08:00",
+  "lastTickEpoch": 1781717540,
   "phase": "brief-v1-engine-core",
-  "nextResearchTheme": "Brief v1 items 1-8 done (full scheduler incl. live reschedule; 54 engine tests). NEXT: item 9 — adaptive pace EMA (Doc 2 §7): per-category r = alpha*(actual/est)+(1-alpha)*r_prev; at compile scale only elastic nodes by userMultiplier[category]; cold start 1.0 conservative. Need a pace category on nodes or a mapping. Then item 10 — fast-check six-invariant property tests + event-stream simulation, after which run web-research + author Brief v2."
+  "nextResearchTheme": "Brief v1 items 1-9 done (full engine incl. pace EMA; 62 engine tests). NEXT: item 10 (FINAL) — fast-check property tests asserting all six invariants (Doc 2 §9) across random valid DAGs+kitchens after compile/applyEvent/reschedule, plus event-stream simulation (fast/slow/out-of-order). After green -> phase metric met -> run WEB-RESEARCH pass and AUTHOR docs/Research-Brief-v2-single-recipe-ui.md."
 }
