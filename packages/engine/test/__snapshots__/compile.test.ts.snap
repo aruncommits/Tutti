@@ -1,0 +1,609 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`compile — MasterExecutionPlan (Doc 2 §2.4, §4) > matches the golden thali snapshot 1`] = `
+{
+  "criticalPath": [
+    "kz_2",
+    "kz_4",
+    "kz_5",
+  ],
+  "criticalPathMins": 30,
+  "kitchenProfile": {
+    "cooks": 1,
+    "resources": [
+      {
+        "category": "burner",
+        "count": 2,
+      },
+      {
+        "category": "pressure_cooker",
+        "count": 1,
+      },
+      {
+        "category": "cutting_board",
+        "count": 1,
+      },
+      {
+        "capabilities": [
+          "small",
+          "large",
+        ],
+        "category": "pan",
+        "count": 2,
+      },
+    ],
+  },
+  "nodes": [
+    {
+      "attention": "active",
+      "dependencies": [],
+      "duration": {
+        "elastic": true,
+        "estMins": 3,
+        "maxMins": 4,
+        "minMins": 2,
+      },
+      "ingredients": [
+        {
+          "amount": 1.5,
+          "name": "raw rice",
+          "unit": "cup",
+        },
+      ],
+      "nodeId": "ri_1",
+      "phase": "prep",
+      "recipeId": "rec_rice",
+      "resources": [],
+      "status": "locked",
+      "title": "Rinse rice",
+    },
+    {
+      "attention": "passive",
+      "dependencies": [
+        "ri_1",
+      ],
+      "duration": {
+        "elastic": false,
+        "estMins": 20,
+        "maxMins": 24,
+        "minMins": 18,
+      },
+      "ingredients": [
+        {
+          "amount": 1.5,
+          "name": "rinsed rice",
+          "unit": "cup",
+        },
+        {
+          "amount": 3,
+          "name": "water",
+          "unit": "cup",
+        },
+      ],
+      "nodeId": "ri_2",
+      "phase": "cook",
+      "recipeId": "rec_rice",
+      "resources": [
+        {
+          "capabilities": [],
+          "category": "pressure_cooker",
+          "count": 1,
+          "heldFor": "duration",
+        },
+        {
+          "capabilities": [],
+          "category": "burner",
+          "count": 1,
+          "heldFor": "duration",
+        },
+      ],
+      "status": "locked",
+      "title": "Cook rice in pressure cooker",
+    },
+    {
+      "attention": "passive",
+      "dependencies": [
+        "ri_2",
+      ],
+      "duration": {
+        "elastic": false,
+        "estMins": 5,
+        "maxMins": 8,
+        "minMins": 5,
+      },
+      "ingredients": [],
+      "nodeId": "ri_3",
+      "phase": "serve",
+      "recipeId": "rec_rice",
+      "resources": [],
+      "status": "locked",
+      "title": "Rest & fluff rice",
+    },
+    {
+      "attention": "active",
+      "dependencies": [],
+      "duration": {
+        "elastic": false,
+        "estMins": 6,
+        "maxMins": 10,
+        "minMins": 5,
+      },
+      "ingredients": [
+        {
+          "amount": 1,
+          "name": "tamarind",
+          "unit": "lime-size",
+        },
+        {
+          "amount": 1.5,
+          "name": "warm water",
+          "unit": "cup",
+        },
+      ],
+      "nodeId": "kz_1",
+      "phase": "prep",
+      "recipeId": "rec_kuzhambu",
+      "resources": [],
+      "status": "locked",
+      "title": "Soak tamarind & extract pulp",
+    },
+    {
+      "attention": "active",
+      "dependencies": [],
+      "duration": {
+        "elastic": true,
+        "estMins": 7,
+        "maxMins": 11,
+        "minMins": 5,
+      },
+      "ingredients": [
+        {
+          "amount": 8,
+          "name": "baby brinjals",
+          "preparedState": "slit",
+          "unit": "whole",
+        },
+        {
+          "amount": 10,
+          "name": "shallots",
+          "preparedState": "peeled",
+          "unit": "whole",
+        },
+      ],
+      "nodeId": "kz_2",
+      "phase": "prep",
+      "recipeId": "rec_kuzhambu",
+      "resources": [
+        {
+          "capabilities": [],
+          "category": "cutting_board",
+          "count": 1,
+          "heldFor": "duration",
+        },
+      ],
+      "status": "locked",
+      "title": "Slit baby brinjals & shallots",
+    },
+    {
+      "attention": "active",
+      "dependencies": [],
+      "duration": {
+        "elastic": false,
+        "estMins": 3,
+        "maxMins": 4,
+        "minMins": 2,
+      },
+      "ingredients": [
+        {
+          "amount": 2,
+          "name": "sesame oil",
+          "unit": "tbsp",
+        },
+        {
+          "amount": 1,
+          "name": "mustard seeds",
+          "unit": "tsp",
+        },
+        {
+          "amount": 0.5,
+          "name": "fenugreek seeds",
+          "unit": "tsp",
+        },
+        {
+          "amount": 1,
+          "name": "curry leaves",
+          "unit": "sprig",
+        },
+      ],
+      "nodeId": "kz_3",
+      "phase": "cook",
+      "recipeId": "rec_kuzhambu",
+      "resources": [
+        {
+          "capabilities": [],
+          "category": "burner",
+          "count": 1,
+          "heldFor": "duration",
+        },
+        {
+          "capabilities": [
+            "large",
+          ],
+          "category": "pan",
+          "count": 1,
+          "heldFor": "duration",
+        },
+      ],
+      "status": "locked",
+      "title": "Temper mustard, fenugreek & curry leaves",
+    },
+    {
+      "attention": "active",
+      "dependencies": [
+        "kz_2",
+        "kz_3",
+      ],
+      "duration": {
+        "elastic": false,
+        "estMins": 8,
+        "maxMins": 12,
+        "minMins": 6,
+      },
+      "ingredients": [
+        {
+          "amount": 8,
+          "name": "slit brinjals",
+          "unit": "whole",
+        },
+        {
+          "amount": 10,
+          "name": "peeled shallots",
+          "unit": "whole",
+        },
+      ],
+      "nodeId": "kz_4",
+      "phase": "cook",
+      "recipeId": "rec_kuzhambu",
+      "resources": [
+        {
+          "capabilities": [],
+          "category": "burner",
+          "count": 1,
+          "heldFor": "duration",
+        },
+        {
+          "capabilities": [
+            "large",
+          ],
+          "category": "pan",
+          "count": 1,
+          "heldFor": "duration",
+        },
+      ],
+      "status": "locked",
+      "title": "Fry brinjals & shallots",
+    },
+    {
+      "attention": "passive",
+      "dependencies": [
+        "kz_1",
+        "kz_4",
+      ],
+      "duration": {
+        "elastic": false,
+        "estMins": 15,
+        "maxMins": 20,
+        "minMins": 12,
+      },
+      "ingredients": [
+        {
+          "amount": 1.5,
+          "name": "tamarind pulp",
+          "unit": "cup",
+        },
+        {
+          "amount": 2,
+          "name": "sambar powder",
+          "unit": "tbsp",
+        },
+        {
+          "amount": 1,
+          "name": "jaggery",
+          "unit": "tsp",
+        },
+        {
+          "amount": 1,
+          "name": "salt",
+          "unit": "tsp",
+        },
+      ],
+      "nodeId": "kz_5",
+      "phase": "cook",
+      "recipeId": "rec_kuzhambu",
+      "resources": [
+        {
+          "capabilities": [],
+          "category": "burner",
+          "count": 1,
+          "heldFor": "duration",
+        },
+        {
+          "capabilities": [
+            "large",
+          ],
+          "category": "pan",
+          "count": 1,
+          "heldFor": "duration",
+        },
+      ],
+      "status": "locked",
+      "title": "Add tamarind, sambar powder & simmer",
+    },
+    {
+      "attention": "active",
+      "dependencies": [],
+      "duration": {
+        "elastic": true,
+        "estMins": 9,
+        "maxMins": 14,
+        "minMins": 7,
+      },
+      "ingredients": [
+        {
+          "amount": 250,
+          "name": "green beans",
+          "preparedState": "finely chopped",
+          "unit": "g",
+        },
+      ],
+      "nodeId": "po_1",
+      "phase": "prep",
+      "recipeId": "rec_poriyal",
+      "resources": [
+        {
+          "capabilities": [],
+          "category": "cutting_board",
+          "count": 1,
+          "heldFor": "duration",
+        },
+      ],
+      "status": "locked",
+      "title": "Chop green beans",
+    },
+    {
+      "attention": "active",
+      "dependencies": [],
+      "duration": {
+        "elastic": false,
+        "estMins": 3,
+        "maxMins": 4,
+        "minMins": 2,
+      },
+      "ingredients": [
+        {
+          "amount": 1,
+          "name": "coconut oil",
+          "unit": "tbsp",
+        },
+        {
+          "amount": 1,
+          "name": "mustard seeds",
+          "unit": "tsp",
+        },
+        {
+          "amount": 1,
+          "name": "urad dal",
+          "unit": "tsp",
+        },
+        {
+          "amount": 2,
+          "name": "dried red chili",
+          "unit": "whole",
+        },
+      ],
+      "nodeId": "po_2",
+      "phase": "cook",
+      "recipeId": "rec_poriyal",
+      "resources": [
+        {
+          "capabilities": [],
+          "category": "burner",
+          "count": 1,
+          "heldFor": "duration",
+        },
+        {
+          "capabilities": [
+            "small",
+          ],
+          "category": "pan",
+          "count": 1,
+          "heldFor": "duration",
+        },
+      ],
+      "status": "locked",
+      "title": "Temper mustard & urad dal",
+    },
+    {
+      "attention": "active",
+      "dependencies": [
+        "po_1",
+        "po_2",
+      ],
+      "duration": {
+        "elastic": false,
+        "estMins": 10,
+        "maxMins": 14,
+        "minMins": 8,
+      },
+      "ingredients": [
+        {
+          "amount": 250,
+          "name": "chopped beans",
+          "unit": "g",
+        },
+        {
+          "amount": 0.5,
+          "name": "salt",
+          "unit": "tsp",
+        },
+        {
+          "amount": 0.25,
+          "name": "turmeric",
+          "unit": "tsp",
+        },
+      ],
+      "nodeId": "po_3",
+      "phase": "cook",
+      "recipeId": "rec_poriyal",
+      "resources": [
+        {
+          "capabilities": [],
+          "category": "burner",
+          "count": 1,
+          "heldFor": "duration",
+        },
+        {
+          "capabilities": [
+            "small",
+          ],
+          "category": "pan",
+          "count": 1,
+          "heldFor": "duration",
+        },
+      ],
+      "status": "locked",
+      "title": "Sauté beans till tender",
+    },
+    {
+      "attention": "active",
+      "dependencies": [
+        "po_3",
+      ],
+      "duration": {
+        "elastic": false,
+        "estMins": 2,
+        "maxMins": 3,
+        "minMins": 1,
+      },
+      "ingredients": [
+        {
+          "amount": 3,
+          "name": "grated coconut",
+          "unit": "tbsp",
+        },
+      ],
+      "nodeId": "po_4",
+      "phase": "cook",
+      "recipeId": "rec_poriyal",
+      "resources": [
+        {
+          "capabilities": [],
+          "category": "burner",
+          "count": 1,
+          "heldFor": "duration",
+        },
+        {
+          "capabilities": [
+            "small",
+          ],
+          "category": "pan",
+          "count": 1,
+          "heldFor": "duration",
+        },
+      ],
+      "status": "locked",
+      "title": "Add grated coconut & toss",
+    },
+  ],
+  "projectedServeTime": "19:30:00",
+  "schedule": {
+    "kz_1": {
+      "earliestStart": 30,
+      "latestStart": 30,
+      "plannedEnd": "19:15:00",
+      "plannedStart": "19:09:00",
+      "slackMins": 0,
+    },
+    "kz_2": {
+      "earliestStart": 0,
+      "latestStart": 21,
+      "plannedEnd": "18:46:00",
+      "plannedStart": "18:39:00",
+      "slackMins": 21,
+    },
+    "kz_3": {
+      "earliestStart": 10,
+      "latestStart": 25,
+      "plannedEnd": "18:52:00",
+      "plannedStart": "18:49:00",
+      "slackMins": 15,
+    },
+    "kz_4": {
+      "earliestStart": 13,
+      "latestStart": 28,
+      "plannedEnd": "19:00:00",
+      "plannedStart": "18:52:00",
+      "slackMins": 15,
+    },
+    "kz_5": {
+      "earliestStart": 36,
+      "latestStart": 36,
+      "plannedEnd": "19:30:00",
+      "plannedStart": "19:15:00",
+      "slackMins": 0,
+    },
+    "po_1": {
+      "earliestStart": 21,
+      "latestStart": 30,
+      "plannedEnd": "19:09:00",
+      "plannedStart": "19:00:00",
+      "slackMins": 9,
+    },
+    "po_2": {
+      "earliestStart": 36,
+      "latestStart": 36,
+      "plannedEnd": "19:18:00",
+      "plannedStart": "19:15:00",
+      "slackMins": 0,
+    },
+    "po_3": {
+      "earliestStart": 39,
+      "latestStart": 39,
+      "plannedEnd": "19:28:00",
+      "plannedStart": "19:18:00",
+      "slackMins": 0,
+    },
+    "po_4": {
+      "earliestStart": 49,
+      "latestStart": 49,
+      "plannedEnd": "19:30:00",
+      "plannedStart": "19:28:00",
+      "slackMins": 0,
+    },
+    "ri_1": {
+      "earliestStart": 7,
+      "latestStart": 23,
+      "plannedEnd": "18:49:00",
+      "plannedStart": "18:46:00",
+      "slackMins": 16,
+    },
+    "ri_2": {
+      "earliestStart": 10,
+      "latestStart": 26,
+      "plannedEnd": "19:09:00",
+      "plannedStart": "18:49:00",
+      "slackMins": 16,
+    },
+    "ri_3": {
+      "earliestStart": 30,
+      "latestStart": 46,
+      "plannedEnd": "19:14:00",
+      "plannedStart": "19:09:00",
+      "slackMins": 16,
+    },
+  },
+  "sessionId": "session_1oujuh5",
+  "startTime": "18:39:00",
+  "targetServeTime": "19:30:00",
+}
+`;

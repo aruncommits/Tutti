@@ -17,4 +17,5 @@ export {
   type AnchoredSchedule,
 } from "./schedule";
 export { parseClock, formatClock } from "./time";
+export { compile, type PaceModel } from "./compile";
 export { HANDS, normalizeKitchen, nodeRequirements, capacityOf } from "./resources";

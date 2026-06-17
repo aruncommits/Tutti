@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 4,
-  "lastTick": "2026-06-18T01:03:56.5214233+08:00",
-  "lastTickEpoch": 1781715837,
+  "iteration": 5,
+  "lastTick": "2026-06-18T01:08:20.5598478+08:00",
+  "lastTickEpoch": 1781716101,
   "phase": "brief-v1-engine-core",
-  "nextResearchTheme": "Brief v1 items 1-3 done (CPM + hands normalization + resource-aware greedy forward pass; 26 engine tests, thali interleaves within 2 burners/1 hands and beats 91-min baseline). NEXT: item 4 — reverse target-time anchoring (startTime = targetServeTime - makespan; shift planned start/end so last node ends at target; backward pass -> latestStart + slack; if start in past, report earliest realistic serve)."
+  "nextResearchTheme": "Brief v1 items 1-4 done (CPM, hands, forward pass, reverse anchoring; 32 engine tests). NEXT: item 5 — compile(recipes, kitchen, targetServeTime, paceModel?) assembling MasterExecutionPlan (merge nodes, scheduleForward, anchor, fill schedule{}/criticalPath/criticalPathMins/startTime/projectedServeTime) + golden thali snapshot test."
 }
