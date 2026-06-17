@@ -35,6 +35,7 @@ export function App() {
   const earliestServe = formatClock(nowMins + makespan);
 
   const complete = (id: string) => setPlan((prev) => applyEvent(prev, { type: "complete", nodeId: id, at: "" }));
+  const undo = (id: string) => setPlan((prev) => applyEvent(prev, { type: "undo", nodeId: id, at: "" }));
   const toggleDish = (id: string) =>
     setDishes((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   const buildPlan = () => {
@@ -68,7 +69,7 @@ export function App() {
       </header>
 
       {screen === "cook" ? (
-        <CookScreen plan={plan} onComplete={complete} onReset={reset} />
+        <CookScreen plan={plan} onComplete={complete} onUndo={undo} onReset={reset} />
       ) : screen === "kitchen" ? (
         <KitchenScreen kitchen={kitchen} onChange={setKitchen} onDone={() => setScreen("home")} />
       ) : screen === "pick" ? (

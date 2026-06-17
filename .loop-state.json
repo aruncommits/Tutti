@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 14,
-  "lastTick": "2026-06-18T01:53:13.4037660+08:00",
-  "lastTickEpoch": 1781718793,
+  "iteration": 15,
+  "lastTick": "2026-06-18T01:57:04.0700941+08:00",
+  "lastTickEpoch": 1781719024,
   "phase": "brief-v2-single-recipe-ui",
-  "nextResearchTheme": "Brief v2 items 1-4 done (shell, kitchen, onboarding, pick+serve-time with 91->51 delta; all verified in browser). NEXT: item 5 — plan-preview timeline (Doc 7 §7): a simple Gantt from plan.schedule (per-node bars by plannedStart/end, dish-colored) that VISUALLY nests active tasks inside passive windows; show start time + 'all ready at HH:MM'; Start cooking / Edit. This is the differentiator made visible (out-show Time To Plate). Then items 6-9."
+  "nextResearchTheme": "Brief v2 items 1-5 done (full pre-cook flow + plan-preview Gantt visualizing interleaving, verified). NEXT: item 6 — polished cook view: passive tasks as live countdown timers (start -> ticking remaining), nextStartAlert prominent, amber clock when runningLate, Screen Wake Lock API to keep screen awake, undo from archive (long-press/tap -> applyEvent undo). Then items 7-9 (session persistence verify, guided-not-gated, a11y)."
 }

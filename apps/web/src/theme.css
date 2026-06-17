@@ -183,8 +183,30 @@ header {
   cursor: pointer;
 }
 .done-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
   color: var(--faint);
-  padding: 6px 16px;
+  padding: 8px 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+.undo-hint {
+  margin-left: auto;
+  font-size: 11px;
+  opacity: 0;
+  transition: opacity 0.2s var(--ease);
+}
+.done-card:hover .undo-hint {
+  opacity: 0.7;
+}
+.cooking-label.ready {
+  color: var(--poriyal);
+  font-weight: 600;
 }
 .idle {
   color: var(--muted);
