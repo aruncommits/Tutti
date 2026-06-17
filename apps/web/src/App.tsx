@@ -1,152 +1,81 @@
-import { useMemo, useState } from "react";
-import {
-  applyEvent,
-  compile,
-  deriveViewState,
-  formatClock,
-  parseClock,
-  thaliV1,
-  type MasterExecutionPlan,
-  type TaskNode,
-} from "@tutti/engine";
+import { useMemo } from "react";
+import { applyEvent, compile, thaliV1, type MasterExecutionPlan } from "@tutti/engine";
+import { usePersistentState, type Screen } from "./state";
+import { CookScreen } from "./CookScreen";
 
-// Cook Mode now renders genuine engine output: compile() -> MasterExecutionPlan ->
-// deriveViewState() three-tier NOW / NEXT / DONE (Doc 2 §5.2, Doc 7 §8). Tap-to-Done sets a
-// node completed and re-derives. (applyEvent + live reschedule arrive in Brief v1 items 7-8.)
-
-const DISH_COLORS: Record<string, string> = {
-  rec_rice: "#5aa6ff",
-  rec_kuzhambu: "#ff8a5b",
-  rec_poriyal: "#86cf4d",
-};
-const DISH_NAMES: Record<string, string> = {
-  rec_rice: "Rice",
-  rec_kuzhambu: "Kuzhambu",
-  rec_poriyal: "Poriyal",
-};
-
-const hhmm = (clock: string) => formatClock(parseClock(clock)).slice(0, 5);
-
-function Measures({ node }: { node: TaskNode }) {
-  if (!node.ingredients.length) return null;
-  return (
-    <div className="measure">
-      {node.ingredients.map((ing, i) => (
-        <span className="chip" key={i}>
-          {ing.amount !== undefined && <b>{ing.amount}{ing.unit ? ` ${ing.unit}` : ""}</b>} {ing.name}
-        </span>
-      ))}
-    </div>
-  );
-}
-
-function Tag({ node }: { node: TaskNode }) {
-  return (
-    <span className="tag">
-      <span className="swatch" style={{ background: DISH_COLORS[node.recipeId] ?? "var(--accent)" }} />
-      {DISH_NAMES[node.recipeId] ?? node.recipeId}
-    </span>
-  );
-}
+// App shell + screen state machine (Brief v2 item 1). Screen + plan persist to localStorage so an
+// in-progress cook survives reload (Doc 1 P4). Most screens are stubs filled by items 2-9; the
+// cook screen is already the real engine render.
 
 export function App() {
-  const initial = useMemo<MasterExecutionPlan>(
+  const initialPlan = useMemo<MasterExecutionPlan>(
     () => compile(thaliV1.recipes, thaliV1.kitchenProfile, thaliV1.targetServeTime),
     [],
   );
-  const [plan, setPlan] = useState<MasterExecutionPlan>(initial);
-  const view = deriveViewState(plan);
+  const [screen, setScreen] = usePersistentState<Screen>("tutti.screen", "home");
+  const [plan, setPlan] = usePersistentState<MasterExecutionPlan>("tutti.plan", initialPlan);
 
-  const complete = (id: string) =>
-    setPlan((prev) => applyEvent(prev, { type: "complete", nodeId: id, at: "" }));
-  const reset = () => setPlan(initial);
-
-  const allDone = view.active.length === 0 && view.queue.length === 0;
+  const complete = (id: string) => setPlan((prev) => applyEvent(prev, { type: "complete", nodeId: id, at: "" }));
+  const startCooking = () => {
+    setPlan(initialPlan);
+    setScreen("cook");
+  };
+  const reset = () => {
+    setPlan(initialPlan);
+    setScreen("home");
+  };
 
   return (
     <div className="wrap">
       <header>
-        <div className="logo">
+        <button className="logo" onClick={() => setScreen("home")} aria-label="Home">
           <div className="mark">T</div>
           <div className="brand">
             Tutti
             <small>cook the whole meal, together</small>
           </div>
-        </div>
+        </button>
       </header>
 
-      <div className="clock" role="status">
-        <div>
-          <div className="lbl">Serving at</div>
-          <div className="time">{hhmm(view.projectedServeTime)}</div>
-        </div>
-        <div className="status">
-          <span className="dot" /> start {hhmm(plan.startTime)}
-        </div>
-      </div>
-
-      <p className="value">
-        <b>{thaliV1.recipes.length} dishes</b> · <span className="strike">91 min separately</span> →{" "}
-        <b>{plan.criticalPathMins}+ min interleaved</b>
-      </p>
-
-      <section className="zone" aria-label="NOW">
-        <h2 className="zone-h"><span>NOW</span></h2>
-        {allDone ? (
-          <div className="finale">
-            <div className="big">Dinner is served</div>
-            <button className="btn" onClick={reset}>Cook it again</button>
-          </div>
-        ) : view.active.length ? (
-          view.active.map((n) => (
-            <div className={n.attention === "passive" ? "now-card passive" : "now-card"} key={n.nodeId}>
-              <div className="now-head">
-                <Tag node={n} />
-                <span className="phase">{n.phase}{n.attention === "passive" ? " · hands-free" : ""}</span>
-              </div>
-              <div className="now-title">{n.title}</div>
-              <Measures node={n} />
-              <div className="act">
-                {n.attention === "passive" ? (
-                  <span className="cooking-label">⏲ runs itself · ~{n.duration.estMins}m</span>
-                ) : (
-                  <button className="btn" onClick={() => complete(n.nodeId)} aria-label={`Mark "${n.title}" done`}>
-                    ✓ Done
-                  </button>
-                )}
-                <span className="dur">~{n.duration.estMins} min</span>
-              </div>
-            </div>
-          ))
-        ) : (
-          <div className="idle"><b>Hands free.</b> Something's cooking — relax a moment.</div>
-        )}
-      </section>
-
-      <section className="zone" aria-label="NEXT">
-        <h2 className="zone-h"><span>NEXT</span><span className="count">{view.queue.length}</span></h2>
-        {view.queue.map((n) => (
-          <div className="q-item" key={n.nodeId}>
-            <span className="swatch" style={{ background: DISH_COLORS[n.recipeId] ?? "var(--accent)" }} />
-            <span className="node-title">{n.title}</span>
-            <span className="dur">~{n.duration.estMins}m</span>
-          </div>
-        ))}
-      </section>
-
-      <section className="zone" aria-label="DONE">
-        <h2 className="zone-h"><span>DONE</span><span className="count">{view.archive.length}</span></h2>
-        {view.archive.map((n) => (
-          <div className="done-card" key={n.nodeId}>
-            <s>{n.title}</s>
-          </div>
-        ))}
-      </section>
+      {screen === "cook" ? (
+        <CookScreen plan={plan} onComplete={complete} onReset={reset} />
+      ) : screen === "home" ? (
+        <Home onStart={startCooking} onPick={() => setScreen("pick")} onKitchen={() => setScreen("kitchen")} />
+      ) : (
+        <Stub screen={screen} onBack={() => setScreen("home")} onCook={startCooking} />
+      )}
 
       <footer className="scaffold-note">
-        Rendering real engine output · compile() → deriveViewState() · live reschedule &amp; voice
-        arrive in later briefs.
+        Phase 2 · single-recipe flow taking shape (screens being built brief by brief).
       </footer>
     </div>
+  );
+}
+
+function Home({ onStart, onPick, onKitchen }: { onStart: () => void; onPick: () => void; onKitchen: () => void }) {
+  return (
+    <section className="zone" aria-label="Home">
+      <p className="value">A South Indian thali — three dishes, all hot together in about 45 minutes.</p>
+      <button className="btn big-btn" onClick={onStart}>Start cooking the thali</button>
+      <div className="home-links">
+        <button className="link" onClick={onPick}>Pick dishes</button>
+        <button className="link" onClick={onKitchen}>Your kitchen</button>
+      </div>
+    </section>
+  );
+}
+
+function Stub({ screen, onBack, onCook }: { screen: Screen; onBack: () => void; onCook: () => void }) {
+  return (
+    <section className="zone" aria-label={screen}>
+      <h2 className="zone-h"><span>{screen}</span></h2>
+      <div className="idle">
+        This screen ("{screen}") is being built in an upcoming brief. For now you can jump straight in.
+      </div>
+      <div className="home-links">
+        <button className="link" onClick={onCook}>Start cooking</button>
+        <button className="link" onClick={onBack}>Back home</button>
+      </div>
+    </section>
   );
 }

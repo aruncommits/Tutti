@@ -265,6 +265,43 @@ header {
   font-weight: 600;
   margin-bottom: 16px;
 }
+.time.late {
+  color: var(--accent-deep);
+}
+.alert {
+  margin: 12px 0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(232, 98, 61, 0.12);
+  border: 1px solid var(--accent-deep);
+  color: var(--accent);
+  font-size: 14px;
+}
+.logo {
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+.big-btn {
+  width: 100%;
+  padding: 16px;
+  font-size: 16px;
+  margin: 8px 0 16px;
+}
+.home-links {
+  display: flex;
+  gap: 16px;
+}
+.link {
+  background: none;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 6px 0;
+  text-decoration: underline;
+}
 .scaffold-note {
   margin-top: 32px;
   color: var(--faint);
