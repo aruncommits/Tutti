@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   deriveViewState,
   formatClock,
@@ -7,6 +7,15 @@ import {
   type TaskNode,
 } from "@tutti/engine";
 import { colorFor, dishName } from "./dishColors";
+import { useSpeech } from "./useSpeech";
+import { parseVoiceCommand } from "./voice";
+
+function speak(text: string) {
+  const synth = (window as unknown as { speechSynthesis?: { cancel: () => void; speak: (u: unknown) => void } }).speechSynthesis;
+  const Utt = (window as unknown as { SpeechSynthesisUtterance?: new (t: string) => unknown }).SpeechSynthesisUtterance;
+  if (!synth || !Utt) return;
+  try { synth.cancel(); synth.speak(new Utt(text)); } catch { /* ignore */ }
+}
 
 // Pure-ish render of the engine's three-tier ViewState (Doc 2 §5.2, Doc 7 §8). The only local
 // state is UI-only passive countdown timers; all cooking truth comes from the plan via events.
@@ -68,6 +77,43 @@ export function CookScreen({
     return () => clearInterval(t);
   }, [remaining]);
 
+  // Voice control (Doc 7 §11). The on-screen Done button always remains the fallback (§11.2).
+  const activeHands = view.active.filter((n) => n.attention === "active"); // the hands-on NOW tasks
+  const stopRef = useRef<() => void>(() => {});
+  const handleVoice = (transcript: string) => {
+    const { type } = parseVoiceCommand(transcript);
+    switch (type) {
+      case "complete":
+      case "next":
+        if (activeHands.length === 1) {
+          const t = activeHands[0]!;
+          complete(t.nodeId);
+          speak(`Done. ${activeHands.length > 1 ? "" : ""}`.trim() || "Done");
+        } else if (activeHands.length > 1) {
+          speak(`Which one — ${activeHands.map((n) => n.title).join(", or ")}?`); // ambiguity asks, never guesses
+        } else {
+          speak("Nothing to mark done right now.");
+        }
+        break;
+      case "status":
+        speak(`Now: ${view.active.map((n) => n.title).join("; ") || "nothing"}. Serving at ${hhmm(view.projectedServeTime)}.`);
+        break;
+      case "howLong":
+        speak(`Serving at ${hhmm(view.projectedServeTime)}.`);
+        break;
+      case "repeat":
+        speak(activeHands[0]?.title ?? view.active[0]?.title ?? "Nothing active.");
+        break;
+      case "pause":
+        stopRef.current();
+        break;
+      default:
+        break;
+    }
+  };
+  const speech = useSpeech(handleVoice);
+  stopRef.current = speech.stop;
+
   // Keep the screen awake while cooking (Doc 7 §12). Guarded for unsupported browsers.
   useEffect(() => {
     let lock: { release: () => void } | null = null;
@@ -85,8 +131,23 @@ export function CookScreen({
         </div>
         <div className="status">
           <span className="dot" /> {plan.runningLate ? "running late" : `start ${hhmm(plan.startTime)}`}
+          {speech.supported && (
+            <button
+              className={`mic${speech.listening ? " on" : ""}`}
+              aria-pressed={speech.listening}
+              aria-label={speech.listening ? "Stop voice control" : "Start voice control"}
+              onClick={() => (speech.listening ? speech.stop() : speech.start())}
+            >
+              🎙
+            </button>
+          )}
         </div>
       </div>
+      {speech.supported && speech.listening && (
+        <p className="listening" aria-live="polite">
+          Listening… say “done”, “what's next”, or “how long”{speech.transcript ? ` · heard: ${speech.transcript}` : ""}
+        </p>
+      )}
 
       {view.nextStartAlert && <p className="alert">{view.nextStartAlert}</p>}
       {showNudge && (

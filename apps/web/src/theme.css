@@ -299,6 +299,12 @@ header {
   color: var(--accent);
   font-size: 14px;
 }
+.mic {
+  margin-left: 10px; width: 38px; height: 38px; border-radius: 50%;
+  border: 1px solid var(--card-edge); background: var(--bg2); cursor: pointer; font-size: 16px;
+}
+.mic.on { background: var(--accent-deep); border-color: transparent; box-shadow: 0 0 0 4px rgba(232,98,61,.25); }
+.listening { margin: 8px 0 0; font-size: 13px; color: var(--accent); }
 .logo {
   background: none;
   border: none;

@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 32,
-  "lastTick": "2026-06-18T03:19:33.1050090+08:00",
-  "lastTickEpoch": 1781723973,
+  "iteration": 33,
+  "lastTick": "2026-06-18T03:22:39.3915220+08:00",
+  "lastTickEpoch": 1781724159,
   "phase": "brief-v5-handsfree-voice",
-  "nextResearchTheme": "Brief v5 item 1 done (parseVoiceCommand pure grammar; 122 tests). NEXT: item 2 - useSpeech hook (apps/web/src/useSpeech.ts): wrap webkitSpeechRecognition||SpeechRecognition; supported flag via feature-detect; start/stop listening; auto-restart in onend while active; swallow no-speech; expose latest transcript + listening state; SSR/jsdom-safe (guard window). Then item 3 wire mic into Cook Mode, item 4 surface pace model, item 5 tests."
+  "nextResearchTheme": "Brief v5 items 1-2 done (parseVoiceCommand + useSpeech; 123 tests). NEXT: item 3 - wire voice into CookScreen: a tap-to-talk mic toggle in the header (only when useSpeech.supported); onCommand -> parseVoiceCommand; complete/next -> onComplete(first active non-passive NOW task, or ask if 2+ active); status -> speechSynthesis speak NOW + serve time; howLong/repeat -> speak; pause -> stop; spoken confirmation on complete; big Done button always remains; aria-live listening indicator. Then item 4 (surface adaptive pace) + item 5 (tests)."
 }
