@@ -1,4 +1,5 @@
-import { applyEvent, compile, formatClock, parseClock, scaleRecipe, thaliV1, type MasterExecutionPlan, type PaceModel, type RecipeGraph } from "@tutti/engine";
+import { useRef } from "react";
+import { applyEvent, compile, formatClock, parseClock, paceCategoryOf, scaleRecipe, thaliV1, updatePace, type MasterExecutionPlan, type PaceModel, type RecipeGraph } from "@tutti/engine";
 import { usePersistentState, type Screen } from "./state";
 import { CookScreen } from "./CookScreen";
 import { KitchenScreen, DEFAULT_KITCHEN, toKitchenProfile, type KitchenUi } from "./KitchenScreen";
@@ -23,8 +24,10 @@ export function App() {
   // Adaptive pace model (Doc 2 §7): per-category multipliers learned from the user's own cooks.
   // Fed into compile() so elastic estimates adjust. Populated by telemetry in the learning loop
   // (Brief v6) — kept honest here: empty until real data exists, so it's identity by default.
-  const [pace] = usePersistentState<PaceModel>("tutti.pace", {});
+  const [pace, setPace] = usePersistentState<PaceModel>("tutti.pace", {});
+  const [learnPace] = usePersistentState<boolean>("tutti.learnPace", true);
   const paceAdjusted = Object.entries(pace).filter(([, m]) => Math.abs(m - 1) > 0.05);
+  const focusAtRef = useRef<number | null>(null); // wall-clock boundary for honest actual-duration capture
   const allRecipes = [...thaliV1.recipes, ...candidates];
   const toggleAvoid = (a: string) => setAvoid((p) => (p.includes(a) ? p.filter((x) => x !== a) : [...p, a]));
   const factorOf = (id: string) => servingsFactor[id] ?? 1;
@@ -50,7 +53,21 @@ export function App() {
   const feasible = startMins >= nowMins;
   const earliestServe = formatClock(nowMins + makespan);
 
-  const complete = (id: string) => setPlan((prev) => applyEvent(prev, { type: "complete", nodeId: id, at: "" }));
+  const complete = (id: string) => {
+    // Honest pace learning (Doc 10 Loop A): measure real elapsed time between completions and feed
+    // the EMA — only for elastic hands-on tasks, only in-band samples, only when opted in. Never
+    // fabricate: a missing/out-of-band interval teaches nothing.
+    const node = plan.nodes.find((n) => n.nodeId === id);
+    const now = Date.now();
+    if (learnPace && node && node.attention === "active" && node.duration.elastic && focusAtRef.current != null) {
+      const actualMins = (now - focusAtRef.current) / 60000;
+      if (actualMins >= 0.3 * node.duration.minMins && actualMins <= 3 * node.duration.maxMins) {
+        setPace((p) => updatePace(p, { category: paceCategoryOf(node), actualMins, estMins: node.duration.estMins }));
+      }
+    }
+    focusAtRef.current = now;
+    setPlan((prev) => applyEvent(prev, { type: "complete", nodeId: id, at: "" }));
+  };
   const undo = (id: string) => setPlan((prev) => applyEvent(prev, { type: "undo", nodeId: id, at: "" }));
   const toggleDish = (id: string) =>
     setDishes((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
@@ -65,6 +82,7 @@ export function App() {
   };
   const startCooking = () => {
     setPlan(previewPlan ?? compile(thaliV1.recipes, toKitchenProfile(kitchen), target, pace));
+    focusAtRef.current = Date.now(); // first completion measures from cook start
     setScreen("cook");
   };
   const reset = () => {

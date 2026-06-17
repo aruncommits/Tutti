@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 35,
-  "lastTick": "2026-06-18T03:31:34.1647676+08:00",
-  "lastTickEpoch": 1781724694,
-  "phase": "brief-v5-handsfree-voice",
-  "nextResearchTheme": "Brief v5 items 1-4 done (voice parser+hook+CookMode wiring + pace fed into compile; 123 tests). NEXT: item 5 (FINAL v5) - web test: mock window.SpeechRecognition with a stub class in a CookScreen test, assert the mic button renders AND a Done button still renders (fallback invariant). Then Brief v5 DONE -> research (Doc 10 learning loop) -> author Research-Brief-v6-learning-loop.md."
+  "iteration": 36,
+  "lastTick": "2026-06-18T03:35:11.6858972+08:00",
+  "lastTickEpoch": 1781724912,
+  "phase": "brief-v6-learning-loop",
+  "nextResearchTheme": "ROADMAP COMPLETE: Phases 0-4 + Track C delivered (125 tests). Brief v6 authored (Doc 10 Loop A on-device learning). NEXT: Brief v6 item 1 - honest actual-duration capture in CookScreen: stamp Date.now() when a task becomes focus / prior completes; on complete compute gap; guard outliers (<0.3*minMins or >3*maxMins ignored); only elastic active tasks. No fabrication. (item 2 feeds updatePace behind tutti.learnPace opt-in -> populates tutti.pace already fed into compile.)"
 }
