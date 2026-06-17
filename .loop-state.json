@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 12,
-  "lastTick": "2026-06-18T01:42:43.1395009+08:00",
-  "lastTickEpoch": 1781718163,
+  "iteration": 13,
+  "lastTick": "2026-06-18T01:48:00.1813339+08:00",
+  "lastTickEpoch": 1781718480,
   "phase": "brief-v2-single-recipe-ui",
-  "nextResearchTheme": "Brief v2 item 1 done (app shell + screen state machine + localStorage persistence; cook view extracted to CookScreen, surfaces nextStartAlert/runningLate; verified in browser). Also fixed a masked-gate typecheck regression. NEXT: Brief v2 item 2 — Kitchen Profile screen (Level-0 +/- steppers + toggles for cooks/burners/oven/pressure cooker/microwave/blender/cutting boards/counter), persist to localStorage, feed into compile()."
+  "nextResearchTheme": "Brief v2 items 1-2 done (app shell + Kitchen Profile screen feeding compile; verified burners change the plan). NEXT: item 3 — onboarding (3 swipeable value cards, first-run only, localStorage flag, -> kitchen) AND item 4 pick-dishes + serve-time with live 'X->Y min with Tutti' delta from compile(). Keep gate green via GATE_EXIT check."
 }
