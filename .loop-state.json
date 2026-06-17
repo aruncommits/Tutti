@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 31,
-  "lastTick": "2026-06-18T03:16:14.3104176+08:00",
-  "lastTickEpoch": 1781723774,
+  "iteration": 32,
+  "lastTick": "2026-06-18T03:19:33.1050090+08:00",
+  "lastTickEpoch": 1781723973,
   "phase": "brief-v5-handsfree-voice",
-  "nextResearchTheme": "PHASE complete: Brief v4 done (multi-dish/scaling/shopping/allergens; 116 tests). Brief v5 authored (voice + pace). NEXT: Brief v5 item 1 - parseVoiceCommand(transcript) pure parser mapping done/next/finished->complete, whats next->status, how long->howLong, again/repeat->repeat, hold on/pause->pause, else unknown; unit-tested. Then useSpeech hook, wire voice into Cook Mode, surface pace model, tests."
+  "nextResearchTheme": "Brief v5 item 1 done (parseVoiceCommand pure grammar; 122 tests). NEXT: item 2 - useSpeech hook (apps/web/src/useSpeech.ts): wrap webkitSpeechRecognition||SpeechRecognition; supported flag via feature-detect; start/stop listening; auto-restart in onend while active; swallow no-speech; expose latest transcript + listening state; SSR/jsdom-safe (guard window). Then item 3 wire mic into Cook Mode, item 4 surface pace model, item 5 tests."
 }
