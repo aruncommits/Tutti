@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 57,
-  "lastTick": "2026-06-18T11:57:15.9113931+08:00",
-  "lastTickEpoch": 1781755036,
-  "phase": "brief-v16-share-export",
-  "nextResearchTheme": "Brief v16 item 1 done (share.ts formatters + shareOrCopy; 178 tests). NEXT: items 2-3+5 - ShoppingScreen 'Share list' button: builds items from buildShoppingList(recipes) (combined), calls shareOrCopy('Tutti shopping list', formatShoppingList(items)); show inline aria-live status (Copied!/Shared/Couldn't copy) via useState. PreviewScreen 'Share plan' button using formatPlan(plan, dishNames) - dishNames from plan recipeIds via dishName. ShoppingScreen test: Share button present + clicking calls shareOrCopy (mock the module). Verify in browser. Then Brief v16 done -> research + author Brief v17."
+  "iteration": 58,
+  "lastTick": "2026-06-18T12:04:01.0715004+08:00",
+  "lastTickEpoch": 1781755441,
+  "phase": "brief-v17-notes-ratings",
+  "nextResearchTheme": "Brief v16 DONE (share/export shopping list+plan; 179 tests). Brief v17 authored (recipe notes/ratings/cook-count). NEXT: Brief v17 item 1 - apps/web/src/recipeNotes.ts: RecipeNote {rating?,note?,cookCount,lastCookedAt?} + NotesMap=Record<id,RecipeNote>; pure immutable helpers setRating/setNote/recordCook(increment cookCount + set lastCookedAt)/clearNote; recipeNotes.test.ts (recordCook increments+stamps, setters, clear, immutability). Then item 2 persist tutti.recipeNotes + recordCook each cooked dish in the finish hook (reset, where recents recorded), item 3 finale star+note capture in CookScreen, item 4 show rating/cookCount in BrowseScreen, item 5 tests."
 }
