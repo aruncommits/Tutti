@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { goldenLibrary, type RecipeGraph } from "@tutti/engine";
-import { toLibraryEntries, filterLibrary, sortLibrary, type SortKey } from "./libraryView";
+import { toLibraryEntries, filterLibrary, sortLibrary, cuisinesOf, type SortKey } from "./libraryView";
 import { colorFor } from "./dishColors";
 import { Stars } from "./Stars";
 import type { NotesMap } from "./recipeNotes";
@@ -9,6 +9,7 @@ import type { NotesMap } from "./recipeNotes";
 // stackable filters (max time, veg-only, hide-my-allergens). Tapping a dish adds it to the meal.
 
 const ENTRIES = toLibraryEntries(goldenLibrary);
+const CUISINES = cuisinesOf(ENTRIES);
 
 export function BrowseScreen({
   avoid,
@@ -29,6 +30,7 @@ export function BrowseScreen({
   const [maxMins, setMaxMins] = useState<number | null>(null);
   const [vegOnly, setVegOnly] = useState(true);
   const [hideAllergens, setHideAllergens] = useState(true);
+  const [cuisine, setCuisine] = useState<string | null>(null);
   const [sort, setSort] = useState<SortKey>("default");
 
   const filtered = sortLibrary(
@@ -36,6 +38,7 @@ export function BrowseScreen({
       query,
       maxMins: maxMins ?? undefined,
       vegOnly,
+      cuisine: cuisine ?? undefined,
       avoidAllergens: hideAllergens ? avoid : [],
     }),
     sort,
@@ -64,6 +67,16 @@ export function BrowseScreen({
           <button className={`chip-toggle${hideAllergens ? " on" : ""}`} role="switch" aria-checked={hideAllergens} onClick={() => setHideAllergens(!hideAllergens)}>hide my allergens</button>
         )}
       </div>
+
+      {CUISINES.length > 1 && (
+        <div className="browse-filters" role="group" aria-label="Cuisine">
+          <span className="kp-label" style={{ alignSelf: "center" }}>Cuisine</span>
+          <button className={`chip-toggle${cuisine === null ? " on" : ""}`} aria-pressed={cuisine === null} onClick={() => setCuisine(null)}>All</button>
+          {CUISINES.map((c) => (
+            <button key={c} className={`chip-toggle${cuisine === c ? " on" : ""}`} aria-pressed={cuisine === c} onClick={() => setCuisine(c)}>{c}</button>
+          ))}
+        </div>
+      )}
 
       <div className="browse-filters" role="group" aria-label="Sort">
         <span className="kp-label" style={{ alignSelf: "center" }}>Sort</span>

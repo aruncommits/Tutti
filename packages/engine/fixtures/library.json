@@ -234,6 +234,79 @@
           "duration": { "estMins": 1, "minMins": 1, "maxMins": 2, "elastic": false },
           "ingredients": [], "resources": [], "dependencies": ["po_4"] }
       ]
+    },
+    {
+      "recipeId": "rec_aglio", "name": "Aglio e Olio", "version": 1, "servings": 4, "verified": true, "cuisine": "Italian",
+      "nodes": [
+        { "nodeId": "ag_1", "recipeId": "rec_aglio", "title": "Boil the spaghetti", "phase": "cook", "attention": "passive",
+          "duration": { "estMins": 10, "minMins": 9, "maxMins": 13, "elastic": false },
+          "ingredients": [ { "name": "spaghetti", "amount": 400, "unit": "g" }, { "name": "water", "amount": 8, "unit": "cup" }, { "name": "salt", "amount": 1, "unit": "tbsp" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["large"], "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "ag_2", "recipeId": "rec_aglio", "title": "Sizzle garlic & chili in olive oil", "phase": "cook", "attention": "active",
+          "duration": { "estMins": 4, "minMins": 3, "maxMins": 6, "elastic": false },
+          "ingredients": [ { "name": "olive oil", "amount": 5, "unit": "tbsp" }, { "name": "garlic", "amount": 6, "unit": "clove", "preparedState": "sliced" }, { "name": "red pepper flakes", "amount": 1, "unit": "tsp" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["small"], "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "ag_3", "recipeId": "rec_aglio", "title": "Toss pasta in the oil with parsley & serve", "phase": "serve", "attention": "active",
+          "duration": { "estMins": 2, "minMins": 1, "maxMins": 3, "elastic": false },
+          "ingredients": [ { "name": "parsley", "amount": 3, "unit": "tbsp" } ], "resources": [], "dependencies": ["ag_1", "ag_2"] }
+      ]
+    },
+    {
+      "recipeId": "rec_tompasta", "name": "Tomato-Basil Pasta", "version": 1, "servings": 4, "verified": true, "cuisine": "Italian",
+      "nodes": [
+        { "nodeId": "tp_1", "recipeId": "rec_tompasta", "title": "Boil the penne", "phase": "cook", "attention": "passive",
+          "duration": { "estMins": 10, "minMins": 9, "maxMins": 13, "elastic": false },
+          "ingredients": [ { "name": "penne", "amount": 400, "unit": "g" }, { "name": "water", "amount": 8, "unit": "cup" }, { "name": "salt", "amount": 1, "unit": "tbsp" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["large"], "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "tp_2", "recipeId": "rec_tompasta", "title": "Simmer tomato-garlic sauce", "phase": "cook", "attention": "passive",
+          "duration": { "estMins": 12, "minMins": 10, "maxMins": 16, "elastic": false },
+          "ingredients": [ { "name": "crushed tomatoes", "amount": 2, "unit": "cup" }, { "name": "garlic", "amount": 3, "unit": "clove", "preparedState": "minced" }, { "name": "olive oil", "amount": 2, "unit": "tbsp" }, { "name": "salt", "amount": 1, "unit": "tsp" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["large"], "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "tp_3", "recipeId": "rec_tompasta", "title": "Toss pasta with sauce & basil, serve", "phase": "serve", "attention": "active",
+          "duration": { "estMins": 2, "minMins": 1, "maxMins": 3, "elastic": false },
+          "ingredients": [ { "name": "basil", "amount": 10, "unit": "leaf" } ], "resources": [], "dependencies": ["tp_1", "tp_2"] }
+      ]
+    },
+    {
+      "recipeId": "rec_friedrice", "name": "Veg Fried Rice", "version": 1, "servings": 4, "verified": true, "cuisine": "East Asian",
+      "nodes": [
+        { "nodeId": "fr_1", "recipeId": "rec_friedrice", "title": "Cook & cool the rice", "phase": "cook", "attention": "passive",
+          "duration": { "estMins": 18, "minMins": 16, "maxMins": 24, "elastic": false },
+          "ingredients": [ { "name": "rice", "amount": 2, "unit": "cup" }, { "name": "water", "amount": 3, "unit": "cup" } ],
+          "resources": [ { "category": "pressure_cooker", "count": 1, "heldFor": "duration" }, { "category": "burner", "count": 1, "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "fr_2", "recipeId": "rec_friedrice", "title": "Chop mixed vegetables", "phase": "prep", "attention": "active",
+          "duration": { "estMins": 6, "minMins": 5, "maxMins": 10, "elastic": true },
+          "ingredients": [ { "name": "carrot", "amount": 1, "unit": "whole", "preparedState": "diced" }, { "name": "green beans", "amount": 10, "unit": "whole", "preparedState": "chopped" }, { "name": "spring onion", "amount": 3, "unit": "stalk" } ],
+          "resources": [ { "category": "cutting_board", "count": 1, "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "fr_3", "recipeId": "rec_friedrice", "title": "Stir-fry the vegetables", "phase": "cook", "attention": "active",
+          "duration": { "estMins": 6, "minMins": 4, "maxMins": 9, "elastic": false },
+          "ingredients": [ { "name": "sesame oil", "amount": 2, "unit": "tbsp" }, { "name": "garlic", "amount": 2, "unit": "clove", "preparedState": "minced" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["large"], "heldFor": "duration" } ], "dependencies": ["fr_2"] },
+        { "nodeId": "fr_4", "recipeId": "rec_friedrice", "title": "Add rice & soy, toss & serve", "phase": "serve", "attention": "active",
+          "duration": { "estMins": 4, "minMins": 3, "maxMins": 6, "elastic": false },
+          "ingredients": [ { "name": "soy sauce", "amount": 3, "unit": "tbsp" }, { "name": "white pepper", "amount": 0.5, "unit": "tsp" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["large"], "heldFor": "duration" } ], "dependencies": ["fr_1", "fr_3"] }
+      ]
+    },
+    {
+      "recipeId": "rec_noodles", "name": "Veg Stir-fry Noodles", "version": 1, "servings": 4, "verified": true, "cuisine": "East Asian",
+      "nodes": [
+        { "nodeId": "nd_1", "recipeId": "rec_noodles", "title": "Boil the noodles", "phase": "cook", "attention": "passive",
+          "duration": { "estMins": 8, "minMins": 6, "maxMins": 11, "elastic": false },
+          "ingredients": [ { "name": "noodles", "amount": 300, "unit": "g" }, { "name": "water", "amount": 6, "unit": "cup" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["large"], "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "nd_2", "recipeId": "rec_noodles", "title": "Chop the vegetables", "phase": "prep", "attention": "active",
+          "duration": { "estMins": 6, "minMins": 5, "maxMins": 10, "elastic": true },
+          "ingredients": [ { "name": "bell pepper", "amount": 1, "unit": "whole", "preparedState": "sliced" }, { "name": "cabbage", "amount": 1, "unit": "cup", "preparedState": "shredded" }, { "name": "carrot", "amount": 1, "unit": "whole", "preparedState": "julienned" } ],
+          "resources": [ { "category": "cutting_board", "count": 1, "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "nd_3", "recipeId": "rec_noodles", "title": "Stir-fry vegetables in soy-ginger", "phase": "cook", "attention": "active",
+          "duration": { "estMins": 6, "minMins": 4, "maxMins": 9, "elastic": false },
+          "ingredients": [ { "name": "sesame oil", "amount": 2, "unit": "tbsp" }, { "name": "ginger", "amount": 1, "unit": "inch", "preparedState": "minced" }, { "name": "soy sauce", "amount": 3, "unit": "tbsp" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["large"], "heldFor": "duration" } ], "dependencies": ["nd_2"] },
+        { "nodeId": "nd_4", "recipeId": "rec_noodles", "title": "Toss the noodles in & serve", "phase": "serve", "attention": "active",
+          "duration": { "estMins": 3, "minMins": 2, "maxMins": 4, "elastic": false },
+          "ingredients": [ { "name": "spring onion", "amount": 2, "unit": "stalk" } ], "resources": [], "dependencies": ["nd_1", "nd_3"] }
+      ]
     }
   ]
 }

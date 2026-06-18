@@ -32,6 +32,7 @@ export interface LibraryFilter {
   maxMins?: number;
   avoidAllergens?: string[];
   vegOnly?: boolean;
+  cuisine?: string; // exact match on recipe.cuisine; undefined/"" = all cuisines
 }
 
 /** Stackable filter: every provided criterion must pass. Query matches name OR an ingredient name. */
@@ -40,6 +41,7 @@ export function filterLibrary(entries: LibraryEntry[], opts: LibraryFilter = {})
   const avoid = new Set(opts.avoidAllergens ?? []);
   return entries.filter((e) => {
     if (opts.vegOnly && !e.veg) return false;
+    if (opts.cuisine && e.recipe.cuisine !== opts.cuisine) return false;
     if (opts.maxMins !== undefined && e.totalMins > opts.maxMins) return false;
     if (avoid.size && e.allergens.some((a) => avoid.has(a))) return false;
     if (q) {
@@ -68,4 +70,9 @@ export function sortLibrary(entries: LibraryEntry[], key: SortKey, notes: NotesM
     default:
       return arr;
   }
+}
+
+/** Distinct cuisines present in a set of entries, sorted — for building the cuisine filter UI. */
+export function cuisinesOf(entries: LibraryEntry[]): string[] {
+  return [...new Set(entries.map((e) => e.recipe.cuisine).filter((c): c is string => !!c))].sort();
 }

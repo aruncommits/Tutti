@@ -3,7 +3,7 @@ import { goldenLibrary, validate, compile, type RecipeGraph } from "../src/index
 
 describe("goldenLibrary — seeded verified recipes (Brief v8 item 1, Doc 8/9)", () => {
   it("ships several recipes", () => {
-    expect(goldenLibrary.length).toBeGreaterThanOrEqual(11);
+    expect(goldenLibrary.length).toBeGreaterThanOrEqual(15);
   });
 
   it("every entry is valid, verified, and non-empty", () => {

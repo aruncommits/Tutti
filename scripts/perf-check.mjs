@@ -20,7 +20,12 @@ if (!m) fail("could not find the entry chunk referenced in index.html");
 const entry = m[1];
 const kb = Math.round(statSync(join(assets, entry)).size / 1024);
 
-const BUDGET_KB = 190; // regression guard; entry is ~176KB after splitting out ingest + secondary screens
+// Regression guard. Baseline raised 190 -> 215 once, deliberately: the de-thali "meal-builder" home
+// (Builder) made the core app reference the whole goldenLibrary (SAMPLE_RECIPES), so the recipe data
+// — which doubled to 15 verified recipes — now lands in the entry. One-time baseline shift, not creep.
+// Proper long-term fix to push it back down: load the recipe pool lazily (out of the entry) instead of
+// importing goldenLibrary eagerly in App. Keep this tight to still catch real regressions.
+const BUDGET_KB = 215;
 if (kb > BUDGET_KB) fail(`entry chunk ${entry} is ${kb}KB > ${BUDGET_KB}KB budget`);
 
 console.log(`perf-check OK: ${js.length} JS chunks; entry ${entry} ${kb}KB (< ${BUDGET_KB}KB budget)`);

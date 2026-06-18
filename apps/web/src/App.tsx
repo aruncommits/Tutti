@@ -2,7 +2,6 @@ import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import { applyEvent, compile, formatClock, parseClock, paceCategoryOf, scaleRecipe, thaliV1, goldenLibrary, updatePace, type MasterExecutionPlan, type PaceModel, type RecipeGraph } from "@tutti/engine";
 import { usePersistentState, type Screen } from "./state";
 import { Shell } from "./Shell";
-import { Builder } from "./Builder";
 import { ErrorBoundary } from "./ErrorBoundary";
 import { CookScreen } from "./CookScreen"; // eager — the critical cook path must be instant
 import { DEFAULT_KITCHEN, toKitchenProfile, type KitchenUi } from "./kitchenModel";
@@ -20,6 +19,7 @@ import { addPhoto, resizeToThumb, type Photos } from "./photos";
 
 // Secondary screens are lazy-loaded so the initial/cook bundle stays lean (Brief v10).
 // AddRecipe pulls @tutti/ingest, so splitting it keeps the parser out of the entry chunk.
+const Builder = lazy(() => import("./Builder").then((m) => ({ default: m.Builder })));
 const KitchenScreen = lazy(() => import("./KitchenScreen").then((m) => ({ default: m.KitchenScreen })));
 const MealsScreen = lazy(() => import("./MealsScreen").then((m) => ({ default: m.MealsScreen })));
 const RecipeDetailScreen = lazy(() => import("./RecipeDetailScreen").then((m) => ({ default: m.RecipeDetailScreen })));

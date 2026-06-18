@@ -69,3 +69,17 @@ describe("sortLibrary (Brief v38 item 1)", () => {
     expect(sortLibrary(entries, "default").map((e) => e.recipe.recipeId)).toEqual(entries.map((e) => e.recipe.recipeId));
   });
 });
+
+import { filterLibrary as _filterCuisine, cuisinesOf } from "./libraryView";
+
+describe("filterLibrary cuisine (Brief v39)", () => {
+  it("narrows to a single cuisine and ignores it when unset", () => {
+    const cuisines = cuisinesOf(entries);
+    expect(cuisines.length).toBeGreaterThan(1); // multi-cuisine library
+    const c = cuisines[0]!;
+    const only = _filterCuisine(entries, { cuisine: c });
+    expect(only.length).toBeGreaterThan(0);
+    expect(only.every((e) => e.recipe.cuisine === c)).toBe(true);
+    expect(_filterCuisine(entries, {}).length).toBe(entries.length); // unset = all
+  });
+});
