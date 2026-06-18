@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 50,
-  "lastTick": "2026-06-18T11:10:02.1540723+08:00",
-  "lastTickEpoch": 1781752202,
-  "phase": "brief-v12-saved-meals",
-  "nextResearchTheme": "Brief v12 item 1 done (meals.ts model+helpers; 154 tests). NEXT: items 2-4 - in App: usePersistentState<SavedMeal[]>('tutti.meals',[]); a 'Save this meal' action on Preview (capture dishes+servingsFactor+target, id=m+Date.now(), savedAt=Date.now(), kind:saved, name default) via addSaved; auto-record a kind:recent meal when a cook finishes (in reset() or when view all-done -> addRecent); add 'meals' to Screen union + MealsScreen.tsx (list saved+recent, dish-color dots + count, tap restores setDishes/setServingsFactor/setTarget -> setScreen('pick'), remove x) reachable from Home 'Your meals'. Then item 5 web test restore sets selection + browser verify."
+  "iteration": 51,
+  "lastTick": "2026-06-18T11:19:54.0690898+08:00",
+  "lastTickEpoch": 1781752794,
+  "phase": "brief-v13-cook-with-help",
+  "nextResearchTheme": "Brief v12 DONE (saved meals + recents, verified; 157 tests). Brief v13 authored (cook with help / multi-hands moat). NEXT: Brief v13 item 1 - engine test asserting compile(meal, kitchen{cooks:2}) makespan/criticalPathMins STRICTLY LESS than cooks:1 for a parallelizable meal (thali or 2 library dishes) on an ample kitchen (enough burners/pans so hands are the constraint); if not less, investigate scheduler hands modelling before UI. Then item 2 cook-count stepper in serve-time/preview (edits kitchen.cooks), item 3 show honest time-saved-vs-solo delta, item 4 thread cooks, item 5 web test + browser verify."
 }
