@@ -16,7 +16,7 @@ describe("Home suggestion card (Brief v18 items 2-3+5)", () => {
     expect(screen.getByRole("button", { name: /cook this/i })).toBeInTheDocument();
   });
 
-  it("suggests a highly-rated saved meal and 'Cook this' opens it in Pick", () => {
+  it("suggests a highly-rated saved meal and 'Cook this' opens it in Pick", async () => {
     localStorage.setItem(
       "tutti.meals",
       JSON.stringify([
@@ -28,6 +28,7 @@ describe("Home suggestion card (Brief v18 items 2-3+5)", () => {
     expect(screen.getByText("Sunday Feast")).toBeInTheDocument();
     expect(screen.getByText(/rated this highly/i)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /cook this/i }));
-    expect(screen.getByRole("heading", { level: 2, name: /pick your dishes/i })).toBeInTheDocument();
+    // Pick is lazy-loaded (Brief v34) — await it through Suspense
+    expect(await screen.findByRole("heading", { level: 2, name: /pick your dishes/i }, { timeout: 3000 })).toBeInTheDocument();
   });
 });

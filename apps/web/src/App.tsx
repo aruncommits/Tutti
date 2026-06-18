@@ -3,7 +3,6 @@ import { applyEvent, compile, formatClock, parseClock, paceCategoryOf, scaleReci
 import { usePersistentState, type Screen } from "./state";
 import { Shell } from "./Shell";
 import { CookScreen } from "./CookScreen"; // eager — the critical cook path must be instant
-import { PickScreen, ServeTimeScreen } from "./PlanFlow"; // eager — central planning flow
 import { DEFAULT_KITCHEN, toKitchenProfile, type KitchenUi } from "./kitchenModel";
 import type { LearnEvent } from "./StatsScreen";
 import { shouldLearn } from "./learn";
@@ -31,6 +30,9 @@ const AddRecipe = lazy(() => import("./AddRecipe").then((m) => ({ default: m.Add
 const ShoppingScreen = lazy(() => import("./ShoppingScreen").then((m) => ({ default: m.ShoppingScreen })));
 const StatsScreen = lazy(() => import("./StatsScreen").then((m) => ({ default: m.StatsScreen })));
 const BrowseScreen = lazy(() => import("./BrowseScreen").then((m) => ({ default: m.BrowseScreen })));
+// PlanFlow (Pick + Serve-time) is a secondary route, not the instant-cook path — lazy (Brief v34).
+const PickScreen = lazy(() => import("./PlanFlow").then((m) => ({ default: m.PickScreen })));
+const ServeTimeScreen = lazy(() => import("./PlanFlow").then((m) => ({ default: m.ServeTimeScreen })));
 
 const Loading = () => <div className="idle" role="status">Loading…</div>;
 
