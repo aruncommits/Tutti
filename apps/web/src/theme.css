@@ -1,46 +1,51 @@
-/* Tutti — "every dish, in concert."
-   The plan is a score; each dish a voice; the serve time the downbeat where every
-   voice resolves on one chord. Concert-hall dark (aubergine ink, gilt brass), engraved
-   typography. Mobile-first; the boldness lives in The Score, everything else stays calm. */
+/* Tutti — warm & appetizing kitchen app.
+   Rice-paper cream, clay-pot terracotta, spice-toned dishes. Soft shadows instead of
+   borders; a friendly soft serif for headings. Calm, legible, mobile-first, fluid to desktop. */
 :root {
-  /* dish voices — instruments under stage light (kept in sync with dishColors.ts) */
-  --rice: #5aa6ff;
-  --kuzhambu: #ff8a5b;
-  --poriyal: #86cf4d;
+  /* dish colours — spice tones, legible on cream (kept in sync with dishColors.ts) */
+  --rice: #2f6fb0;     /* indigo */
+  --kuzhambu: #cf7a23; /* turmeric-amber */
+  --poriyal: #4f9a3a;  /* curry-leaf green */
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
 
-  /* concert hall, lights down */
-  --bg: #0d0b13;
-  --bg2: #15121d;
-  --ink: #f1ead9;
-  --muted: #a59db4;
-  --faint: #6c6480;
+  /* warm paper + ink */
+  --bg: #fbf5ea;       /* rice-paper cream */
+  --bg-tint: #f3e9d8;  /* slightly deeper warm — subtle fills, timeline track */
+  --surface: #ffffff;  /* cards */
+  --bg2: #ffffff;      /* legacy alias → white surface */
+  --ink: #2c2117;      /* roasted-spice near-black */
+  --muted: #7c6e5b;    /* warm taupe */
+  --faint: #a99e8b;    /* faint warm — small labels */
 
-  /* gilt — stage light, instrument lacquer, a conductor's gravity. Used like gold leaf. */
-  --accent: #e6c06a;
-  --accent-deep: #c89a3e;
+  /* clay-pot terracotta */
+  --accent: #c75d33;
+  --accent-deep: #a8431f;
+  --accent-soft: rgba(199, 93, 51, 0.1);
 
-  --card: rgba(241, 234, 217, 0.04);
-  --card-strong: rgba(241, 234, 217, 0.09);
-  --card-edge: rgba(241, 234, 217, 0.1);
-  --line: rgba(241, 234, 217, 0.08);
-  --staff: rgba(241, 234, 217, 0.16);
+  /* surfaces use shadow, not border; these stay faint where an edge is still wanted */
+  --card: #ffffff;
+  --card-strong: var(--bg-tint);
+  --card-edge: rgba(44, 33, 23, 0.08);
+  --line: rgba(44, 33, 23, 0.08);
+  --staff: rgba(44, 33, 23, 0.1);
+  --shadow: 0 1px 2px rgba(44, 33, 23, 0.05), 0 12px 28px -18px rgba(44, 33, 23, 0.28);
+  --shadow-sm: 0 1px 2px rgba(44, 33, 23, 0.06), 0 4px 12px -8px rgba(44, 33, 23, 0.18);
 
-  --display: "Bodoni Moda", "Times New Roman", serif;
+  --display: Georgia, "Iowan Old Style", "Times New Roman", serif;
   --body: "Instrument Sans", system-ui, sans-serif;
   --mono: "Spline Sans Mono", ui-monospace, monospace;
 
   /* ---- fluid foundation (responsive: 320px phone → 1440px desktop) ---- */
-  --wrap: 720px;                                  /* reading column; widens on desktop */
-  --gutter: clamp(16px, 4vw, 40px);               /* page side padding */
-  --reading: 70ch;                                /* max line length for prose */
-  --fs-time: clamp(2.1rem, 7vw, 2.8rem);          /* .time */
-  --fs-display-lg: clamp(1.9rem, 5.2vw, 2.6rem);  /* .ob-title, .finale .big */
-  --fs-display-md: clamp(1.25rem, 3.6vw, 1.55rem);/* .now-title */
-  --fs-brand: clamp(1.35rem, 4vw, 1.6rem);        /* .brand */
+  --wrap: 720px;
+  --gutter: clamp(16px, 4vw, 40px);
+  --reading: 66ch;
+  --fs-time: clamp(2.1rem, 7vw, 2.8rem);
+  --fs-display-lg: clamp(1.9rem, 5.2vw, 2.6rem);
+  --fs-display-md: clamp(1.25rem, 3.6vw, 1.55rem);
+  --fs-brand: clamp(1.35rem, 4vw, 1.6rem);
 }
 @media (min-width: 1024px) {
-  :root { --wrap: 1080px; } /* desktop: expand into the space */
+  :root { --wrap: 1080px; }
 }
 * {
   box-sizing: border-box;
@@ -55,20 +60,34 @@ body {
   font-family: var(--body);
   color: var(--ink);
   background: var(--bg);
-  /* a single stand-light pool from above — one ambient, static touch */
-  background-image: radial-gradient(120% 60% at 50% -8%, rgba(230, 192, 106, 0.07), transparent 60%);
+  /* barely-there warm wash from the top */
+  background-image: linear-gradient(180deg, #fdf9f1, var(--bg) 240px);
   background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
 }
 ::selection {
-  background: rgba(230, 192, 106, 0.26);
+  background: var(--accent-soft);
   color: var(--ink);
 }
-:focus-visible {
+
+/* Focus rings on real controls only — never a box around the whole screen. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="switch"]:focus-visible,
+[role="checkbox"]:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
   border-radius: 6px;
 }
+.screen-focus,
+.screen-focus:focus,
+.screen-focus:focus-visible {
+  outline: none;
+}
+
 .wrap {
   max-width: var(--wrap);
   margin: 0 auto;
@@ -77,7 +96,7 @@ body {
   padding-right: max(var(--gutter), env(safe-area-inset-right));
 }
 
-/* ---- masthead: a concert program header ---- */
+/* ---- masthead ---- */
 header {
   display: flex;
   align-items: center;
@@ -95,84 +114,52 @@ header {
   cursor: pointer;
   text-align: left;
 }
-/* the monogram set on three staff lines — a rehearsal mark */
 .mark {
-  position: relative;
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
   display: grid;
   place-items: center;
   font-family: var(--display);
-  font-style: italic;
   font-weight: 600;
-  font-size: 21px;
-  color: var(--ink);
-  background: var(--bg2);
-  border: 1px solid var(--card-edge);
-  overflow: hidden;
-}
-.mark::before {
-  content: "";
-  position: absolute;
-  inset: 9px 6px;
-  background: repeating-linear-gradient(
-    to bottom,
-    var(--accent) 0 1.2px,
-    transparent 1.2px 7px
-  );
-  opacity: 0.55;
-}
-.mark > * {
-  position: relative;
-  z-index: 1;
-  text-shadow: 0 0 6px var(--bg2), 0 0 6px var(--bg2);
+  font-size: 22px;
+  color: #fff;
+  background: linear-gradient(150deg, var(--accent), var(--accent-deep));
+  box-shadow: var(--shadow-sm);
 }
 .brand {
   font-family: var(--display);
   font-weight: 600;
   font-size: var(--fs-brand);
-  letter-spacing: 0.01em;
-  line-height: 1;
+  letter-spacing: 0;
+  line-height: 1.05;
+  color: var(--ink);
 }
 .brand small {
   display: block;
   font-family: var(--body);
-  font-style: italic;
   font-weight: 400;
-  font-size: 12px;
-  letter-spacing: 0.01em;
+  font-size: 12.5px;
+  letter-spacing: 0;
   text-transform: none;
   color: var(--muted);
-  margin-top: 5px;
+  margin-top: 4px;
 }
 
-/* ---- the conductor's clock: serving-at + downbeat ---- */
+/* ---- serve-time clock ---- */
 .clock {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  background: var(--bg2);
-  border: 1px solid var(--card-edge);
-  border-radius: 16px;
-  padding: 16px 18px;
-  position: relative;
-  overflow: hidden;
-}
-.clock::after {
-  /* a faint final-barline at the right edge: the downbeat lives here */
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  width: 6px;
-  background: linear-gradient(var(--accent-deep), var(--accent));
-  opacity: 0.5;
+  background: var(--surface);
+  border: none;
+  border-radius: 18px;
+  padding: 18px 20px;
+  box-shadow: var(--shadow);
 }
 .lbl {
   font-size: 11px;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--accent);
   font-weight: 600;
@@ -182,6 +169,7 @@ header {
   font-size: var(--fs-time);
   font-weight: 500;
   letter-spacing: -0.01em;
+  color: var(--ink);
   font-variant-numeric: tabular-nums;
 }
 .status {
@@ -196,12 +184,12 @@ header {
   height: 8px;
   border-radius: 50%;
   background: var(--poriyal);
-  box-shadow: 0 0 0 3px rgba(134, 207, 77, 0.18);
+  box-shadow: 0 0 0 3px rgba(79, 154, 58, 0.16);
 }
 .value {
   color: var(--muted);
   font-size: 14.5px;
-  line-height: 1.5;
+  line-height: 1.55;
   margin: 16px 2px;
 }
 .value b {
@@ -213,9 +201,9 @@ header {
   opacity: 0.7;
 }
 
-/* ---- zones (NOW / NEXT / DONE) set as rehearsal marks ---- */
+/* ---- section headers ---- */
 .zone {
-  margin-top: 22px;
+  margin-top: 24px;
 }
 .zone-h {
   display: flex;
@@ -224,13 +212,12 @@ header {
   font-family: var(--body);
   font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--faint);
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 .zone-h::after {
-  /* the staff line that the rehearsal mark sits on */
   content: "";
   flex: 1;
   height: 1px;
@@ -239,12 +226,13 @@ header {
 .zone-h .count {
   order: 1;
   flex: none;
-  background: none;
-  border: 1px solid var(--card-edge);
+  background: var(--accent-soft);
+  border: none;
   border-radius: 20px;
-  padding: 1px 9px;
+  padding: 2px 10px;
   font-size: 11px;
-  color: var(--muted);
+  color: var(--accent-deep);
+  font-weight: 600;
 }
 
 /* ---- task cards ---- */
@@ -253,11 +241,12 @@ header {
   display: flex;
   align-items: center;
   gap: 11px;
-  border-radius: 14px;
-  border: 1px solid var(--card-edge);
-  background: var(--card);
+  border-radius: 16px;
+  border: none;
+  background: var(--surface);
   padding: 14px 16px;
   margin-bottom: 8px;
+  box-shadow: var(--shadow-sm);
 }
 .swatch {
   width: 12px;
@@ -280,46 +269,47 @@ header {
   font-variant-numeric: tabular-nums;
 }
 
-/* ---- buttons: gilt primary, used sparingly ---- */
+/* ---- buttons: terracotta primary ---- */
 .btn {
   border: none;
-  border-radius: 11px;
-  padding: 10px 17px;
+  border-radius: 13px;
+  padding: 11px 18px;
   font-family: var(--body);
   font-weight: 600;
   font-size: 14.5px;
-  color: #1a140a;
-  background: linear-gradient(160deg, var(--accent), var(--accent-deep));
+  color: #fff;
+  background: linear-gradient(150deg, var(--accent), var(--accent-deep));
   cursor: pointer;
   transition: transform 0.12s var(--ease), box-shadow 0.2s var(--ease), filter 0.2s var(--ease);
-  box-shadow: 0 6px 20px -10px var(--accent-deep);
+  box-shadow: 0 6px 18px -10px var(--accent-deep);
 }
 .btn:hover {
-  filter: brightness(1.05);
-  box-shadow: 0 10px 26px -10px var(--accent-deep);
+  filter: brightness(1.04);
+  box-shadow: 0 12px 26px -12px var(--accent-deep);
 }
 .btn:active {
   transform: translateY(1px);
 }
 .btn:disabled {
-  opacity: 0.4;
+  opacity: 0.45;
   cursor: not-allowed;
   box-shadow: none;
   filter: none;
 }
 .btn.ghost {
   flex: 0 0 auto;
-  background: none;
+  background: var(--surface);
   border: 1px solid var(--card-edge);
   color: var(--ink);
-  box-shadow: none;
+  box-shadow: var(--shadow-sm);
 }
 .btn.ghost:hover {
   border-color: var(--accent);
+  color: var(--accent-deep);
   filter: none;
 }
 
-/* ---- DONE: a played, struck-through line ---- */
+/* ---- DONE: a finished, struck-through line ---- */
 .done-card {
   display: flex;
   align-items: center;
@@ -339,7 +329,6 @@ header {
 .undo-hint {
   margin-left: auto;
   font-size: 11px;
-  font-style: italic;
   opacity: 0;
   transition: opacity 0.2s var(--ease);
 }
@@ -353,7 +342,8 @@ header {
 .idle {
   color: var(--muted);
   padding: 16px;
-  border: 1px dashed var(--card-edge);
+  border: none;
+  background: var(--bg-tint);
   border-radius: 14px;
   line-height: 1.5;
 }
@@ -361,20 +351,21 @@ header {
   color: var(--ink);
 }
 
-/* ---- NOW card: the voice currently being played ---- */
+/* ---- NOW card: the current step ---- */
 .now-card {
   display: block;
-  background: var(--bg2);
-  position: relative;
+  background: var(--surface);
+  box-shadow: var(--shadow);
 }
 .now-card.passive {
-  background: var(--card);
-  border-style: dashed;
+  background: var(--bg-tint);
+  box-shadow: var(--shadow-sm);
 }
 .now-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
   margin-bottom: 9px;
 }
 .tag {
@@ -382,15 +373,15 @@ header {
   align-items: center;
   gap: 8px;
   font-size: 12.5px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--ink);
 }
 .phase {
   font-family: var(--body);
-  font-style: italic;
-  font-size: 12.5px;
-  letter-spacing: 0.02em;
-  text-transform: none;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--accent);
 }
 .now-title {
@@ -399,6 +390,7 @@ header {
   font-weight: 600;
   line-height: 1.15;
   margin-bottom: 10px;
+  color: var(--ink);
 }
 .measure {
   display: flex;
@@ -409,10 +401,10 @@ header {
 .chip {
   font-size: 12.5px;
   color: var(--muted);
-  background: rgba(241, 234, 217, 0.05);
-  border: 1px solid var(--card-edge);
+  background: var(--bg-tint);
+  border: none;
   border-radius: 8px;
-  padding: 3px 9px;
+  padding: 4px 10px;
 }
 .chip b {
   color: var(--ink);
@@ -424,7 +416,7 @@ header {
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
-  max-width: 540px; /* don't let a 1-2 button row stretch the full desktop column */
+  max-width: 540px;
 }
 .act .btn {
   flex: 1;
@@ -439,42 +431,22 @@ header {
   font-variant-numeric: tabular-nums;
 }
 
-/* ---- the cadence: dinner is served ---- */
+/* ---- dinner is served ---- */
 .finale {
   text-align: center;
   padding: 32px 0 24px;
-  position: relative;
-  animation: cadence 0.7s var(--ease) both;
-}
-.finale::before {
-  content: "𝄆 𝄐 𝄇";
-  display: block;
-  font-size: 22px;
-  letter-spacing: 0.3em;
-  color: var(--accent);
-  margin-bottom: 14px;
-  opacity: 0.9;
+  animation: cadence 0.6s var(--ease) both;
 }
 .finale .big {
   font-family: var(--display);
   font-size: var(--fs-display-lg);
   font-weight: 600;
-  font-style: italic;
   margin-bottom: 18px;
-  background: linear-gradient(100deg, var(--ink), var(--accent), var(--ink));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--accent-deep);
 }
 @keyframes cadence {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
 }
 .time.late {
   color: var(--accent-deep);
@@ -483,44 +455,46 @@ header {
 /* ---- alerts & nudges ---- */
 .alert {
   margin: 12px 0;
-  padding: 11px 14px;
+  padding: 12px 14px;
   border-radius: 12px;
-  background: rgba(232, 98, 61, 0.12);
-  border: 1px solid var(--accent-deep);
-  color: var(--accent);
+  background: var(--accent-soft);
+  border: none;
+  color: var(--accent-deep);
+  font-weight: 500;
   font-size: 14px;
 }
 .nudge {
   margin: 12px 0;
-  padding: 11px 14px;
+  padding: 12px 14px;
   border-radius: 12px;
-  background: rgba(134, 207, 77, 0.1);
-  border: 1px solid rgba(134, 207, 77, 0.4);
-  color: var(--ink);
+  background: rgba(79, 154, 58, 0.12);
+  border: none;
+  color: #356b27;
   font-size: 14px;
 }
 
 /* ---- voice mic ---- */
 .mic {
   margin-left: 10px;
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   border: 1px solid var(--card-edge);
-  background: var(--bg2);
+  background: var(--surface);
   cursor: pointer;
   font-size: 16px;
+  box-shadow: var(--shadow-sm);
 }
 .mic.on {
-  background: var(--accent-deep);
+  background: var(--accent);
   border-color: transparent;
-  box-shadow: 0 0 0 4px rgba(230, 192, 106, 0.25);
+  color: #fff;
+  box-shadow: 0 0 0 4px var(--accent-soft);
 }
 .listening {
   margin: 8px 0 0;
   font-size: 13px;
-  font-style: italic;
-  color: var(--accent);
+  color: var(--accent-deep);
 }
 
 /* ---- home ---- */
@@ -538,12 +512,13 @@ header {
 .link {
   background: none;
   border: none;
-  color: var(--accent);
+  color: var(--accent-deep);
   cursor: pointer;
   font-size: 14px;
+  font-weight: 500;
   padding: 6px 0;
   text-decoration: none;
-  border-bottom: 1px solid rgba(230, 192, 106, 0.35);
+  border-bottom: 1.5px solid var(--accent-soft);
 }
 .link:hover {
   border-bottom-color: var(--accent);
@@ -553,7 +528,7 @@ header {
 .kp {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
   margin-bottom: 16px;
 }
 .kp-row {
@@ -561,10 +536,11 @@ header {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 13px 14px;
-  border-radius: 12px;
-  border: 1px solid var(--card-edge);
-  background: var(--card);
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: none;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
 }
 .kp-label {
   font-size: 15px;
@@ -575,17 +551,18 @@ header {
   gap: 14px;
 }
 .kp-stepper button {
-  width: 34px;
-  height: 34px;
-  border-radius: 9px;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
   border: 1px solid var(--card-edge);
-  background: var(--bg2);
+  background: var(--bg-tint);
   color: var(--ink);
   font-size: 18px;
   cursor: pointer;
 }
 .kp-stepper button:hover {
   border-color: var(--accent);
+  color: var(--accent-deep);
 }
 .kp-val {
   min-width: 20px;
@@ -595,16 +572,16 @@ header {
 }
 .kp-toggle {
   min-width: 56px;
-  padding: 7px 14px;
+  padding: 8px 14px;
   border-radius: 20px;
   border: 1px solid var(--card-edge);
-  background: var(--bg2);
+  background: var(--bg-tint);
   color: var(--muted);
   cursor: pointer;
 }
 .kp-toggle.on {
-  background: linear-gradient(160deg, var(--accent), var(--accent-deep));
-  color: #1a140a;
+  background: linear-gradient(150deg, var(--accent), var(--accent-deep));
+  color: #fff;
   border-color: transparent;
   font-weight: 600;
 }
@@ -613,23 +590,23 @@ header {
   gap: 6px;
 }
 .kp-seg button {
-  padding: 7px 12px;
-  border-radius: 9px;
+  padding: 8px 12px;
+  border-radius: 10px;
   border: 1px solid var(--card-edge);
-  background: var(--bg2);
+  background: var(--bg-tint);
   color: var(--muted);
   cursor: pointer;
   text-transform: capitalize;
 }
 .kp-seg button.on {
-  background: var(--card-strong);
-  color: var(--ink);
+  background: var(--accent-soft);
+  color: var(--accent-deep);
   border-color: var(--accent);
 }
 
-/* ---- onboarding: three program notes, opened by an expression mark ---- */
+/* ---- onboarding ---- */
 .onboarding {
-  min-height: min(70vh, 560px); /* not over-tall on short / landscape screens */
+  min-height: min(70vh, 560px);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -637,15 +614,15 @@ header {
 .ob-card,
 .ob-actions,
 .ob-dots {
-  max-width: 560px; /* keep the program note a readable measure on desktop */
+  max-width: 560px;
 }
 .ob-card {
   padding: 24px 4px;
 }
 .ob-hand {
   font-family: var(--display);
-  font-style: italic;
   font-weight: 500;
+  font-style: italic;
   font-size: 19px;
   color: var(--accent);
   margin-bottom: 12px;
@@ -656,11 +633,12 @@ header {
   font-weight: 600;
   line-height: 1.12;
   margin-bottom: 14px;
+  color: var(--ink);
 }
 .ob-body {
   color: var(--muted);
   font-size: 16.5px;
-  line-height: 1.5;
+  line-height: 1.55;
 }
 .ob-dots {
   display: flex;
@@ -690,20 +668,21 @@ header {
 /* ---- pick dishes ---- */
 .pick-row {
   margin-bottom: 8px;
-  border-radius: 14px;
-  border: 1px solid var(--card-edge);
-  background: var(--card);
+  border-radius: 16px;
+  border: none;
+  background: var(--surface);
   color: var(--ink);
   overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s var(--ease);
 }
 .pick-row.on {
-  border-color: var(--accent);
-  background: var(--bg2);
+  box-shadow: 0 0 0 2px var(--accent), var(--shadow);
 }
 .pick-main {
   display: flex;
   align-items: center;
-  flex-wrap: wrap; /* badges/duration/＋Add wrap instead of clipping on narrow phones */
+  flex-wrap: wrap;
   gap: 8px 12px;
   width: 100%;
   padding: 14px 16px;
@@ -730,26 +709,26 @@ header {
   gap: 5px;
 }
 .scale-btn {
-  min-width: 34px;
-  padding: 5px 9px;
-  border-radius: 8px;
+  min-width: 36px;
+  padding: 6px 10px;
+  border-radius: 9px;
   border: 1px solid var(--card-edge);
-  background: var(--bg2);
+  background: var(--bg-tint);
   color: var(--muted);
   cursor: pointer;
   font-size: 13px;
   font-family: var(--mono);
 }
 .scale-btn.on {
-  background: var(--card-strong);
-  color: var(--ink);
+  background: var(--accent-soft);
+  color: var(--accent-deep);
   border-color: var(--accent);
 }
 .pick-box {
-  width: 24px;
-  height: 24px;
-  border-radius: 7px;
-  border: 1px solid var(--card-edge);
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  border: 1.5px solid var(--card-edge);
   display: grid;
   place-items: center;
   color: var(--accent);
@@ -766,6 +745,7 @@ header {
 }
 .delta b {
   font-weight: 600;
+  color: var(--ink);
 }
 .delta .strike {
   text-decoration: line-through;
@@ -783,9 +763,10 @@ header {
   margin: 8px 0 12px;
   border-radius: 12px;
   border: 1px solid var(--card-edge);
-  background: var(--bg2);
+  background: var(--surface);
   color: var(--ink);
   max-width: 640px;
+  box-shadow: var(--shadow-sm);
 }
 
 /* ---- add recipe ---- */
@@ -796,18 +777,19 @@ header {
 }
 .subtab {
   flex: 1;
-  padding: 9px;
-  border-radius: 10px;
+  padding: 10px;
+  border-radius: 11px;
   border: 1px solid var(--card-edge);
-  background: var(--card);
+  background: var(--surface);
   color: var(--muted);
   cursor: pointer;
   font-size: 14px;
 }
 .subtab.on {
-  background: var(--bg2);
-  color: var(--ink);
+  background: var(--accent-soft);
+  color: var(--accent-deep);
   border-color: var(--accent);
+  font-weight: 600;
 }
 .paste-area,
 .url-input {
@@ -818,33 +800,35 @@ header {
   margin-bottom: 12px;
   border-radius: 12px;
   border: 1px solid var(--card-edge);
-  background: var(--bg2);
+  background: var(--surface);
   color: var(--ink);
   resize: vertical;
+  box-shadow: var(--shadow-sm);
 }
 .url-input {
   font-family: var(--mono);
   font-size: 16px;
 }
 .hint {
-  color: var(--faint);
+  color: var(--muted);
   font-size: 12.5px;
   margin-top: 10px;
-  line-height: 1.5;
+  line-height: 1.55;
 }
 .hint code,
 .idle code {
   font-family: var(--mono);
-  background: rgba(241, 234, 217, 0.06);
+  background: var(--bg-tint);
   padding: 1px 5px;
   border-radius: 5px;
 }
 .parse-result {
   margin-top: 16px;
-  padding: 14px;
+  padding: 16px;
   border-radius: 14px;
-  border: 1px solid var(--card-edge);
-  background: var(--card);
+  border: none;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
 }
 .parse-result ul {
   margin: 6px 0 0 18px;
@@ -854,17 +838,18 @@ header {
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--accent-deep);
-  border: 1px solid var(--accent-deep);
+  background: var(--accent-soft);
+  border: none;
   border-radius: 20px;
-  padding: 1px 8px;
+  padding: 2px 9px;
 }
 .badge-allergen {
   font-size: 11px;
   color: var(--accent-deep);
-  background: rgba(232, 98, 61, 0.12);
-  border: 1px solid var(--accent-deep);
+  background: var(--accent-soft);
+  border: none;
   border-radius: 20px;
-  padding: 1px 8px;
+  padding: 2px 9px;
   white-space: nowrap;
 }
 .allergen-chips {
@@ -874,33 +859,36 @@ header {
   margin: 8px 0 4px;
 }
 .chip-toggle {
-  padding: 6px 11px;
+  padding: 7px 12px;
   border-radius: 20px;
   border: 1px solid var(--card-edge);
-  background: var(--bg2);
+  background: var(--surface);
   color: var(--muted);
   cursor: pointer;
   font-size: 13px;
   text-transform: capitalize;
 }
 .chip-toggle.on {
-  background: rgba(232, 98, 61, 0.15);
-  color: var(--accent);
-  border-color: var(--accent-deep);
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+  border-color: var(--accent);
+  font-weight: 600;
 }
 .add-dish {
   width: 100%;
   margin: 6px 0 4px;
-  padding: 13px;
-  border-radius: 12px;
+  padding: 14px;
+  border-radius: 13px;
   cursor: pointer;
-  border: 1px dashed var(--card-edge);
+  border: 1.5px dashed var(--card-edge);
   background: none;
-  color: var(--accent);
+  color: var(--accent-deep);
   font-size: 14px;
+  font-weight: 500;
 }
 .add-dish:hover {
   border-color: var(--accent);
+  background: var(--accent-soft);
 }
 
 /* ---- shopping list ---- */
@@ -925,7 +913,7 @@ header {
   gap: 10px;
   width: 100%;
   text-align: left;
-  padding: 11px 14px;
+  padding: 12px 14px;
   border-bottom: 1px solid var(--line);
   background: none;
   border-left: none;
@@ -936,10 +924,10 @@ header {
   font-size: 15px;
 }
 .ing-row .box {
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
-  border: 1px solid var(--card-edge);
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  border: 1.5px solid var(--card-edge);
   display: grid;
   place-items: center;
   color: var(--poriyal);
@@ -970,41 +958,20 @@ header {
 }
 
 /* =====================================================================
-   THE SCORE — the signature. Each dish is a voice on its own staff line;
-   solid bars are hands-on notes, tied (hollow) bars are passive/simmering
-   holds, and the meal resolves on a gilt final barline at the serve time.
+   THE TIMELINE — every dish finishes together. Soft rounded bars in each
+   dish's colour on a light track; hands-on solid, simmering a light tint.
    ===================================================================== */
 .gantt {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 9px;
   margin: 16px 0;
-  padding: 20px 18px 22px;
-  border-radius: 16px;
-  border: 1px solid var(--card-edge);
-  background: var(--bg2);
-  /* bar lines: faint vertical time grid across the whole score */
-  background-image: repeating-linear-gradient(
-    to right,
-    transparent 0,
-    transparent calc(20% - 1px),
-    var(--line) calc(20% - 1px),
-    var(--line) 20%
-  );
-  overflow: hidden;
-}
-/* the final barline (the downbeat) — gilt, doubled, at the right margin */
-.gantt::after {
-  content: "";
-  position: absolute;
-  top: 12px;
-  bottom: 12px;
-  right: 0;
-  width: 5px;
-  border-left: 1px solid var(--accent);
-  background: linear-gradient(var(--accent), var(--accent-deep));
-  box-shadow: -3px 0 14px -2px rgba(230, 192, 106, 0.4);
+  padding: 20px 18px;
+  border-radius: 18px;
+  border: none;
+  background: var(--surface);
+  box-shadow: var(--shadow);
 }
 .gantt-row {
   position: relative;
@@ -1022,69 +989,51 @@ header {
 }
 .gantt-track {
   position: relative;
-  height: clamp(16px, 4.5vw, 22px);
-}
-.gantt-track::before {
-  /* the staff line this voice plays on */
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  height: 1px;
-  background: var(--staff);
+  height: clamp(18px, 4.5vw, 24px);
+  background: var(--bg-tint);
+  border-radius: 999px;
 }
 .gantt-bar {
   position: absolute;
-  top: 3px;
-  bottom: 3px;
-  border-radius: 4px;
-  min-width: 5px;
+  top: 0;
+  bottom: 0;
+  border-radius: 999px;
+  min-width: 6px;
   animation: phrase-in 0.5s var(--ease) both;
   transform-origin: left center;
 }
-/* hands-on = a solid, struck note */
+/* hands-on = solid colour */
 .gantt-bar:not(.passive) {
-  box-shadow: 0 2px 8px -3px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
-/* passive/simmering = a tied, held note: hollow, ringed, the hands are free */
+/* simmering = a light tint of the dish colour, hands free */
 .gantt-bar.passive {
-  background: transparent !important;
-  border: 1.5px dashed currentColor;
-  opacity: 0.85;
+  background: color-mix(in srgb, currentColor 22%, white) !important;
+  border: 1.5px solid color-mix(in srgb, currentColor 45%, white);
   box-shadow: none;
 }
 @keyframes phrase-in {
-  from {
-    opacity: 0;
-    transform: scaleX(0.2);
-  }
-  to {
-    opacity: 1;
-    transform: scaleX(1);
-  }
+  from { opacity: 0; transform: scaleX(0.2); }
+  to { opacity: 1; transform: scaleX(1); }
 }
-/* tempo marking above the score — pace IS tempo */
+/* plain pace line under the timeline */
 .tempo {
   display: flex;
   align-items: baseline;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
   margin: 4px 2px 0;
-  font-family: var(--display);
-  font-style: italic;
-  font-size: 16px;
-  color: var(--accent);
+  font-size: 13.5px;
+  color: var(--muted);
 }
 .tempo .beat {
   font-family: var(--mono);
-  font-style: normal;
   font-size: 13px;
-  color: var(--muted);
+  color: var(--faint);
 }
 .finale-line {
   color: var(--poriyal);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .scaffold-note {
@@ -1093,8 +1042,7 @@ header {
   border-top: 1px solid var(--line);
   color: var(--faint);
   font-size: 12px;
-  font-style: italic;
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1109,54 +1057,40 @@ header {
 .browse-filters { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 14px; }
 .browse-filters .chip-toggle { min-height: 40px; }
 .browse-row { width: 100%; cursor: pointer; }
-.browse-add { margin-left: 10px; color: var(--accent); font-size: 13px; white-space: nowrap; }
+.browse-add { margin-left: 10px; color: var(--accent-deep); font-weight: 600; font-size: 13px; white-space: nowrap; }
 
-/* accessibility (Brief v9) */
+/* accessibility */
 .sr-only {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
 }
-.screen-focus { outline: none; }
 .skip-link {
   position: absolute; left: 8px; top: -48px; z-index: 50;
-  background: var(--accent); color: #1a1209; padding: 10px 14px; border-radius: 10px;
+  background: var(--accent); color: #fff; padding: 10px 14px; border-radius: 10px;
   font-weight: 600; text-decoration: none; transition: top 0.15s var(--ease);
 }
 .skip-link:focus { top: 8px; }
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-button:focus-visible, a:focus-visible, input:focus-visible,
-[role="switch"]:focus-visible, .chip-toggle:focus-visible, .scale-btn:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
 @media (prefers-reduced-motion: reduce) {
   .skip-link { transition: none; }
 }
 
-/* motion polish (Brief v11) — Queue->NOW promotion + screen entry. All gated by reduced-motion. */
+/* motion polish — Queue→NOW promotion + screen entry. Gated by reduced-motion. */
 @keyframes rise {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: none; }
 }
 @keyframes promoteGlow {
-  0%   { box-shadow: 0 0 0 0 rgba(255, 163, 77, 0); }
-  35%  { box-shadow: 0 0 0 3px rgba(255, 163, 77, 0.35); }
-  100% { box-shadow: 0 0 0 0 rgba(255, 163, 77, 0); }
+  0%   { box-shadow: var(--shadow); }
+  35%  { box-shadow: 0 0 0 3px var(--accent-soft), var(--shadow); }
+  100% { box-shadow: var(--shadow); }
 }
 @keyframes fade {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
-/* Active hands-on card: rises in and pulses when it (re)mounts on promotion. The passive
-   countdown card is excluded so its per-second re-render never replays the animation. */
 .now-card:not(.passive) {
-  animation: rise 180ms var(--ease) both, promoteGlow 700ms var(--ease) 120ms;
+  animation: rise 180ms var(--ease) both, promoteGlow 800ms var(--ease) 120ms;
 }
-/* Each screen's zone gently fades in on entry/screen change. */
 .zone {
   animation: fade 160ms var(--ease) both;
 }
@@ -1168,25 +1102,23 @@ button:focus-visible, a:focus-visible, input:focus-visible,
   }
 }
 
-/* saved meals (Brief v12) */
-.meal-sec { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); margin: 16px 0 8px; }
+/* saved meals */
+.meal-sec { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); margin: 16px 0 8px; }
 .meal-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 .meal-main {
   flex: 1; display: flex; align-items: center; gap: 11px; text-align: left; cursor: pointer;
-  border-radius: 14px; border: 1px solid var(--card-edge); background: var(--card); padding: 12px 14px;
+  border-radius: 14px; border: none; background: var(--surface); padding: 13px 15px; box-shadow: var(--shadow-sm);
 }
 .meal-dots { display: flex; gap: 3px; flex: none; }
 .meal-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .meal-text .dur { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60vw; }
 .meal-x {
-  flex: none; width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--card-edge);
-  background: var(--bg2); color: var(--muted); font-size: 20px; cursor: pointer;
+  flex: none; width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--card-edge);
+  background: var(--surface); color: var(--muted); font-size: 20px; cursor: pointer; box-shadow: var(--shadow-sm);
 }
 
 /* =====================================================================
-   RESPONSIVE LAYOUT — "expand into the space" on desktop, stay calm on phones.
-   One auto-filling grid: 1 column on narrow screens, more columns as width
-   allows (no breakpoint needed — minmax + container width do the work).
+   RESPONSIVE LAYOUT — "expand into the space" on desktop, calm on phones.
    ===================================================================== */
 .card-grid {
   --col-min: 300px;
@@ -1196,12 +1128,11 @@ button:focus-visible, a:focus-visible, input:focus-visible,
   align-items: start;
 }
 .card-grid > * {
-  margin-bottom: 0; /* gap owns the spacing; cancel each card's own margin */
+  margin-bottom: 0;
 }
-.now-grid { --col-min: 340px; } /* cook cards stay roomy */
-.ing-grid { --col-min: 240px; } /* shopping lines are short */
+.now-grid { --col-min: 340px; }
+.ing-grid { --col-min: 240px; }
 
-/* Keep single-column prose & forms a readable measure once the column widens. */
 .value,
 .hint,
 .alert,
@@ -1216,7 +1147,6 @@ button:focus-visible, a:focus-visible, input:focus-visible,
   max-width: 680px;
 }
 
-/* Tap-target floor for standalone controls (row/card buttons are already large). */
 .scale-btn,
 .kp-toggle,
 .chip-toggle,
@@ -1224,7 +1154,6 @@ button:focus-visible, a:focus-visible, input:focus-visible,
   min-height: 40px;
 }
 
-/* The Score: stack each voice's label above its staff line on very narrow phones. */
 @media (max-width: 419px) {
   .gantt-row {
     grid-template-columns: 1fr;
@@ -1235,45 +1164,46 @@ button:focus-visible, a:focus-visible, input:focus-visible,
   }
 }
 
-/* hands-lanes (Brief v14) — who does what when cooking with help */
+/* hands-lanes — who does what when cooking with help */
 .lane {
-  margin-left: 8px; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px;
-  letter-spacing: 0.02em; color: #100e0c;
+  margin-left: 8px; font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 999px;
+  letter-spacing: 0.02em; color: #2c2117;
 }
-.lane-0 { background: #ffce6b; }   /* You */
-.lane-1 { background: #7fd1ff; }   /* Cook 2 */
-.lane-2 { background: #9be58c; }   /* Cook 3 */
-.lane-3 { background: #f3a0c2; }   /* Cook 4 */
+.lane-0 { background: #f4c98a; }   /* You */
+.lane-1 { background: #a8d4ef; }   /* Cook 2 */
+.lane-2 { background: #b9e0a8; }   /* Cook 3 */
+.lane-3 { background: #f0bcd0; }   /* Cook 4 */
 
-/* recipe notes & ratings (Brief v17) */
+/* recipe notes & ratings */
 .stars { display: inline-flex; gap: 2px; }
 .star { background: none; border: none; cursor: pointer; font-size: 20px; line-height: 1; color: var(--accent); padding: 2px; }
-.star:not(.on) { color: var(--faint); }
+.star:not(.on) { color: var(--card-edge); }
 .stars-ro { color: var(--accent); font-size: 12px; letter-spacing: 1px; margin-left: 6px; }
 .cooked-n { font-size: 11px; color: var(--faint); margin-left: 6px; }
 .review { margin: 14px 0; text-align: left; }
-.review-h { font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); margin-bottom: 8px; }
+.review-h { font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); margin-bottom: 8px; }
 .review-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 8px 0; border-top: 1px solid var(--line); }
 .review-name { display: flex; align-items: center; gap: 8px; min-width: 120px; flex: 1; }
 .review-note { flex: 1 1 100%; font-family: inherit; font-size: 13px; padding: 8px 10px; border-radius: 8px;
-  border: 1px solid var(--card-edge); background: var(--bg2); color: var(--ink); }
+  border: 1px solid var(--card-edge); background: var(--surface); color: var(--ink); }
 
-/* "what should I cook?" suggestion (Brief v18) */
+/* "what should I cook?" suggestion */
 .suggest-card {
-  margin: 4px 0 16px; padding: 16px; border-radius: 16px;
-  background: linear-gradient(150deg, rgba(255,163,77,0.12), rgba(232,98,61,0.08));
-  border: 1px solid var(--card-edge);
+  margin: 4px 0 16px; padding: 18px; border-radius: 18px;
+  background: linear-gradient(150deg, rgba(207, 122, 35, 0.12), rgba(199, 93, 51, 0.08));
+  border: none;
+  box-shadow: var(--shadow-sm);
 }
-.suggest-h { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--faint); }
-.suggest-name { font-family: var(--display); font-size: 22px; font-weight: 600; margin: 4px 0 2px; }
+.suggest-h { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent-deep); font-weight: 600; }
+.suggest-name { font-family: var(--display); font-size: 22px; font-weight: 600; margin: 4px 0 2px; color: var(--ink); }
 .suggest-card .hint { margin-bottom: 12px; }
 .suggest-card .btn { width: 100%; padding: 12px; }
 
-/* recipe detail + browse details affordance (Brief v19) */
+/* recipe detail + browse details affordance */
 .browse-line { display: flex; align-items: stretch; gap: 8px; }
 .browse-line .browse-row { flex: 1; }
-.browse-info { flex: none; width: 44px; border-radius: 14px; border: 1px solid var(--card-edge);
-  background: var(--card); color: var(--muted); font-size: 18px; cursor: pointer; }
+.browse-info { flex: none; width: 44px; border-radius: 14px; border: none;
+  background: var(--surface); color: var(--muted); font-size: 18px; cursor: pointer; box-shadow: var(--shadow-sm); }
 .recipe-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
 .recipe-steps { margin: 4px 0 16px; padding-left: 22px; display: flex; flex-direction: column; gap: 10px; }
 .recipe-step { padding-left: 4px; }

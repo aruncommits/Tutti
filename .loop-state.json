@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 63,
-  "lastTick": "2026-06-18T12:31:36.7276601+08:00",
-  "lastTickEpoch": 1781757097,
-  "phase": "brief-v19-recipe-detail",
-  "nextResearchTheme": "Brief v19 item 1 done (recipeView orderedSteps/recipeIngredients/recipeTotalMins; 199 tests). NEXT: items 2-3+5 - RecipeDetailScreen.tsx (lazy in App): props recipe, note?, onAdd, onBack; header name + total mins + serves + allergen badges (allergensOf) + ★rating/cookCount/note if present; Ingredients section (recipeIngredients); numbered <ol> Steps (orderedSteps) each with title + phase chip + duration + 'hands-free' tag when attention passive; 'Add to meal' button -> onAdd. Add 'recipe' to Screen union + App detailRecipe state (RecipeGraph|null); route screen==='recipe' -> <RecipeDetailScreen recipe={detailRecipe} note={notes[id]} onAdd={()=>addCandidate(detailRecipe)} onBack={()=>setScreen('browse')}/>. BrowseScreen: add a 'details' affordance per row (e.g. an ⓘ button) distinct from the row's +Add, calling onDetails(recipe); App passes onDetails=(r)=>{setDetailRecipe(r); setScreen('recipe')}. Item 5: RecipeDetail render test (ingredients + N numbered steps for a library recipe; Add to meal calls onAdd). Verify in browser. Then Brief v19 done -> research + Brief v20."
+  "iteration": 64,
+  "lastTick": "2026-06-18T12:40:30.9728897+08:00",
+  "lastTickEpoch": 1781757631,
+  "phase": "brief-v20-mise-en-place",
+  "nextResearchTheme": "Brief v19 DONE (recipe detail read view; 202 tests). Brief v20 authored (mise en place / get-ready checklist). NEXT: Brief v20 item 1 - apps/web/src/mise.ts: requiredEquipment(recipes):string[] (unique node resource categories across meal, EXCLUDE 'hands', humanized via label map) + missingEquipment(required, kitchen:KitchenUi):string[] (required tools not in kitchen - check via toKitchenProfile+capacityOf, or KitchenUi flags). reuse buildShoppingList for ingredients. mise.test.ts (excludes hands+dedupe; missing flags a lacking tool e.g. no blender; empty when all present). Then item 2 MiseScreen (lazy, 'ready' screen: checkable ingredients + equipment + missing-tool warning + Start cooking), item 3 wire Preview->ready->startCooking, item 5 tests."
 }

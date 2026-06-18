@@ -184,7 +184,7 @@ export function App() {
       <header>
         <button className="logo" onClick={() => setScreen("home")} aria-label="Home">
           <div className="mark">T</div>
-          <div className="brand">Tutti<small>every dish, in concert</small></div>
+          <div className="brand">Tutti<small>the whole meal, ready at once</small></div>
         </button>
       </header>
 
@@ -302,7 +302,7 @@ export function App() {
       </main>
 
       <footer className="scaffold-note">
-        Tutti — every dish, in concert. Cooks fully offline; nothing leaves your device.
+        Tutti — the whole meal, ready at once. Cooks fully offline; nothing leaves your device.
       </footer>
     </div>
   );

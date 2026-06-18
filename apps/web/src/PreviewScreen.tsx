@@ -7,11 +7,6 @@ import { colorFor } from "./dishColors";
 
 const hhmm = (clock: string) => formatClock(parseClock(clock)).slice(0, 5);
 
-// The meal's pace, named like a score's tempo: a longer movement runs slower. Flavor on
-// the timeline, not a claim about the cook — a 45-min thali simply reads as "Andante".
-const tempoOf = (mins: number): string =>
-  mins < 30 ? "Allegro" : mins < 50 ? "Andante" : mins < 80 ? "Adagio" : "Largo";
-
 export function PreviewScreen({
   plan,
   onStart,
@@ -34,12 +29,11 @@ export function PreviewScreen({
 
   return (
     <section className="zone" aria-label="Your plan">
-      <h2 className="zone-h"><span>The score · serve {hhmm(plan.projectedServeTime)}</span></h2>
-      <p className="value">Start at <b>{hhmm(plan.startTime)}</b> — every voice lands together on the downbeat.</p>
+      <h2 className="zone-h"><span>Your timeline · ready {hhmm(plan.projectedServeTime)}</span></h2>
+      <p className="value">Start at <b>{hhmm(plan.startTime)}</b> and every dish finishes together at <b>{hhmm(plan.projectedServeTime)}</b>.</p>
 
       <p className="tempo">
-        {tempoOf(plan.criticalPathMins)}
-        <span className="beat">♩ {plan.criticalPathMins}-min movement · {voices} voices</span>
+        <span className="beat">About {plan.criticalPathMins} min · {voices} dishes</span>
       </p>
       <div className="gantt" role="img" aria-label="Cooking timeline showing dishes interleaved">
         {rows.map((n) => {
