@@ -109,7 +109,7 @@ export function App() {
       <header>
         <button className="logo" onClick={() => setScreen("home")} aria-label="Home">
           <div className="mark">T</div>
-          <div className="brand">Tutti<small>cook the whole meal, together</small></div>
+          <div className="brand">Tutti<small>every dish, in concert</small></div>
         </button>
       </header>
 

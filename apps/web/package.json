@@ -11,6 +11,9 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@fontsource/bodoni-moda": "^5.2.7",
+    "@fontsource/instrument-sans": "^5.2.8",
+    "@fontsource/spline-sans-mono": "^5.2.8",
     "@tutti/engine": "*",
     "@tutti/ingest": "*",
     "react": "^18.3.1",

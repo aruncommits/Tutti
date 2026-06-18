@@ -7,6 +7,11 @@ import { colorFor } from "./dishColors";
 
 const hhmm = (clock: string) => formatClock(parseClock(clock)).slice(0, 5);
 
+// The meal's pace, named like a score's tempo: a longer movement runs slower. Flavor on
+// the timeline, not a claim about the cook — a 45-min thali simply reads as "Andante".
+const tempoOf = (mins: number): string =>
+  mins < 30 ? "Allegro" : mins < 50 ? "Andante" : mins < 80 ? "Adagio" : "Largo";
+
 export function PreviewScreen({
   plan,
   onStart,
@@ -21,12 +26,17 @@ export function PreviewScreen({
   const rows = [...plan.nodes].sort(
     (a, b) => parseClock(plan.schedule[a.nodeId]!.plannedStart) - parseClock(plan.schedule[b.nodeId]!.plannedStart),
   );
+  const voices = new Set(plan.nodes.map((n) => n.recipeId)).size;
 
   return (
     <section className="zone" aria-label="Your plan">
-      <h2 className="zone-h"><span>Your plan · serve {hhmm(plan.projectedServeTime)}</span></h2>
-      <p className="value">Start at <b>{hhmm(plan.startTime)}</b> · {plan.criticalPathMins}-min critical path</p>
+      <h2 className="zone-h"><span>The score · serve {hhmm(plan.projectedServeTime)}</span></h2>
+      <p className="value">Start at <b>{hhmm(plan.startTime)}</b> — every voice lands together on the downbeat.</p>
 
+      <p className="tempo">
+        {tempoOf(plan.criticalPathMins)}
+        <span className="beat">♩ {plan.criticalPathMins}-min movement · {voices} voices</span>
+      </p>
       <div className="gantt" role="img" aria-label="Cooking timeline showing dishes interleaved">
         {rows.map((n) => {
           const s = plan.schedule[n.nodeId]!;
@@ -39,7 +49,7 @@ export function PreviewScreen({
               <span className="gantt-track">
                 <span
                   className={`gantt-bar${n.attention === "passive" ? " passive" : ""}`}
-                  style={{ left: `${left}%`, width: `${width}%`, background: color }}
+                  style={{ left: `${left}%`, width: `${width}%`, background: color, color }}
                   title={`${hhmm(s.plannedStart)}–${hhmm(s.plannedEnd)} · ${n.attention}`}
                 />
               </span>
