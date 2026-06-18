@@ -38,4 +38,24 @@ describe("cook journey (Brief v30 item 1)", () => {
 
     expect(await screen.findByText(/dinner is served/i)).toBeInTheDocument();
   });
+
+  it("plans a meal through Pick -> Preview -> Get ready -> Cook", async () => {
+    render(<App />);
+
+    fireEvent.click(screen.getByRole("button", { name: /pick dishes/i }));
+    // thali dishes are selected by default -> proceed
+    fireEvent.click(await screen.findByRole("button", { name: /set serve time/i }));
+    fireEvent.click(await screen.findByRole("button", { name: /build my plan/i }));
+
+    // Preview is lazy-loaded (region label is stable across heading-text redesigns)
+    expect(await screen.findByRole("region", { name: /your plan/i })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /start cooking/i }));
+
+    // "Get ready" mise screen (lazy)
+    expect(await screen.findByRole("heading", { name: /get ready/i })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /start cooking/i }));
+
+    // Cook Mode
+    expect(await screen.findByText(/serving at/i)).toBeInTheDocument();
+  });
 });

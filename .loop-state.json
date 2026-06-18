@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 84,
-  "lastTick": "2026-06-18T07:11:37.218Z",
-  "lastTickEpoch": 1781766697,
+  "iteration": 85,
+  "lastTick": "2026-06-18T07:15:27.331Z",
+  "lastTickEpoch": 1781766927,
   "phase": "brief-v30-e2e-journey",
-  "nextResearchTheme": "Brief v29 DONE (metric units toggle; 262 tests). Brief v30 authored (e2e cook-journey test). NEXT: Brief v30 item 1 - apps/web/src/journey.test.tsx: seed tutti.onboarded=true + tutti.screen=home, render <App/>, click Start cooking (getByRole button /start cooking/i), assert NOW region + Serving-at clock present, then loop (cap ~40 iters) clicking any /cooks itself/i (passive start) or /done/i (active) button found each pass until the finale, assert findByText /dinner is served/i. Use role/text queries; getAllByRole+filter; await/findBy for lazy. Item 2 plan-flow sub-journey (Pick->serveTime->Build->Preview findBy->Start->Get ready->Start->Cook). Item 3 fix any wiring the journey surfaces. Keep gate green."
+  "nextResearchTheme": "Brief v30 item 1 done (e2e journey Home->finale passes; 263 tests; RESUMED after 6th ~8h stall). NEXT: item 2 - plan-flow sub-journey in journey.test.tsx: from Home click Pick dishes link -> Set serve time button -> Build my plan -> await findByText (Preview lazy) /the score|serving at/i -> Start cooking -> Get ready (Mise) /get ready/i -> Start cooking -> assert Cook NOW/serving-at. Use findBy for lazy Preview/Mise; role/text queries. Item 3 fix any wiring it surfaces. Then Brief v30 done -> research + Brief v31."
 }
