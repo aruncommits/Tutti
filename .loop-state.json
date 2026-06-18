@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
-  "mode": "until-stop",
-  "iteration": 94,
-  "lastTick": "2026-06-18T08:22:01.153Z",
-  "lastTickEpoch": 1781770921,
-  "phase": "brief-v38-browse-sort",
-  "nextResearchTheme": "Brief v38 item 1 done (sortLibrary; 285 tests). NEXT: items 2+5 - BrowseScreen: import { sortLibrary, type SortKey } from ./libraryView; const [sort,setSort]=useState<SortKey>(default); after computing filtered=filterLibrary(...), const ordered=sortLibrary(filtered,sort,notes); render ordered rows. Add a labelled Sort row ABOVE/with the filters: a small label Sort + chip-toggle buttons Default/Quickest/Top rated/Most cooked (aria-pressed sort===key). Keep the count = ordered.length. item 5: browse.test or new - click Quickest -> first row is the shortest-time dish; clicking sort does not change the result count. Verify in browser. Then Brief v38 done -> research + Brief v39 (onboarding polish / second cuisine / competitor)."
+  "mode": "STOPPED",
+  "iteration": 98,
+  "lastTick": "2026-06-18T11:14:13.366Z",
+  "lastTickEpoch": 1781781253,
+  "phase": "STOPPED by user after Brief v40 (2026-06-18)",
+  "nextResearchTheme": "LOOP STOPPED by user (finish pending tasks then stop). Brief v40 COMMITTED (2c7f4d4): dev AI endpoint secure-by-default localhost-only + AI_ALLOW_LAN/AI_DEV_TOKEN opt-in; HIGH security finding fixed; gate green 290 tests. Backstop cron b3c87eaa deleted; fast ScheduleWakeup NOT re-armed. To resume later: re-arm the ~60s ScheduleWakeup with the continuation prompt + recreate the heartbeat cron. Last committed brief: v40. Next candidate if resumed: implement nothing pending; pick a fresh enhancement (e.g. onboarding polish, more recipes, or hardening the AI router)."
 }
