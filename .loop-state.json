@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 39,
-  "lastTick": "2026-06-18T10:07:01.4718013+08:00",
-  "lastTickEpoch": 1781748421,
+  "iteration": 40,
+  "lastTick": "2026-06-18T10:12:42.4531092+08:00",
+  "lastTickEpoch": 1781748762,
   "phase": "brief-v7-pwa-offline",
-  "nextResearchTheme": "ROADMAP + Loop A COMPLETE (132 tests). Continuous-enhancement phase begun. Brief v7 authored (PWA/offline-first). NEXT: Brief v7 item 1 - add vite-plugin-pwa (npm i -D -w apps/web) + configure VitePWA in vite.config.ts (registerType autoUpdate, Tutti manifest, workbox globPatterns incl woff2); keep port 5180 strictPort; verify build emits service worker + manifest.webmanifest; gate green."
+  "nextResearchTheme": "Brief v7 item 1 done (PWA plugin: build emits manifest+sw, installable/offline; adapted to external Bodoni/Instrument-Sans theme edit; 132 tests). NEXT: item 3 - self-host fonts for TRUE offline: add @fontsource packages (or vendor woff2) for the externally-chosen fonts Bodoni Moda + Instrument Sans (+ Spline Sans Mono if used), import them in main.tsx/css, remove the Google Fonts <link> from index.html so there is no cross-origin runtime dependency. Verify build + woff2 precached + offline. Then item 4 (light update toast) + item 5 (offline Playwright check)."
 }

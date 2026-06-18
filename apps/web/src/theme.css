@@ -1,24 +1,34 @@
-/* Tutti — responsive Cook Mode shell. Aesthetic seeded from the prototype
-   (grainy ember dark theme, Fraunces/Caveat/Inter). Mobile-first. */
+/* Tutti — "every dish, in concert."
+   The plan is a score; each dish a voice; the serve time the downbeat where every
+   voice resolves on one chord. Concert-hall dark (aubergine ink, gilt brass), engraved
+   typography. Mobile-first; the boldness lives in The Score, everything else stays calm. */
 :root {
+  /* dish voices — instruments under stage light (kept in sync with dishColors.ts) */
   --rice: #5aa6ff;
   --kuzhambu: #ff8a5b;
   --poriyal: #86cf4d;
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
-}
-[data-theme="dark"] {
-  --bg: #100e0c;
-  --bg2: #1a1613;
-  --ink: #f4ece1;
-  --muted: #a89c8c;
-  --faint: #6f6557;
-  --accent: #ffa34d;
-  --accent-deep: #e8623d;
-  --card: rgba(255, 255, 255, 0.045);
-  --card-edge: rgba(255, 255, 255, 0.085);
-  --line: rgba(255, 255, 255, 0.08);
-  --display: "Bodoni Moda", Georgia, serif;
-  --hand: "Bodoni Moda", Georgia, serif;
+
+  /* concert hall, lights down */
+  --bg: #0d0b13;
+  --bg2: #15121d;
+  --ink: #f1ead9;
+  --muted: #a59db4;
+  --faint: #6c6480;
+
+  /* gilt — stage light, instrument lacquer, a conductor's gravity. Used like gold leaf. */
+  --accent: #e6c06a;
+  --accent-deep: #c89a3e;
+
+  --card: rgba(241, 234, 217, 0.04);
+  --card-strong: rgba(241, 234, 217, 0.09);
+  --card-edge: rgba(241, 234, 217, 0.1);
+  --line: rgba(241, 234, 217, 0.08);
+  --staff: rgba(241, 234, 217, 0.16);
+
+  --display: "Bodoni Moda", "Times New Roman", serif;
+  --body: "Instrument Sans", system-ui, sans-serif;
+  --mono: "Spline Sans Mono", ui-monospace, monospace;
 }
 * {
   box-sizing: border-box;
@@ -30,74 +40,135 @@ body {
   min-height: 100%;
 }
 body {
-  font-family: "Instrument Sans", system-ui, sans-serif;
+  font-family: var(--body);
   color: var(--ink);
   background: var(--bg);
+  /* a single stand-light pool from above — one ambient, static touch */
+  background-image: radial-gradient(120% 60% at 50% -8%, rgba(230, 192, 106, 0.07), transparent 60%);
+  background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
+}
+::selection {
+  background: rgba(230, 192, 106, 0.26);
+  color: var(--ink);
+}
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 6px;
 }
 .wrap {
   max-width: 720px;
   margin: 0 auto;
   padding: 22px 20px 90px;
 }
+
+/* ---- masthead: a concert program header ---- */
 header {
   display: flex;
   align-items: center;
   gap: 14px;
-  margin-bottom: 18px;
+  margin-bottom: 22px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
 }
 .logo {
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
 }
+/* the monogram set on three staff lines — a rehearsal mark */
 .mark {
-  width: 38px;
-  height: 38px;
-  border-radius: 11px;
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
   display: grid;
   place-items: center;
   font-family: var(--display);
+  font-style: italic;
   font-weight: 600;
-  background: linear-gradient(145deg, var(--accent), var(--accent-deep));
-  color: #fff;
-  box-shadow: 0 6px 18px -6px var(--accent-deep);
+  font-size: 21px;
+  color: var(--ink);
+  background: var(--bg2);
+  border: 1px solid var(--card-edge);
+  overflow: hidden;
+}
+.mark::before {
+  content: "";
+  position: absolute;
+  inset: 9px 6px;
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--accent) 0 1.2px,
+    transparent 1.2px 7px
+  );
+  opacity: 0.55;
+}
+.mark > * {
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 0 6px var(--bg2), 0 0 6px var(--bg2);
 }
 .brand {
   font-family: var(--display);
   font-weight: 600;
-  font-size: 23px;
-  line-height: 1.1;
+  font-size: 25px;
+  letter-spacing: 0.01em;
+  line-height: 1;
 }
 .brand small {
   display: block;
-  font-family: "Instrument Sans";
-  font-weight: 500;
-  font-size: 10.5px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--faint);
-  margin-top: 3px;
+  font-family: var(--body);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 12px;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  color: var(--muted);
+  margin-top: 5px;
 }
+
+/* ---- the conductor's clock: serving-at + downbeat ---- */
 .clock {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  background: var(--card);
+  background: var(--bg2);
   border: 1px solid var(--card-edge);
   border-radius: 16px;
   padding: 16px 18px;
+  position: relative;
+  overflow: hidden;
+}
+.clock::after {
+  /* a faint final-barline at the right edge: the downbeat lives here */
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 6px;
+  background: linear-gradient(var(--accent-deep), var(--accent));
+  opacity: 0.5;
 }
 .lbl {
   font-size: 11px;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--faint);
+  color: var(--accent);
+  font-weight: 600;
 }
 .time {
-  font-family: var(--display);
-  font-size: 34px;
-  font-weight: 600;
+  font-family: var(--mono);
+  font-size: 36px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
 }
 .status {
   display: flex;
@@ -111,36 +182,58 @@ header {
   height: 8px;
   border-radius: 50%;
   background: var(--poriyal);
+  box-shadow: 0 0 0 3px rgba(134, 207, 77, 0.18);
 }
 .value {
   color: var(--muted);
-  font-size: 14px;
+  font-size: 14.5px;
+  line-height: 1.5;
   margin: 16px 2px;
+}
+.value b {
+  color: var(--ink);
+  font-weight: 600;
 }
 .value .strike {
   text-decoration: line-through;
   opacity: 0.7;
 }
+
+/* ---- zones (NOW / NEXT / DONE) set as rehearsal marks ---- */
 .zone {
-  margin-top: 18px;
+  margin-top: 22px;
 }
 .zone-h {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  font-family: var(--body);
   font-size: 12px;
-  letter-spacing: 0.18em;
+  font-weight: 600;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--faint);
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+}
+.zone-h::after {
+  /* the staff line that the rehearsal mark sits on */
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
 }
 .zone-h .count {
-  background: var(--card);
+  order: 1;
+  flex: none;
+  background: none;
   border: 1px solid var(--card-edge);
   border-radius: 20px;
   padding: 1px 9px;
   font-size: 11px;
+  color: var(--muted);
 }
+
+/* ---- task cards ---- */
 .now-card,
 .q-item {
   display: flex;
@@ -151,9 +244,6 @@ header {
   background: var(--card);
   padding: 14px 16px;
   margin-bottom: 8px;
-}
-.now-card {
-  background: var(--bg2);
 }
 .swatch {
   width: 12px;
@@ -171,18 +261,51 @@ header {
 }
 .dur {
   color: var(--faint);
-  font-size: 13px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
 }
+
+/* ---- buttons: gilt primary, used sparingly ---- */
 .btn {
   border: none;
-  border-radius: 10px;
-  padding: 9px 16px;
+  border-radius: 11px;
+  padding: 10px 17px;
+  font-family: var(--body);
   font-weight: 600;
-  font-size: 14px;
-  color: #1a1209;
-  background: linear-gradient(145deg, var(--accent), var(--accent-deep));
+  font-size: 14.5px;
+  color: #1a140a;
+  background: linear-gradient(160deg, var(--accent), var(--accent-deep));
   cursor: pointer;
+  transition: transform 0.12s var(--ease), box-shadow 0.2s var(--ease), filter 0.2s var(--ease);
+  box-shadow: 0 6px 20px -10px var(--accent-deep);
 }
+.btn:hover {
+  filter: brightness(1.05);
+  box-shadow: 0 10px 26px -10px var(--accent-deep);
+}
+.btn:active {
+  transform: translateY(1px);
+}
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+  filter: none;
+}
+.btn.ghost {
+  flex: 0 0 auto;
+  background: none;
+  border: 1px solid var(--card-edge);
+  color: var(--ink);
+  box-shadow: none;
+}
+.btn.ghost:hover {
+  border-color: var(--accent);
+  filter: none;
+}
+
+/* ---- DONE: a played, struck-through line ---- */
 .done-card {
   display: flex;
   align-items: center;
@@ -190,15 +313,19 @@ header {
   width: 100%;
   text-align: left;
   color: var(--faint);
-  padding: 8px 16px;
+  padding: 9px 16px;
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 14.5px;
+}
+.done-card .swatch {
+  opacity: 0.5;
 }
 .undo-hint {
   margin-left: auto;
   font-size: 11px;
+  font-style: italic;
   opacity: 0;
   transition: opacity 0.2s var(--ease);
 }
@@ -211,58 +338,72 @@ header {
 }
 .idle {
   color: var(--muted);
-  padding: 14px 16px;
+  padding: 16px;
   border: 1px dashed var(--card-edge);
   border-radius: 14px;
+  line-height: 1.5;
 }
+.idle b {
+  color: var(--ink);
+}
+
+/* ---- NOW card: the voice currently being played ---- */
 .now-card {
   display: block;
+  background: var(--bg2);
+  position: relative;
 }
 .now-card.passive {
-  opacity: 0.92;
+  background: var(--card);
   border-style: dashed;
 }
 .now-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 9px;
 }
 .tag {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  font-size: 12px;
-  color: var(--muted);
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ink);
 }
 .phase {
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--faint);
+  font-family: var(--body);
+  font-style: italic;
+  font-size: 12.5px;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--accent);
 }
 .now-title {
   font-family: var(--display);
-  font-size: 20px;
+  font-size: 23px;
   font-weight: 600;
-  margin-bottom: 8px;
+  line-height: 1.15;
+  margin-bottom: 10px;
 }
 .measure {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 .chip {
   font-size: 12.5px;
   color: var(--muted);
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(241, 234, 217, 0.05);
   border: 1px solid var(--card-edge);
   border-radius: 8px;
   padding: 3px 9px;
 }
 .chip b {
   color: var(--ink);
+  font-family: var(--mono);
+  font-weight: 500;
 }
 .act {
   display: flex;
@@ -271,47 +412,102 @@ header {
 }
 .act .btn {
   flex: 1;
-  padding: 12px;
+  padding: 13px;
+  font-size: 15px;
 }
 .cooking-label {
   flex: 1;
   color: var(--muted);
+  font-family: var(--mono);
   font-size: 14px;
+  font-variant-numeric: tabular-nums;
 }
+
+/* ---- the cadence: dinner is served ---- */
 .finale {
   text-align: center;
-  padding: 24px 0;
+  padding: 32px 0 24px;
+  position: relative;
+  animation: cadence 0.7s var(--ease) both;
+}
+.finale::before {
+  content: "𝄆 𝄐 𝄇";
+  display: block;
+  font-size: 22px;
+  letter-spacing: 0.3em;
+  color: var(--accent);
+  margin-bottom: 14px;
+  opacity: 0.9;
 }
 .finale .big {
   font-family: var(--display);
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 600;
-  margin-bottom: 16px;
+  font-style: italic;
+  margin-bottom: 18px;
+  background: linear-gradient(100deg, var(--ink), var(--accent), var(--ink));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+@keyframes cadence {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 .time.late {
   color: var(--accent-deep);
 }
+
+/* ---- alerts & nudges ---- */
 .alert {
   margin: 12px 0;
-  padding: 10px 14px;
+  padding: 11px 14px;
   border-radius: 12px;
   background: rgba(232, 98, 61, 0.12);
   border: 1px solid var(--accent-deep);
   color: var(--accent);
   font-size: 14px;
 }
+.nudge {
+  margin: 12px 0;
+  padding: 11px 14px;
+  border-radius: 12px;
+  background: rgba(134, 207, 77, 0.1);
+  border: 1px solid rgba(134, 207, 77, 0.4);
+  color: var(--ink);
+  font-size: 14px;
+}
+
+/* ---- voice mic ---- */
 .mic {
-  margin-left: 10px; width: 38px; height: 38px; border-radius: 50%;
-  border: 1px solid var(--card-edge); background: var(--bg2); cursor: pointer; font-size: 16px;
-}
-.mic.on { background: var(--accent-deep); border-color: transparent; box-shadow: 0 0 0 4px rgba(232,98,61,.25); }
-.listening { margin: 8px 0 0; font-size: 13px; color: var(--accent); }
-.logo {
-  background: none;
-  border: none;
+  margin-left: 10px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--card-edge);
+  background: var(--bg2);
   cursor: pointer;
-  text-align: left;
+  font-size: 16px;
 }
+.mic.on {
+  background: var(--accent-deep);
+  border-color: transparent;
+  box-shadow: 0 0 0 4px rgba(230, 192, 106, 0.25);
+}
+.listening {
+  margin: 8px 0 0;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--accent);
+}
+
+/* ---- home ---- */
 .big-btn {
   width: 100%;
   padding: 16px;
@@ -320,7 +516,8 @@ header {
 }
 .home-links {
   display: flex;
-  gap: 16px;
+  gap: 18px;
+  flex-wrap: wrap;
 }
 .link {
   background: none;
@@ -329,8 +526,14 @@ header {
   cursor: pointer;
   font-size: 14px;
   padding: 6px 0;
-  text-decoration: underline;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(230, 192, 106, 0.35);
 }
+.link:hover {
+  border-bottom-color: var(--accent);
+}
+
+/* ---- kitchen profile rows ---- */
 .kp {
   display: flex;
   flex-direction: column;
@@ -341,7 +544,8 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 14px;
+  gap: 12px;
+  padding: 13px 14px;
   border-radius: 12px;
   border: 1px solid var(--card-edge);
   background: var(--card);
@@ -364,10 +568,14 @@ header {
   font-size: 18px;
   cursor: pointer;
 }
+.kp-stepper button:hover {
+  border-color: var(--accent);
+}
 .kp-val {
   min-width: 20px;
   text-align: center;
   font-weight: 600;
+  font-family: var(--mono);
 }
 .kp-toggle {
   min-width: 56px;
@@ -379,8 +587,8 @@ header {
   cursor: pointer;
 }
 .kp-toggle.on {
-  background: linear-gradient(145deg, var(--accent), var(--accent-deep));
-  color: #1a1209;
+  background: linear-gradient(160deg, var(--accent), var(--accent-deep));
+  color: #1a140a;
   border-color: transparent;
   font-weight: 600;
 }
@@ -402,127 +610,385 @@ header {
   color: var(--ink);
   border-color: var(--accent);
 }
-/* onboarding */
-.onboarding { min-height: 70vh; display: flex; flex-direction: column; justify-content: center; }
-.ob-card { padding: 24px 4px; }
-.ob-hand { font-family: var(--hand, "Bodoni Moda", serif); font-style: italic; font-size: 22px; color: var(--accent); margin-bottom: 10px; }
-.ob-title { font-family: var(--display); font-size: 30px; font-weight: 600; line-height: 1.15; margin-bottom: 12px; }
-.ob-body { color: var(--muted); font-size: 16px; line-height: 1.5; }
-.ob-dots { display: flex; gap: 8px; margin: 18px 4px; }
-.ob-dots span { width: 8px; height: 8px; border-radius: 50%; background: var(--card-edge); }
-.ob-dots span.on { background: var(--accent); }
-.ob-actions { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-.ob-actions .btn { flex: 1; padding: 14px; }
 
-/* pick dishes */
-.pick-row {
-  margin-bottom: 8px; border-radius: 14px;
-  border: 1px solid var(--card-edge); background: var(--card); color: var(--ink); overflow: hidden;
-}
-.pick-row.on { border-color: var(--accent); background: var(--bg2); }
-.pick-main {
-  display: flex; align-items: center; gap: 12px; width: 100%;
-  padding: 14px 16px; background: none; border: none; color: inherit; cursor: pointer; text-align: left;
-}
-.serve-scale {
-  display: flex; align-items: center; justify-content: space-between; gap: 10px;
-  padding: 8px 16px 12px; border-top: 1px solid var(--line);
-}
-.serve-label { font-size: 12px; color: var(--faint); }
-.scale-btns { display: flex; gap: 5px; }
-.scale-btn {
-  min-width: 34px; padding: 5px 9px; border-radius: 8px; border: 1px solid var(--card-edge);
-  background: var(--bg2); color: var(--muted); cursor: pointer; font-size: 13px;
-}
-.scale-btn.on { background: var(--card-strong); color: var(--ink); border-color: var(--accent); }
-.pick-box {
-  width: 24px; height: 24px; border-radius: 7px; border: 1px solid var(--card-edge);
-  display: grid; place-items: center; color: var(--accent); font-weight: 700; flex: none;
-}
-.delta {
-  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-  margin: 14px 2px; font-size: 15px;
-}
-.delta .strike { text-decoration: line-through; color: var(--faint); }
-.delta .arrow { color: var(--muted); }
-
-/* serve time */
-.time-input {
-  font-family: var(--display); font-size: 28px; padding: 12px 16px; margin: 8px 0 12px;
-  border-radius: 12px; border: 1px solid var(--card-edge); background: var(--bg2); color: var(--ink);
-}
-.btn:disabled { opacity: 0.45; cursor: not-allowed; }
-
-/* add-recipe */
-.subtabs { display: flex; gap: 6px; margin: 4px 0 14px; }
-.subtab {
-  flex: 1; padding: 9px; border-radius: 10px; border: 1px solid var(--card-edge);
-  background: var(--card); color: var(--muted); cursor: pointer; font-size: 14px;
-}
-.subtab.on { background: var(--bg2); color: var(--ink); border-color: var(--accent); }
-.paste-area, .url-input {
-  width: 100%; font-family: inherit; font-size: 14px; padding: 12px 14px; margin-bottom: 12px;
-  border-radius: 12px; border: 1px solid var(--card-edge); background: var(--bg2); color: var(--ink); resize: vertical;
-}
-.url-input { font-family: var(--display); font-size: 18px; }
-.hint { color: var(--faint); font-size: 12.5px; margin-top: 10px; line-height: 1.5; }
-.hint code, .idle code { background: rgba(255,255,255,.06); padding: 1px 5px; border-radius: 5px; }
-.parse-result { margin-top: 16px; padding: 14px; border-radius: 14px; border: 1px solid var(--card-edge); background: var(--card); }
-.parse-result ul { margin: 6px 0 0 18px; }
-.badge-unverified {
-  font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--accent-deep);
-  border: 1px solid var(--accent-deep); border-radius: 20px; padding: 1px 8px;
-}
-.badge-allergen {
-  font-size: 11px; color: var(--accent-deep); background: rgba(232,98,61,.12);
-  border: 1px solid var(--accent-deep); border-radius: 20px; padding: 1px 8px; white-space: nowrap;
-}
-.allergen-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 4px; }
-.chip-toggle {
-  padding: 6px 11px; border-radius: 20px; border: 1px solid var(--card-edge);
-  background: var(--bg2); color: var(--muted); cursor: pointer; font-size: 13px; text-transform: capitalize;
-}
-.chip-toggle.on { background: rgba(232,98,61,.15); color: var(--accent); border-color: var(--accent-deep); }
-.add-dish {
-  width: 100%; margin: 6px 0 4px; padding: 13px; border-radius: 12px; cursor: pointer;
-  border: 1px dashed var(--card-edge); background: none; color: var(--accent); font-size: 14px;
-}
-
-/* shopping list */
-.ing-sec { margin-bottom: 18px; }
-.ing-title { display: flex; align-items: center; gap: 8px; font-weight: 600; margin: 6px 2px 8px; }
-.ing-title .sw { width: 12px; height: 12px; border-radius: 4px; }
-.ing-row {
-  display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
-  padding: 11px 14px; border-bottom: 1px solid var(--line); background: none; border-left: none;
-  border-right: none; border-top: none; color: var(--ink); cursor: pointer; font-size: 15px;
-}
-.ing-row .box {
-  width: 22px; height: 22px; border-radius: 6px; border: 1px solid var(--card-edge);
-  display: grid; place-items: center; color: var(--poriyal); font-weight: 700; flex: none;
-}
-.ing-row.tick .nm { text-decoration: line-through; color: var(--faint); }
-.ing-row .nm { flex: 1; }
-.ing-row .for { display: flex; gap: 4px; }
-.ing-row .for .d { width: 9px; height: 9px; border-radius: 50%; }
-.ing-row .amt { color: var(--muted); font-size: 13.5px; white-space: nowrap; }
-
-/* plan preview gantt */
-.gantt {
+/* ---- onboarding: three program notes, opened by an expression mark ---- */
+.onboarding {
+  min-height: 70vh;
   display: flex;
   flex-direction: column;
+  justify-content: center;
+}
+.ob-card {
+  padding: 24px 4px;
+}
+.ob-hand {
+  font-family: var(--display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 19px;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+.ob-title {
+  font-family: var(--display);
+  font-size: 33px;
+  font-weight: 600;
+  line-height: 1.12;
+  margin-bottom: 14px;
+}
+.ob-body {
+  color: var(--muted);
+  font-size: 16.5px;
+  line-height: 1.5;
+}
+.ob-dots {
+  display: flex;
+  gap: 8px;
+  margin: 20px 4px;
+}
+.ob-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--card-edge);
+}
+.ob-dots span.on {
+  background: var(--accent);
+}
+.ob-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.ob-actions .btn {
+  flex: 1;
+  padding: 14px;
+}
+
+/* ---- pick dishes ---- */
+.pick-row {
+  margin-bottom: 8px;
+  border-radius: 14px;
+  border: 1px solid var(--card-edge);
+  background: var(--card);
+  color: var(--ink);
+  overflow: hidden;
+}
+.pick-row.on {
+  border-color: var(--accent);
+  background: var(--bg2);
+}
+.pick-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+.serve-scale {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 16px 12px;
+  border-top: 1px solid var(--line);
+}
+.serve-label {
+  font-size: 12px;
+  color: var(--faint);
+}
+.scale-btns {
+  display: flex;
+  gap: 5px;
+}
+.scale-btn {
+  min-width: 34px;
+  padding: 5px 9px;
+  border-radius: 8px;
+  border: 1px solid var(--card-edge);
+  background: var(--bg2);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 13px;
+  font-family: var(--mono);
+}
+.scale-btn.on {
+  background: var(--card-strong);
+  color: var(--ink);
+  border-color: var(--accent);
+}
+.pick-box {
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  border: 1px solid var(--card-edge);
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+  font-weight: 700;
+  flex: none;
+}
+.delta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 16px 2px;
+  font-size: 15px;
+}
+.delta b {
+  font-weight: 600;
+}
+.delta .strike {
+  text-decoration: line-through;
+  color: var(--faint);
+}
+.delta .arrow {
+  color: var(--accent);
+}
+
+/* ---- serve time ---- */
+.time-input {
+  font-family: var(--mono);
+  font-size: 28px;
+  padding: 12px 16px;
+  margin: 8px 0 12px;
+  border-radius: 12px;
+  border: 1px solid var(--card-edge);
+  background: var(--bg2);
+  color: var(--ink);
+}
+
+/* ---- add recipe ---- */
+.subtabs {
+  display: flex;
   gap: 6px;
-  margin: 14px 0;
+  margin: 4px 0 14px;
+}
+.subtab {
+  flex: 1;
+  padding: 9px;
+  border-radius: 10px;
+  border: 1px solid var(--card-edge);
+  background: var(--card);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 14px;
+}
+.subtab.on {
+  background: var(--bg2);
+  color: var(--ink);
+  border-color: var(--accent);
+}
+.paste-area,
+.url-input {
+  width: 100%;
+  font-family: inherit;
+  font-size: 14px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--card-edge);
+  background: var(--bg2);
+  color: var(--ink);
+  resize: vertical;
+}
+.url-input {
+  font-family: var(--mono);
+  font-size: 16px;
+}
+.hint {
+  color: var(--faint);
+  font-size: 12.5px;
+  margin-top: 10px;
+  line-height: 1.5;
+}
+.hint code,
+.idle code {
+  font-family: var(--mono);
+  background: rgba(241, 234, 217, 0.06);
+  padding: 1px 5px;
+  border-radius: 5px;
+}
+.parse-result {
+  margin-top: 16px;
   padding: 14px;
   border-radius: 14px;
   border: 1px solid var(--card-edge);
   background: var(--card);
 }
-.gantt-row {
-  display: grid;
-  grid-template-columns: 40% 1fr;
+.parse-result ul {
+  margin: 6px 0 0 18px;
+}
+.badge-unverified {
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-deep);
+  border: 1px solid var(--accent-deep);
+  border-radius: 20px;
+  padding: 1px 8px;
+}
+.badge-allergen {
+  font-size: 11px;
+  color: var(--accent-deep);
+  background: rgba(232, 98, 61, 0.12);
+  border: 1px solid var(--accent-deep);
+  border-radius: 20px;
+  padding: 1px 8px;
+  white-space: nowrap;
+}
+.allergen-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0 4px;
+}
+.chip-toggle {
+  padding: 6px 11px;
+  border-radius: 20px;
+  border: 1px solid var(--card-edge);
+  background: var(--bg2);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 13px;
+  text-transform: capitalize;
+}
+.chip-toggle.on {
+  background: rgba(232, 98, 61, 0.15);
+  color: var(--accent);
+  border-color: var(--accent-deep);
+}
+.add-dish {
+  width: 100%;
+  margin: 6px 0 4px;
+  padding: 13px;
+  border-radius: 12px;
+  cursor: pointer;
+  border: 1px dashed var(--card-edge);
+  background: none;
+  color: var(--accent);
+  font-size: 14px;
+}
+.add-dish:hover {
+  border-color: var(--accent);
+}
+
+/* ---- shopping list ---- */
+.ing-sec {
+  margin-bottom: 18px;
+}
+.ing-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  margin: 6px 2px 8px;
+}
+.ing-title .sw {
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+}
+.ing-row {
+  display: flex;
   align-items: center;
   gap: 10px;
+  width: 100%;
+  text-align: left;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--line);
+  background: none;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 15px;
+}
+.ing-row .box {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 1px solid var(--card-edge);
+  display: grid;
+  place-items: center;
+  color: var(--poriyal);
+  font-weight: 700;
+  flex: none;
+}
+.ing-row.tick .nm {
+  text-decoration: line-through;
+  color: var(--faint);
+}
+.ing-row .nm {
+  flex: 1;
+}
+.ing-row .for {
+  display: flex;
+  gap: 4px;
+}
+.ing-row .for .d {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+.ing-row .amt {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* =====================================================================
+   THE SCORE — the signature. Each dish is a voice on its own staff line;
+   solid bars are hands-on notes, tied (hollow) bars are passive/simmering
+   holds, and the meal resolves on a gilt final barline at the serve time.
+   ===================================================================== */
+.gantt {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin: 16px 0;
+  padding: 20px 18px 22px;
+  border-radius: 16px;
+  border: 1px solid var(--card-edge);
+  background: var(--bg2);
+  /* bar lines: faint vertical time grid across the whole score */
+  background-image: repeating-linear-gradient(
+    to right,
+    transparent 0,
+    transparent calc(20% - 1px),
+    var(--line) calc(20% - 1px),
+    var(--line) 20%
+  );
+  overflow: hidden;
+}
+/* the final barline (the downbeat) — gilt, doubled, at the right margin */
+.gantt::after {
+  content: "";
+  position: absolute;
+  top: 12px;
+  bottom: 12px;
+  right: 0;
+  width: 5px;
+  border-left: 1px solid var(--accent);
+  background: linear-gradient(var(--accent), var(--accent-deep));
+  box-shadow: -3px 0 14px -2px rgba(230, 192, 106, 0.4);
+}
+.gantt-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 34% 1fr;
+  align-items: center;
+  gap: 12px;
 }
 .gantt-label {
   font-size: 12.5px;
@@ -533,54 +999,89 @@ header {
 }
 .gantt-track {
   position: relative;
-  height: 16px;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.04);
+  height: 18px;
+}
+.gantt-track::before {
+  /* the staff line this voice plays on */
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--staff);
 }
 .gantt-bar {
   position: absolute;
-  top: 2px;
-  bottom: 2px;
-  border-radius: 5px;
-  min-width: 4px;
+  top: 3px;
+  bottom: 3px;
+  border-radius: 4px;
+  min-width: 5px;
+  animation: phrase-in 0.5s var(--ease) both;
+  transform-origin: left center;
 }
+/* hands-on = a solid, struck note */
+.gantt-bar:not(.passive) {
+  box-shadow: 0 2px 8px -3px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+/* passive/simmering = a tied, held note: hollow, ringed, the hands are free */
 .gantt-bar.passive {
-  opacity: 0.45;
-  background-image: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.25) 0 4px, transparent 4px 8px);
+  background: transparent !important;
+  border: 1.5px dashed currentColor;
+  opacity: 0.85;
+  box-shadow: none;
+}
+@keyframes phrase-in {
+  from {
+    opacity: 0;
+    transform: scaleX(0.2);
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+/* tempo marking above the score — pace IS tempo */
+.tempo {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 4px 2px 0;
+  font-family: var(--display);
+  font-style: italic;
+  font-size: 16px;
+  color: var(--accent);
+}
+.tempo .beat {
+  font-family: var(--mono);
+  font-style: normal;
+  font-size: 13px;
+  color: var(--muted);
 }
 .finale-line {
   color: var(--poriyal);
   font-weight: 500;
 }
-.nudge {
-  margin: 12px 0;
-  padding: 10px 14px;
-  border-radius: 12px;
-  background: rgba(134, 207, 77, 0.1);
-  border: 1px solid rgba(134, 207, 77, 0.4);
-  color: var(--ink);
-  font-size: 14px;
+
+.scaffold-note {
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  color: var(--faint);
+  font-size: 12px;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+@media (min-width: 560px) {
+  .time {
+    font-size: 42px;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   * {
     transition: none !important;
     animation: none !important;
-  }
-}
-.btn.ghost {
-  flex: 0 0 auto;
-  background: none;
-  border: 1px solid var(--card-edge);
-  color: var(--ink);
-}
-.scaffold-note {
-  margin-top: 32px;
-  color: var(--faint);
-  font-size: 12px;
-  line-height: 1.5;
-}
-@media (min-width: 560px) {
-  .time {
-    font-size: 40px;
   }
 }
