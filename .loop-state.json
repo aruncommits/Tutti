@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 66,
-  "lastTick": "2026-06-18T12:50:21.6040719+08:00",
-  "lastTickEpoch": 1781758222,
+  "iteration": 67,
+  "lastTick": "2026-06-18T12:53:45.0024624+08:00",
+  "lastTickEpoch": 1781758425,
   "phase": "brief-v21-pantry-staples",
-  "nextResearchTheme": "Brief v20 DONE (mise en place Get-ready; 207 tests). Brief v21 authored (pantry staples). NEXT: Brief v21 item 1 - apps/web/src/pantry.ts: type Pantry=string[]; isStaple(name,pantry) via normalizeIngredientName from @tutti/engine; toggleStaple(pantry,name) add/remove normalized; partitionByPantry(items,pantry)->{toBuy,staples}. pantry.test.ts (normalized match 'Salt' vs 'salt to taste'; toggle add/remove; partition splits). Then item 2 ShoppingScreen: usePersistentState tutti.pantry from App, split combined via partitionByPantry into 'To buy' + 'In your pantry (N)' groups, per-row 'always have' toggle -> toggleStaple. item 3 Share uses toBuy only. item 5 Shopping test marking moves item to pantry group. NOTE external edits: index.html title now 'Tutti — the whole meal, ready at once' (adapt, keep)."
+  "nextResearchTheme": "Brief v21 item 1 done (pantry.ts helpers; 210 tests). NEXT: items 2-3+5 - App: usePersistentState<Pantry>('tutti.pantry',[]) pass pantry+onToggleStaple=(name)=>setPantry(p=>toggleStaple(p,name)) to ShoppingScreen. ShoppingScreen combined view: const {toBuy,staples}=partitionByPantry(combined,pantry); render 'To buy' section (toBuy) + 'In your pantry (N)' section (staples, subtler); each row gets a small 'always have' toggle button (aria-pressed isStaple) calling onToggleStaple(item.name). Item 3: onShare builds formatShoppingList from toBuy only. Item 5: shoppingPantry.test.tsx - render ShoppingScreen with a pantry setter, click an item's 'always have' toggle, assert it moves to the pantry group / leaves to-buy (or onToggleStaple called with the name). Verify browser. Then Brief v21 done -> research + Brief v22."
 }

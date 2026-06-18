@@ -1211,3 +1211,14 @@ header {
 .recipe-step-meta { display: inline-flex; align-items: center; gap: 8px; margin-top: 3px; }
 .hands-free { font-size: 11px; color: var(--poriyal); border: 1px solid var(--card-edge); border-radius: 8px; padding: 1px 7px; }
 .recipe-note-text { color: var(--muted); font-style: italic; }
+
+/* pantry staples (Brief v21) */
+.staple-wrap { display: flex; align-items: stretch; gap: 6px; padding: 0; background: none; border: none; }
+.staple-wrap .ing-main { flex: 1; display: flex; align-items: center; gap: 10px; text-align: left;
+  border-radius: 12px; border: 1px solid var(--card-edge); background: var(--card); padding: 11px 13px; cursor: pointer; }
+.staple-wrap.tick .ing-main { opacity: 0.55; }
+.staple-toggle { flex: none; width: 42px; border-radius: 12px; border: 1px solid var(--card-edge);
+  background: var(--bg2); cursor: pointer; font-size: 15px; filter: grayscale(1) opacity(0.5); }
+.staple-toggle.on { filter: none; background: rgba(134,207,77,0.18); border-color: var(--poriyal); }
+.pantry-sec { color: var(--faint); }
+.pantry-grid { opacity: 0.7; }

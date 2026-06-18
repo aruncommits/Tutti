@@ -3,6 +3,7 @@ import { buildShoppingList, normalizeIngredientName, type RecipeGraph } from "@t
 import { usePersistentState } from "./state";
 import { colorFor } from "./dishColors";
 import { formatShoppingList, shareOrCopy, type ShareResult } from "./share";
+import { partitionByPantry, isStaple } from "./pantry";
 
 const SHARE_MSG: Record<ShareResult, string> = {
   shared: "Shared ✓",
@@ -16,17 +17,56 @@ const SHARE_MSG: Record<ShareResult, string> = {
 const fmtAmount = (amount?: number, unit?: string, toTaste?: boolean) =>
   amount !== undefined ? `${amount}${unit ? ` ${unit}` : ""}` : toTaste ? "to taste" : "";
 
-export function ShoppingScreen({ recipes, onBack }: { recipes: RecipeGraph[]; onBack: () => void }) {
+export function ShoppingScreen({
+  recipes,
+  onBack,
+  pantry = [],
+  onToggleStaple,
+}: {
+  recipes: RecipeGraph[];
+  onBack: () => void;
+  pantry?: string[];
+  onToggleStaple?: (name: string) => void;
+}) {
   const [mode, setMode] = usePersistentState<"combined" | "separate">("tutti.shoppingMode", "combined");
   const [checked, setChecked] = usePersistentState<string[]>("tutti.shoppingChecked", []);
   const isChecked = (key: string) => checked.includes(key);
   const toggle = (key: string) => setChecked((p) => (p.includes(key) ? p.filter((k) => k !== key) : [...p, key]));
 
   const combined = buildShoppingList(recipes);
+  const { toBuy, staples } = partitionByPantry(combined, pantry);
   const [shareMsg, setShareMsg] = useState<string | null>(null);
   const onShare = async () => {
-    const text = formatShoppingList(combined.map((i) => ({ name: i.name, amount: i.amount, unit: i.unit, toTaste: i.toTaste })));
+    // Share only what you actually need to buy — not your whole pantry (Brief v21).
+    const text = formatShoppingList(toBuy.map((i) => ({ name: i.name, amount: i.amount, unit: i.unit, toTaste: i.toTaste })));
     setShareMsg(SHARE_MSG[await shareOrCopy("Tutti shopping list", text)]);
+  };
+
+  type Item = (typeof combined)[number];
+  const ItemRow = ({ item }: { item: Item }) => {
+    const key = `c|${item.name}|${item.unit ?? ""}`;
+    const staple = isStaple(item.name, pantry);
+    return (
+      <div className={`ing-row staple-wrap${isChecked(key) ? " tick" : ""}`}>
+        <button className="ing-main" role="checkbox" aria-checked={isChecked(key)} onClick={() => toggle(key)}>
+          <span className="box">{isChecked(key) ? "✓" : ""}</span>
+          <span className="nm">{item.name}</span>
+          <span className="for">
+            {item.recipeIds.map((id) => <span key={id} className="d" style={{ background: colorFor(id) }} title={id} />)}
+          </span>
+          <span className="amt">{fmtAmount(item.amount, item.unit, item.toTaste)}</span>
+        </button>
+        {onToggleStaple && (
+          <button
+            className={`staple-toggle${staple ? " on" : ""}`}
+            aria-pressed={staple}
+            aria-label={`${staple ? "Remove" : "Mark"} ${item.name} as always-have`}
+            title="I always have this"
+            onClick={(e) => { e.stopPropagation(); onToggleStaple(item.name); }}
+          >🏠</button>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -38,21 +78,21 @@ export function ShoppingScreen({ recipes, onBack }: { recipes: RecipeGraph[]; on
       </div>
 
       {mode === "combined" ? (
-        <div className="ing-sec card-grid ing-grid">
-          {combined.map((item) => {
-            const key = `c|${item.name}|${item.unit ?? ""}`;
-            return (
-              <button key={key} className={`ing-row${isChecked(key) ? " tick" : ""}`} role="checkbox" aria-checked={isChecked(key)} onClick={() => toggle(key)}>
-                <span className="box">{isChecked(key) ? "✓" : ""}</span>
-                <span className="nm">{item.name}</span>
-                <span className="for">
-                  {item.recipeIds.map((id) => <span key={id} className="d" style={{ background: colorFor(id) }} title={id} />)}
-                </span>
-                <span className="amt">{fmtAmount(item.amount, item.unit, item.toTaste)}</span>
-              </button>
-            );
-          })}
-        </div>
+        <>
+          <h3 className="meal-sec">To buy{toBuy.length ? ` (${toBuy.length})` : ""}</h3>
+          <div className="ing-sec card-grid ing-grid">
+            {toBuy.length ? toBuy.map((item) => <ItemRow key={`c|${item.name}|${item.unit ?? ""}`} item={item} />)
+              : <div className="idle">All set — everything's in your pantry.</div>}
+          </div>
+          {staples.length > 0 && (
+            <>
+              <h3 className="meal-sec pantry-sec">In your pantry ({staples.length})</h3>
+              <div className="ing-sec card-grid ing-grid pantry-grid">
+                {staples.map((item) => <ItemRow key={`c|${item.name}|${item.unit ?? ""}`} item={item} />)}
+              </div>
+            </>
+          )}
+        </>
       ) : (
         recipes.map((r) => {
           const names: { raw: string; amount?: number; unit?: string }[] = [];

@@ -9,6 +9,7 @@ import { shouldLearn } from "./learn";
 import { addSaved, addRecent, removeMeal, type SavedMeal } from "./meals";
 import { formatPlan, shareOrCopy } from "./share";
 import { recordCook, setRating, setNote, type NotesMap } from "./recipeNotes";
+import { toggleStaple, type Pantry } from "./pantry";
 import { suggestMeal, type Suggestion } from "./suggest";
 
 // Secondary screens are lazy-loaded so the initial/cook bundle stays lean (Brief v10).
@@ -53,6 +54,7 @@ export function App() {
   const [meals, setMeals] = usePersistentState<SavedMeal[]>("tutti.meals", []);
   const [notes, setNotes] = usePersistentState<NotesMap>("tutti.recipeNotes", {});
   const [detailRecipe, setDetailRecipe] = useState<RecipeGraph | null>(null);
+  const [pantry, setPantry] = usePersistentState<Pantry>("tutti.pantry", []);
   const paceAdjusted = Object.entries(pace).filter(([, m]) => Math.abs(m - 1) > 0.05);
   const focusAtRef = useRef<number | null>(null); // wall-clock boundary for honest actual-duration capture
   const allRecipes = [...thaliV1.recipes, ...candidates];
@@ -225,7 +227,12 @@ export function App() {
           onBack={() => setScreen("browse")}
         />
       ) : screen === "shopping" ? (
-        <ShoppingScreen recipes={selectedRecipes.length ? selectedRecipes : allRecipes} onBack={() => setScreen("pick")} />
+        <ShoppingScreen
+          recipes={selectedRecipes.length ? selectedRecipes : allRecipes}
+          onBack={() => setScreen("pick")}
+          pantry={pantry}
+          onToggleStaple={(name) => setPantry((p) => toggleStaple(p, name))}
+        />
       ) : screen === "meals" ? (
         <MealsScreen
           meals={meals}
