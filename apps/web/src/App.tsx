@@ -65,6 +65,14 @@ export function App() {
     : null;
   const soloMins = selectedRecipes.reduce((a, r) => a + r.nodes.reduce((s, n) => s + n.duration.estMins, 0), 0);
   const makespan = previewPlan ? parseClock(previewPlan.projectedServeTime) - parseClock(previewPlan.startTime) : 0;
+  // How much the extra hands save vs cooking solo (same target serve time => shorter hands-on span).
+  const soloPlan = kitchen.cooks > 1 && selectedRecipes.length
+    ? compile(selectedRecipes, toKitchenProfile({ ...kitchen, cooks: 1 }), target, pace)
+    : null;
+  const soonerMins = soloPlan
+    ? Math.max(0, (parseClock(soloPlan.projectedServeTime) - parseClock(soloPlan.startTime)) - makespan)
+    : null;
+  const setCooks = (n: number) => setKitchen((k) => ({ ...k, cooks: Math.max(1, Math.min(4, n)) }));
   const nowMins = (() => {
     const d = new Date();
     return d.getHours() * 60 + d.getMinutes();
@@ -218,6 +226,9 @@ export function App() {
           feasible={feasible}
           earliestServe={earliestServe}
           onBuild={buildPlan}
+          cooks={kitchen.cooks}
+          onCooks={setCooks}
+          soonerMins={soonerMins}
         />
       ) : screen === "preview" ? (
         <PreviewScreen plan={plan} onStart={() => setScreen("cook")} onEdit={() => setScreen("pick")} onSave={saveMeal} />

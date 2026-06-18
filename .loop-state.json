@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 51,
-  "lastTick": "2026-06-18T11:19:54.0690898+08:00",
-  "lastTickEpoch": 1781752794,
+  "iteration": 52,
+  "lastTick": "2026-06-18T11:24:07.4832388+08:00",
+  "lastTickEpoch": 1781753048,
   "phase": "brief-v13-cook-with-help",
-  "nextResearchTheme": "Brief v12 DONE (saved meals + recents, verified; 157 tests). Brief v13 authored (cook with help / multi-hands moat). NEXT: Brief v13 item 1 - engine test asserting compile(meal, kitchen{cooks:2}) makespan/criticalPathMins STRICTLY LESS than cooks:1 for a parallelizable meal (thali or 2 library dishes) on an ample kitchen (enough burners/pans so hands are the constraint); if not less, investigate scheduler hands modelling before UI. Then item 2 cook-count stepper in serve-time/preview (edits kitchen.cooks), item 3 show honest time-saved-vs-solo delta, item 4 thread cooks, item 5 web test + browser verify."
+  "nextResearchTheme": "Brief v13 item 1 done (engine multi-cook parallelism locked: 2 cooks strictly shorten thali; 160 tests). NEXT: items 2-4 - surface cook-count in the planning flow. In App, the live preview already uses toKitchenProfile(kitchen) which carries kitchen.cooks. Add a compact 'Cooking with help?' hands stepper (1-4) to the ServeTimeScreen (or PreviewScreen) that edits kitchen.cooks via setKitchen. Item 3: when cooks>1, also compute the solo plan (compile with cooks:1) and show honest delta 'ready N min sooner than solo' (or 'about the same' if no saving). Pass needed props down. Item 5: web test that bumping cooks changes shown serve time/delta + browser verify thali faster with 2 cooks."
 }

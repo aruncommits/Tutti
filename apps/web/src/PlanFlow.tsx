@@ -87,6 +87,9 @@ export function ServeTimeScreen({
   feasible,
   earliestServe,
   onBuild,
+  cooks,
+  onCooks,
+  soonerMins,
 }: {
   target: string;
   onChange: (clock: string) => void;
@@ -94,6 +97,9 @@ export function ServeTimeScreen({
   feasible: boolean;
   earliestServe: string;
   onBuild: () => void;
+  cooks: number;
+  onCooks: (n: number) => void;
+  soonerMins: number | null;
 }) {
   return (
     <section className="zone" aria-label="When do you want to eat?">
@@ -110,6 +116,24 @@ export function ServeTimeScreen({
       ) : (
         <p className="alert">That's not enough time — the earliest you can serve is <b>{hhmm(earliestServe)}</b>.</p>
       )}
+
+      {/* Cooking with help: more hands re-schedule the meal in parallel (Doc 2 §4, Brief v13). */}
+      <div className="kp-row" style={{ marginTop: 4 }}>
+        <span className="kp-label">Cooking with help?</span>
+        <div className="kp-stepper">
+          <button aria-label="Fewer cooks" onClick={() => onCooks(cooks - 1)} disabled={cooks <= 1}>−</button>
+          <span className="kp-val" aria-live="polite">{cooks} {cooks === 1 ? "pair of hands" : "pairs of hands"}</span>
+          <button aria-label="More cooks" onClick={() => onCooks(cooks + 1)} disabled={cooks >= 4}>+</button>
+        </div>
+      </div>
+      {cooks > 1 && soonerMins !== null && (
+        <p className="value">
+          {soonerMins > 0
+            ? <>🙌 With {cooks} pairs of hands, the meal takes <b>{soonerMins} min less</b> than cooking solo.</>
+            : <>With extra hands it's about the same — this meal can't split up much.</>}
+        </p>
+      )}
+
       <button className="btn big-btn" onClick={onBuild}>Build my plan</button>
     </section>
   );
