@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 67,
-  "lastTick": "2026-06-18T12:53:45.0024624+08:00",
-  "lastTickEpoch": 1781758425,
-  "phase": "brief-v21-pantry-staples",
-  "nextResearchTheme": "Brief v21 item 1 done (pantry.ts helpers; 210 tests). NEXT: items 2-3+5 - App: usePersistentState<Pantry>('tutti.pantry',[]) pass pantry+onToggleStaple=(name)=>setPantry(p=>toggleStaple(p,name)) to ShoppingScreen. ShoppingScreen combined view: const {toBuy,staples}=partitionByPantry(combined,pantry); render 'To buy' section (toBuy) + 'In your pantry (N)' section (staples, subtler); each row gets a small 'always have' toggle button (aria-pressed isStaple) calling onToggleStaple(item.name). Item 3: onShare builds formatShoppingList from toBuy only. Item 5: shoppingPantry.test.tsx - render ShoppingScreen with a pantry setter, click an item's 'always have' toggle, assert it moves to the pantry group / leaves to-buy (or onToggleStaple called with the name). Verify browser. Then Brief v21 done -> research + Brief v22."
+  "iteration": 68,
+  "lastTick": "2026-06-18T13:00:07.2620896+08:00",
+  "lastTickEpoch": 1781758807,
+  "phase": "brief-v22-settings-data",
+  "nextResearchTheme": "Brief v21 DONE (pantry staples; 212 tests). Brief v22 authored (settings & data export/reset). NEXT: Brief v22 item 1 - apps/web/src/appData.ts pure over a storage interface: tuttiKeys(store), exportData(store):string (JSON of all tutti.* keys, pretty), resetData(store):string[] (removeItem each tutti.* key, return removed). appData.test.ts with a fake storage: export captures only tutti.* (ignores other keys); reset removes+returns them. Then item 2 SettingsScreen (lazy, 'settings' screen: Preferences group Pro+learnPace toggles, Your-data group export + two-step Reset-everything), item 3 wire Home 'Settings' link + App handlers (onExport=shareOrCopy('Tutti data', exportData(localStorage)); onReset=resetData(localStorage)+reset states+home), item 5 tests."
 }
