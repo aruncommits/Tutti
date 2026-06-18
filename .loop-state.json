@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 87,
-  "lastTick": "2026-06-18T07:28:34.690Z",
-  "lastTickEpoch": 1781767714,
-  "phase": "brief-v32-notes-at-cook-time",
-  "nextResearchTheme": "Brief v31 DONE (print support; 266 tests). Brief v32 authored (notes resurfaced at cook time). NEXT: Brief v32 items 1-2+5 - thread notes:NotesMap into MiseScreen (App passes notes); MiseScreen renders a quiet Last-time reminders block above Gather for each recipe in `recipes` with notes[r.recipeId]?.note or rating: dish name + colorFor dot + read-only <Stars value={rating}/> + Last time: <note>. Skip dishes without note/rating. import Stars, colorFor, NotesMap. App: pass notes={notes} to <MiseScreen>. Item 5: MiseScreen test - notes={{<recipeId>:{note:more tamarind,rating:4,cookCount:2}}} for a recipe in the meal shows note text + stars; empty notes -> no reminders block. Then Brief v32 done -> research + Brief v33."
+  "iteration": 88,
+  "lastTick": "2026-06-18T07:34:35.509Z",
+  "lastTickEpoch": 1781768075,
+  "phase": "brief-v33-photos",
+  "nextResearchTheme": "Brief v32 DONE (notes resurfaced on Get-ready; 268 tests). Brief v33 authored (finished-dish photos). NEXT: Brief v33 item 1 - apps/web/src/photos.ts: type Photos=Record<string,string>; pure addPhoto(map,id,dataUrl,cap=12) immutable (set id; if Object.keys>cap drop oldest other key - keep deterministic by insertion order), removePhoto(map,id); resizeToThumb(file:File,max=160):Promise<string> feature-detected (Image+canvas; reject if no document/canvas - jsdom) -> canvas.toDataURL(image/jpeg,0.7). photos.test.ts pure helpers only (add/replace, cap drops oldest, remove, immutability). Then item 2 persist tutti.photos + finale capture in CookScreen, item 3 show thumb in RecipeDetail/Mise-last-time/Browse, item 5 screen test img renders when photo present."
 }

@@ -10,6 +10,9 @@ export function SettingsScreen({
   onToggleLearn,
   metric,
   onToggleMetric,
+  canInstall = false,
+  onInstall,
+  onPace,
   onExport,
   onReset,
   onBack,
@@ -20,6 +23,9 @@ export function SettingsScreen({
   onToggleLearn: () => void;
   metric: boolean;
   onToggleMetric: () => void;
+  canInstall?: boolean;
+  onInstall?: () => void;
+  onPace?: () => void;
   onExport: () => void;
   onReset: () => void;
   onBack: () => void;
@@ -43,6 +49,22 @@ export function SettingsScreen({
       <Toggle on={pro} onToggle={onTogglePro} label="Pro mode" desc="Let prep and cook interleave without nudges" />
       <Toggle on={learnPace} onToggle={onToggleLearn} label="Learn my pace" desc="Tune timings to how you actually cook" />
       <Toggle on={metric} onToggle={onToggleMetric} label="Metric units" desc="Show amounts in millilitres" />
+      {onPace && (
+        <button className="kp-row settings-link" onClick={onPace}>
+          <span className="kp-label">Your pace<small className="kp-desc">See what Tutti has learned about your timings</small></span>
+          <span className="settings-chevron" aria-hidden="true">›</span>
+        </button>
+      )}
+
+      <h3 className="meal-sec">Appearance</h3>
+      <p className="hint">Tutti follows your device's light or dark setting automatically.</p>
+
+      {canInstall && onInstall && (
+        <>
+          <h3 className="meal-sec">App</h3>
+          <button className="btn ghost" onClick={onInstall}>Install Tutti on this device</button>
+        </>
+      )}
 
       <h3 className="meal-sec">Your data</h3>
       <p className="hint">Everything stays on this device. Nothing is uploaded.</p>

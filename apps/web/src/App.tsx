@@ -1,6 +1,7 @@
 import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import { applyEvent, compile, formatClock, parseClock, paceCategoryOf, scaleRecipe, thaliV1, updatePace, type MasterExecutionPlan, type PaceModel, type RecipeGraph } from "@tutti/engine";
 import { usePersistentState, type Screen } from "./state";
+import { Shell } from "./Shell";
 import { CookScreen } from "./CookScreen"; // eager — the critical cook path must be instant
 import { PickScreen, ServeTimeScreen } from "./PlanFlow"; // eager — central planning flow
 import { DEFAULT_KITCHEN, toKitchenProfile, type KitchenUi } from "./kitchenModel";
@@ -198,17 +199,7 @@ export function App() {
   }
 
   return (
-    <div className="wrap">
-      <a className="skip-link" href="#screen-main" onClick={(e) => { e.preventDefault(); focusRef.current?.focus(); }}>
-        Skip to content
-      </a>
-      <header>
-        <button className="logo" onClick={() => setScreen("home")} aria-label="Tutti — home">
-          <div className="mark">T</div>
-          <div className="brand">Tutti<small>the whole meal, ready at once</small></div>
-        </button>
-      </header>
-
+    <Shell screen={screen} onNavigate={setScreen}>
       <div role="status" aria-live="polite" className="sr-only">{announce}</div>
       <main id="screen-main" ref={focusRef} tabIndex={-1} className="screen-focus">
       <Suspense fallback={<Loading />}>
@@ -269,6 +260,9 @@ export function App() {
           onToggleLearn={() => setLearnPace(!learnPace)}
           metric={metric}
           onToggleMetric={() => setMetric(!metric)}
+          canInstall={canInstall}
+          onInstall={promptInstall}
+          onPace={() => setScreen("stats")}
           onExport={() => { void shareOrCopy("Tutti data", exportData(localStorage)); }}
           onReset={() => {
             resetData(localStorage);
@@ -335,16 +329,7 @@ export function App() {
       ) : screen === "home" ? (
         <Home
           onStart={startCooking}
-          onPick={() => setScreen("pick")}
-          onKitchen={() => setScreen("kitchen")}
-          pro={pro}
-          onTogglePro={() => setPro(!pro)}
-          onStats={() => setScreen("stats")}
-          onBrowse={() => setScreen("browse")}
-          onMeals={() => setScreen("meals")}
-          onSettings={() => setScreen("settings")}
-          canInstall={canInstall}
-          onInstall={promptInstall}
+          onPlan={() => setScreen("pick")}
           suggestion={suggestion}
           onCookSuggested={() => restoreMeal(suggestion.meal)}
           paceNote={
@@ -363,37 +348,19 @@ export function App() {
       <footer className="scaffold-note">
         Tutti — the whole meal, ready at once. Cooks fully offline; nothing leaves your device.
       </footer>
-    </div>
+    </Shell>
   );
 }
 
 function Home({
   onStart,
-  onPick,
-  onKitchen,
-  pro,
-  onTogglePro,
-  onStats,
-  onBrowse,
-  onMeals,
-  onSettings,
-  canInstall,
-  onInstall,
+  onPlan,
   suggestion,
   onCookSuggested,
   paceNote,
 }: {
   onStart: () => void;
-  onPick: () => void;
-  onKitchen: () => void;
-  pro: boolean;
-  onTogglePro: () => void;
-  onStats: () => void;
-  onBrowse: () => void;
-  onMeals: () => void;
-  onSettings: () => void;
-  canInstall: boolean;
-  onInstall: () => void;
+  onPlan: () => void;
   suggestion: Suggestion;
   onCookSuggested: () => void;
   paceNote: string | null;
@@ -411,21 +378,9 @@ function Home({
 
       <p className="value">A South Indian thali — three dishes, all hot together in about 45 minutes.</p>
       {paceNote && <p className="hint">{paceNote}</p>}
-      <button className="btn big-btn" onClick={onStart}>Start cooking</button>
-      <div className="home-links">
-        <button className="link" onClick={onBrowse}>Browse recipes</button>
-        <button className="link" onClick={onMeals}>Your meals</button>
-        <button className="link" onClick={onPick}>Pick dishes</button>
-        <button className="link" onClick={onKitchen}>Your kitchen</button>
-        <button className="link" onClick={onStats}>Your pace</button>
-        <button className="link" onClick={onSettings}>Settings</button>
-        {canInstall && <button className="link" onClick={onInstall}>📲 Install Tutti</button>}
-      </div>
-      <div className="kp-row" style={{ marginTop: 16 }}>
-        <span className="kp-label">Pro mode<br /><small style={{ color: "var(--faint)" }}>interleave prep &amp; cook freely; no nudges</small></span>
-        <button className={`kp-toggle${pro ? " on" : ""}`} role="switch" aria-checked={pro} aria-label={`Pro mode, ${pro ? "On" : "Off"}`} onClick={onTogglePro}>
-          {pro ? "On" : "Off"}
-        </button>
+      <div className="home-cta">
+        <button className="btn big-btn" onClick={onStart}>Start cooking</button>
+        <button className="btn ghost big-btn" onClick={onPlan}>Pick dishes</button>
       </div>
     </section>
   );
