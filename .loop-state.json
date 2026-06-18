@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 55,
-  "lastTick": "2026-06-18T11:46:20.5517644+08:00",
-  "lastTickEpoch": 1781754381,
-  "phase": "brief-v15-timer-alerts",
-  "nextResearchTheme": "Brief v14 DONE (hands-lanes You/Cook 2 in Cook Mode, verified; 169 tests). Brief v15 authored (passive-timer notifications). NEXT: Brief v15 item 1 - apps/web/src/notify.ts feature-detected: notifySupported()=('Notification' in window); requestNotifyPermission():Promise<boolean> (no-op false if unsupported, else Notification.requestPermission, jsdom/SSR-safe); notifyReady(title,body?) shows only when permission==='granted' (try/catch; prefer SW registration.showNotification else new Notification). All guarded so jsdom (no Notification) never throws. notify.test.ts: unsupported -> supported false + no-throw no-ops; mocked granted Notification -> notifyReady constructs one. Then item 2 request on 'Start it cooks itself' tap, item 3 fire once on countdown 0 in CookScreen effect (guard re-fire), item 5 keep on-screen label fallback."
+  "iteration": 56,
+  "lastTick": "2026-06-18T11:53:11.4004391+08:00",
+  "lastTickEpoch": 1781754791,
+  "phase": "brief-v16-share-export",
+  "nextResearchTheme": "Brief v15 DONE (timer notifications wired + tested; 172 tests). Brief v16 authored (share/export). NEXT: Brief v16 item 1 - apps/web/src/share.ts: pure formatShoppingList(items):string + formatPlan(plan,dishNames):string, and shareOrCopy(title,text):Promise<'shared'|'copied'|'failed'> (navigator.share if available, AbortError->'shared' quiet; else navigator.clipboard.writeText->'copied'; else 'failed'); feature-detected/jsdom-safe. share.test.ts for formatters + shareOrCopy branch selection with mocked navigator (cleaned up). Then item 2 Share button on ShoppingScreen (+Copied! aria-live), item 3 Share plan on PreviewScreen, item 5 ShoppingScreen test."
 }
