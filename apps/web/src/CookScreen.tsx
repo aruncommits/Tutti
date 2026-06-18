@@ -10,6 +10,7 @@ import { colorFor, dishName } from "./dishColors";
 import { useSpeech } from "./useSpeech";
 import { parseVoiceCommand } from "./voice";
 import { requestNotifyPermission, notifyReady } from "./notify";
+import { extendRemaining } from "./timer";
 import { Stars } from "./Stars";
 import type { NotesMap } from "./recipeNotes";
 
@@ -242,6 +243,11 @@ export function CookScreen({
                       <span className={`cooking-label${ticking === 0 ? " ready" : ""}`}>
                         {ticking === 0 ? "⏲ ready!" : `⏲ ${mmss(ticking!)} left`}
                       </span>
+                      {/* Needs a few more minutes? Extend the timer and re-arm the ready alert (Brief v24). */}
+                      <button className="btn ghost mini" aria-label={`Add 1 minute to ${n.title}`}
+                        onClick={() => { setRemaining((r) => extendRemaining(r, n.nodeId, 60)); notifiedRef.current.delete(n.nodeId); }}>+1m</button>
+                      <button className="btn ghost mini" aria-label={`Add 5 minutes to ${n.title}`}
+                        onClick={() => { setRemaining((r) => extendRemaining(r, n.nodeId, 300)); notifiedRef.current.delete(n.nodeId); }}>+5m</button>
                       <button className="btn" onClick={() => complete(n.nodeId)} aria-label={`Mark "${n.title}" done`}>✓ Done</button>
                     </>
                   ) : (

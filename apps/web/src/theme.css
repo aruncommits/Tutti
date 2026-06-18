@@ -1227,3 +1227,6 @@ header {
 .btn.danger { background: var(--accent-deep); color: #fff; }
 .btn.ghost.danger { background: none; border: 1px solid var(--accent-deep); color: var(--accent-deep); }
 .kp-desc { display: block; font-size: 12px; color: var(--faint); font-weight: 400; margin-top: 2px; }
+
+/* adjustable timers (Brief v24) */
+.btn.mini { padding: 7px 11px; font-size: 13px; min-height: 36px; }

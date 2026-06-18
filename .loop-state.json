@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 72,
-  "lastTick": "2026-06-18T05:21:07.685Z",
-  "lastTickEpoch": 1781760067,
+  "iteration": 73,
+  "lastTick": "2026-06-18T05:23:29.109Z",
+  "lastTickEpoch": 1781760209,
   "phase": "brief-v24-adjustable-timers",
-  "nextResearchTheme": "Brief v23 DONE (resilient persistence: every persisted key validated, self-heals; 230 tests). Brief v24 authored (adjustable cook timers). NEXT: Brief v24 item 1 - apps/web/src/timer.ts pure extendRemaining(remaining, id, addSec) -> new map with max(0,(remaining[id]??0)+addSec) for id only (immutable; seed from 0 if absent). timer.test.ts (adds immutably, floors at 0, seeds-from-absent). Then item 2 +1m/+5m buttons on started passive cards in CookScreen (call setRemaining(extendRemaining) + delete id from notifiedRef so v15 alert re-fires), item 5 CookScreen test (started passive exposes +1m/+5m; click no-throw)."
+  "nextResearchTheme": "Brief v24 item 1 done (extendRemaining; 234 tests). RESUMED after ~8h usage-limit stall. NEXT: items 2+5 - in CookScreen started-passive branch (ticking!==undefined, where the cooking-label + Done render), add +1m/+5m buttons calling setRemaining(r=>extendRemaining(r,n.nodeId,60|300)) AND notifiedRef.current.delete(n.nodeId) so v15 ready-notify re-fires at new zero; aria-label Add 1/5 minutes to <title>; works ticking>0 or ===0; keep big Done + ready label. import extendRemaining. CSS .mini if needed. Item 5: CookScreen test - render plan, click a passive Start, assert +1m/+5m controls appear + click no-throw. Then Brief v24 done -> research + Brief v25."
 }
