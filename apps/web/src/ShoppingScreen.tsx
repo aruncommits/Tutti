@@ -125,6 +125,7 @@ export function ShoppingScreen({
       )}
 
       <button className="btn ghost" style={{ marginTop: 14 }} onClick={onShare}>📤 Share list</button>
+      <button className="btn ghost no-print" onClick={() => { if (typeof window !== "undefined") window.print(); }}>🖨 Print</button>
       {shareMsg && <p className="hint" aria-live="polite">{shareMsg}</p>}
       <div className="home-links"><button className="link" onClick={onBack}>Back</button></div>
     </section>

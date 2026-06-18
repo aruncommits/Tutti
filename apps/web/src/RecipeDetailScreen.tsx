@@ -82,7 +82,10 @@ export function RecipeDetailScreen({
       </ol>
 
       <button className="btn big-btn" onClick={onAdd}>+ Add to meal</button>
-      <div className="home-links"><button className="link" onClick={onBack}>Back</button></div>
+      <div className="home-links">
+        <button className="link" onClick={onBack}>Back</button>
+        <button className="link no-print" onClick={() => { if (typeof window !== "undefined") window.print(); }}>🖨 Print</button>
+      </div>
     </section>
   );
 }
