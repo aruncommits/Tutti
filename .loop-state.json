@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 76,
-  "lastTick": "2026-06-18T06:07:00.532Z",
-  "lastTickEpoch": 1781762820,
-  "phase": "brief-v25-substitutions",
-  "nextResearchTheme": "Brief v25 item 1 done (substitutions.ts + substitutesFor; 239 tests). NEXT: items 2+5 - RecipeDetailScreen: under each Ingredients row where substitutesFor(i.name).length, render a subtle hint line (e.g. a muted .sub-hint span or <details>): \"Out of {i.name}? Try {swaps.map(s=>s.swap + (s.note?` (${s.note})`:\"\")).join(\" or \")}\". import substitutesFor. Keep rows without swaps clean. Add CSS .sub-hint. Item 5: recipeDetail.test add a case - a recipe with ghee (rec_rasam has ghee) shows /out of/i + /oil|butter/i hint; an ingredient without swaps shows no hint. Then Brief v25 DONE -> research + Brief v26."
+  "iteration": 77,
+  "lastTick": "2026-06-18T06:11:47.464Z",
+  "lastTickEpoch": 1781763107,
+  "phase": "brief-v26-meal-servings",
+  "nextResearchTheme": "Brief v25 DONE (substitution hints; 240 tests). RESUMED after 3rd ~8h stall. Brief v26 authored (meal-level cooking-for-N scaling). NEXT: Brief v26 item 1 - apps/web/src/servings.ts pure: factorForPeople(baseServings,people)=max(1,min(6,round(people/max(1,baseServings)))); peopleFromFactor(baseServings,factor)=baseServings*factor. servings.test.ts (base4: people8->2, people4->1, people12->3, clamp[1,6], people<base->1). Then item 2 PickScreen meal-level Cooking-for-N stepper -> App sets servingsFactor[id]=factorForPeople(recipe.servings,N) for each selected dish; item 3 per-dish chips still override; item 5 Pick test stepper drives factor."
 }
