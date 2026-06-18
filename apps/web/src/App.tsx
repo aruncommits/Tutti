@@ -13,6 +13,7 @@ import { toggleStaple, type Pantry } from "./pantry";
 import { exportData, resetData } from "./appData";
 import { isStringArray, isPlainObject, isMealArray, isScreen, isClock } from "./validators";
 import { factorForPeople } from "./servings";
+import { useInstallPrompt } from "./useInstallPrompt";
 import { suggestMeal, type Suggestion } from "./suggest";
 
 // Secondary screens are lazy-loaded so the initial/cook bundle stays lean (Brief v10).
@@ -60,6 +61,7 @@ export function App() {
   const [detailRecipe, setDetailRecipe] = useState<RecipeGraph | null>(null);
   const [pantry, setPantry] = usePersistentState<Pantry>("tutti.pantry", [], isStringArray);
   const [people, setPeople] = usePersistentState<number>("tutti.people", 4, (v) => typeof v === "number");
+  const { canInstall, promptInstall } = useInstallPrompt();
   const paceAdjusted = Object.entries(pace).filter(([, m]) => Math.abs(m - 1) > 0.05);
   const focusAtRef = useRef<number | null>(null); // wall-clock boundary for honest actual-duration capture
   const allRecipes = [...thaliV1.recipes, ...candidates];
@@ -334,6 +336,8 @@ export function App() {
           onBrowse={() => setScreen("browse")}
           onMeals={() => setScreen("meals")}
           onSettings={() => setScreen("settings")}
+          canInstall={canInstall}
+          onInstall={promptInstall}
           suggestion={suggestion}
           onCookSuggested={() => restoreMeal(suggestion.meal)}
           paceNote={
@@ -366,6 +370,8 @@ function Home({
   onBrowse,
   onMeals,
   onSettings,
+  canInstall,
+  onInstall,
   suggestion,
   onCookSuggested,
   paceNote,
@@ -379,6 +385,8 @@ function Home({
   onBrowse: () => void;
   onMeals: () => void;
   onSettings: () => void;
+  canInstall: boolean;
+  onInstall: () => void;
   suggestion: Suggestion;
   onCookSuggested: () => void;
   paceNote: string | null;
@@ -404,6 +412,7 @@ function Home({
         <button className="link" onClick={onKitchen}>Your kitchen</button>
         <button className="link" onClick={onStats}>Your pace</button>
         <button className="link" onClick={onSettings}>Settings</button>
+        {canInstall && <button className="link" onClick={onInstall}>📲 Install Tutti</button>}
       </div>
       <div className="kp-row" style={{ marginTop: 16 }}>
         <span className="kp-label">Pro mode<br /><small style={{ color: "var(--faint)" }}>interleave prep &amp; cook freely; no nudges</small></span>

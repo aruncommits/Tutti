@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 79,
-  "lastTick": "2026-06-18T06:22:37.819Z",
-  "lastTickEpoch": 1781763757,
+  "iteration": 80,
+  "lastTick": "2026-06-18T06:25:00.080Z",
+  "lastTickEpoch": 1781763900,
   "phase": "brief-v27-install-prompt",
-  "nextResearchTheme": "Brief v26 DONE (cooking-for-N scaler, verified; 247 tests). Brief v27 authored (install prompt). NEXT: Brief v27 item 1 - apps/web/src/useInstallPrompt.ts: hook adding beforeinstallprompt listener (preventDefault+store event in state) + appinstalled listener (clear); returns {canInstall, promptInstall:()=>Promise<void> calling evt.prompt() then clearing}; SSR/jsdom-safe (typeof window guard; no event->canInstall false; no-op). Local BeforeInstallPromptEvent type {preventDefault();prompt():Promise<void>;userChoice}. useInstallPrompt.test.ts (renderHook: jsdom canInstall false + promptInstall no-throw; dispatch fake beforeinstallprompt with prompt stub -> canInstall true + promptInstall calls stub.prompt). Then item 2 Home Install Tutti button (canInstall) -> promptInstall, item 5 verify."
+  "nextResearchTheme": "Brief v27 item 1 done (useInstallPrompt; 250 tests; RESUMED after 4th ~8h stall). NEXT: items 2+5 - App: const {canInstall, promptInstall}=useInstallPrompt(); pass canInstall + onInstall=promptInstall to <Home>. Home: add props canInstall:boolean, onInstall:()=>void; when canInstall render a subtle button (className btn ghost) in home-links: \"Install Tutti\" -> onInstall. Hidden otherwise. item 5: a Home render test (render App OR Home with canInstall true + onInstall spy) asserting the Install button appears + click calls onInstall; and that it is absent when canInstall false. Then Brief v27 done -> research + Brief v28 (photos/units/onboarding/other)."
 }
