@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 64,
-  "lastTick": "2026-06-18T12:40:30.9728897+08:00",
-  "lastTickEpoch": 1781757631,
+  "iteration": 65,
+  "lastTick": "2026-06-18T12:43:47.0132256+08:00",
+  "lastTickEpoch": 1781757827,
   "phase": "brief-v20-mise-en-place",
-  "nextResearchTheme": "Brief v19 DONE (recipe detail read view; 202 tests). Brief v20 authored (mise en place / get-ready checklist). NEXT: Brief v20 item 1 - apps/web/src/mise.ts: requiredEquipment(recipes):string[] (unique node resource categories across meal, EXCLUDE 'hands', humanized via label map) + missingEquipment(required, kitchen:KitchenUi):string[] (required tools not in kitchen - check via toKitchenProfile+capacityOf, or KitchenUi flags). reuse buildShoppingList for ingredients. mise.test.ts (excludes hands+dedupe; missing flags a lacking tool e.g. no blender; empty when all present). Then item 2 MiseScreen (lazy, 'ready' screen: checkable ingredients + equipment + missing-tool warning + Start cooking), item 3 wire Preview->ready->startCooking, item 5 tests."
+  "nextResearchTheme": "Brief v20 item 1 done (mise.ts requiredEquipment/missingEquipment/labelFor; 205 tests). NEXT: items 2-3+5 - MiseScreen.tsx (lazy, 'ready' screen): props recipes, kitchen, onStart, onBack. Checkable Ingredients (buildShoppingList -> local checked state) + checkable Equipment (requiredEquipment -> labelFor) + warning banner listing missingEquipment(recipes,kitchen) ('Heads up - uses X; your kitchen does not list one. You can still cook.'); big 'Start cooking' -> onStart; Back. Add 'ready' to Screen union + SCREEN_NAMES. App: route screen==='ready' -> <MiseScreen recipes={selectedRecipes.length?selectedRecipes:thaliV1.recipes} kitchen={kitchen} onStart={startCooking} onBack={()=>setScreen('preview')}/>. PreviewScreen 'Start cooking' -> setScreen('ready') (keep skippable). Item 5: mise tests done + MiseScreen render test (shows ingredients+equipment+missing warning when blender:false; Start cooking calls onStart). Then Brief v20 done -> research + Brief v21."
 }

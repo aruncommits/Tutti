@@ -16,6 +16,7 @@ import { suggestMeal, type Suggestion } from "./suggest";
 const KitchenScreen = lazy(() => import("./KitchenScreen").then((m) => ({ default: m.KitchenScreen })));
 const MealsScreen = lazy(() => import("./MealsScreen").then((m) => ({ default: m.MealsScreen })));
 const RecipeDetailScreen = lazy(() => import("./RecipeDetailScreen").then((m) => ({ default: m.RecipeDetailScreen })));
+const MiseScreen = lazy(() => import("./MiseScreen").then((m) => ({ default: m.MiseScreen })));
 const OnboardingScreen = lazy(() => import("./OnboardingScreen").then((m) => ({ default: m.OnboardingScreen })));
 const PreviewScreen = lazy(() => import("./PreviewScreen").then((m) => ({ default: m.PreviewScreen })));
 const AddRecipe = lazy(() => import("./AddRecipe").then((m) => ({ default: m.AddRecipe })));
@@ -30,7 +31,7 @@ const ALL_DISHES = thaliV1.recipes.map((r) => r.recipeId);
 const SCREEN_NAMES: Record<Screen, string> = {
   onboarding: "Welcome", kitchen: "Your kitchen", home: "Home", addRecipe: "Add a dish",
   browse: "Browse recipes", recipe: "Recipe", shopping: "Shopping list", stats: "Your pace", meals: "Your meals", pick: "Pick dishes",
-  serveTime: "Serve time", preview: "Plan preview", cook: "Cook mode", done: "Done",
+  serveTime: "Serve time", preview: "Plan preview", ready: "Get ready", cook: "Cook mode", done: "Done",
 };
 
 export function App() {
@@ -271,10 +272,17 @@ export function App() {
       ) : screen === "preview" ? (
         <PreviewScreen
           plan={plan}
-          onStart={() => setScreen("cook")}
+          onStart={() => setScreen("ready")}
           onEdit={() => setScreen("pick")}
           onSave={saveMeal}
           onShare={() => { void shareOrCopy("Tutti plan", formatPlan(plan, selectedRecipes.map((r) => r.name))); }}
+        />
+      ) : screen === "ready" ? (
+        <MiseScreen
+          recipes={selectedRecipes.length ? selectedRecipes : thaliV1.recipes}
+          kitchen={kitchen}
+          onStart={startCooking}
+          onBack={() => setScreen("preview")}
         />
       ) : screen === "home" ? (
         <Home

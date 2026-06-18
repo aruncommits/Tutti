@@ -15,6 +15,7 @@ export type Screen =
   | "pick"
   | "serveTime"
   | "preview"
+  | "ready"
   | "cook"
   | "done";
 
