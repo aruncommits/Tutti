@@ -17,7 +17,8 @@
   --card: rgba(255, 255, 255, 0.045);
   --card-edge: rgba(255, 255, 255, 0.085);
   --line: rgba(255, 255, 255, 0.08);
-  --display: "Fraunces", serif;
+  --display: "Bodoni Moda", Georgia, serif;
+  --hand: "Bodoni Moda", Georgia, serif;
 }
 * {
   box-sizing: border-box;
@@ -29,7 +30,7 @@ body {
   min-height: 100%;
 }
 body {
-  font-family: "Inter", system-ui, sans-serif;
+  font-family: "Instrument Sans", system-ui, sans-serif;
   color: var(--ink);
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
@@ -70,7 +71,7 @@ header {
 }
 .brand small {
   display: block;
-  font-family: "Inter";
+  font-family: "Instrument Sans";
   font-weight: 500;
   font-size: 10.5px;
   letter-spacing: 0.16em;
@@ -404,7 +405,7 @@ header {
 /* onboarding */
 .onboarding { min-height: 70vh; display: flex; flex-direction: column; justify-content: center; }
 .ob-card { padding: 24px 4px; }
-.ob-hand { font-family: var(--hand, "Caveat", cursive); font-size: 22px; color: var(--accent); margin-bottom: 10px; }
+.ob-hand { font-family: var(--hand, "Bodoni Moda", serif); font-style: italic; font-size: 22px; color: var(--accent); margin-bottom: 10px; }
 .ob-title { font-family: var(--display); font-size: 30px; font-weight: 600; line-height: 1.15; margin-bottom: 12px; }
 .ob-body { color: var(--muted); font-size: 16px; line-height: 1.5; }
 .ob-dots { display: flex; gap: 8px; margin: 18px 4px; }
