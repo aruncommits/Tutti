@@ -9,6 +9,7 @@ import {
 import { colorFor, dishName } from "./dishColors";
 import { useSpeech } from "./useSpeech";
 import { parseVoiceCommand } from "./voice";
+import { requestNotifyPermission, notifyReady } from "./notify";
 
 function speak(text: string) {
   const synth = (window as unknown as { speechSynthesis?: { cancel: () => void; speak: (u: unknown) => void } }).speechSynthesis;
@@ -61,7 +62,11 @@ export function CookScreen({
 
   // UI-only countdowns for passive tasks the cook has started (seconds remaining, floored at 0).
   const [remaining, setRemaining] = useState<Record<string, number>>({});
-  const startPassive = (id: string, mins: number) => setRemaining((r) => ({ ...r, [id]: mins * 60 }));
+  const notifiedRef = useRef<Set<string>>(new Set());
+  const startPassive = (id: string, mins: number) => {
+    void requestNotifyPermission(); // intentful gesture: the cook is about to walk away (Brief v15)
+    setRemaining((r) => ({ ...r, [id]: mins * 60 }));
+  };
   const complete = (id: string) => {
     setRemaining((r) => { const n = { ...r }; delete n[id]; return n; });
     onComplete(id);
@@ -78,6 +83,18 @@ export function CookScreen({
     }, 1000);
     return () => clearInterval(t);
   }, [remaining]);
+
+  // Fire a local notification once when a started passive timer reaches zero, so the cook who
+  // walked away comes back before it overcooks (Brief v15). The "⏲ ready!" label is the fallback.
+  useEffect(() => {
+    for (const [id, sec] of Object.entries(remaining)) {
+      if (sec === 0 && !notifiedRef.current.has(id)) {
+        notifiedRef.current.add(id);
+        const node = plan.nodes.find((n) => n.nodeId === id);
+        if (node) notifyReady(`${dishName(node.recipeId)} — ${node.title} is ready`);
+      }
+    }
+  }, [remaining, plan.nodes]);
 
   // Voice control (Doc 7 §11). The on-screen Done button always remains the fallback (§11.2).
   const activeHands = view.active.filter((n) => n.attention === "active"); // the hands-on NOW tasks
