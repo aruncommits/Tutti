@@ -1118,3 +1118,34 @@ button:focus-visible, a:focus-visible, input:focus-visible,
 @media (prefers-reduced-motion: reduce) {
   .skip-link { transition: none; }
 }
+
+/* motion polish (Brief v11) — Queue->NOW promotion + screen entry. All gated by reduced-motion. */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes promoteGlow {
+  0%   { box-shadow: 0 0 0 0 rgba(255, 163, 77, 0); }
+  35%  { box-shadow: 0 0 0 3px rgba(255, 163, 77, 0.35); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 163, 77, 0); }
+}
+@keyframes fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+/* Active hands-on card: rises in and pulses when it (re)mounts on promotion. The passive
+   countdown card is excluded so its per-second re-render never replays the animation. */
+.now-card:not(.passive) {
+  animation: rise 180ms var(--ease) both, promoteGlow 700ms var(--ease) 120ms;
+}
+/* Each screen's zone gently fades in on entry/screen change. */
+.zone {
+  animation: fade 160ms var(--ease) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .now-card:not(.passive),
+  .zone,
+  .skip-link {
+    animation: none !important;
+  }
+}

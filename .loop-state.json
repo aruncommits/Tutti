@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 47,
-  "lastTick": "2026-06-18T10:51:42.9688632+08:00",
-  "lastTickEpoch": 1781751103,
-  "phase": "brief-v10-performance",
-  "nextResearchTheme": "Brief v9 DONE (a11y, Lighthouse Accessibility 100 / Best Practices 100; 147 tests). Brief v10 authored (route code-splitting). NEXT: Brief v10 item 1 - React.lazy the secondary screens in App (AddRecipe/BrowseScreen/ShoppingScreen/StatsScreen/PreviewScreen/KitchenScreen/OnboardingScreen via lazy(()=>import(...).then(m=>({default:m.Name})))), keep CookScreen+engine eager, wrap routed <main> content in one Suspense with an accessible 'Loading...' fallback. Fix any App-level tests needing findBy/await. Verify build splits (ingest out of entry) + gate green. Then item 2 perf-check budget, item 4 lighthouse before/after."
+  "iteration": 48,
+  "lastTick": "2026-06-18T11:00:27.6070981+08:00",
+  "lastTickEpoch": 1781751628,
+  "phase": "brief-v11-motion",
+  "nextResearchTheme": "Brief v10 DONE (code-splitting; entry 173KB, ingest deferred, 8 chunks, perf-check gate; 147 tests). Brief v11 authored (motion polish, CSS-only, reduced-motion gated). NEXT: Brief v11 item 1 - CSS @keyframes rise (opacity 0/translateY 8px -> none, ~180ms var(--ease)) on .now-card enter; CAUTION the passive countdown card re-renders every second so scope the animation so it doesn't replay each tick (use a modifier class for active cards, or animation only on appearance). Extend the prefers-reduced-motion block to null it. Then item 2 promotion highlight, item 3 screen-change fade, item 5 verify in browser + toggle reduced motion."
 }
