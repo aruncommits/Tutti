@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 40,
-  "lastTick": "2026-06-18T10:12:42.4531092+08:00",
-  "lastTickEpoch": 1781748762,
+  "iteration": 41,
+  "lastTick": "2026-06-18T10:17:43.0543874+08:00",
+  "lastTickEpoch": 1781749063,
   "phase": "brief-v7-pwa-offline",
-  "nextResearchTheme": "Brief v7 item 1 done (PWA plugin: build emits manifest+sw, installable/offline; adapted to external Bodoni/Instrument-Sans theme edit; 132 tests). NEXT: item 3 - self-host fonts for TRUE offline: add @fontsource packages (or vendor woff2) for the externally-chosen fonts Bodoni Moda + Instrument Sans (+ Spline Sans Mono if used), import them in main.tsx/css, remove the Google Fonts <link> from index.html so there is no cross-origin runtime dependency. Verify build + woff2 precached + offline. Then item 4 (light update toast) + item 5 (offline Playwright check)."
+  "nextResearchTheme": "Brief v7 items 1+3 done (PWA installable; self-hosted fonts; 38 woff2 precached; true offline; 132 tests). Adapted to external 'in concert' redesign (Bodoni/Instrument/Spline, PreviewScreen score/tempo). NEXT: item 5 - offline Playwright verification: \npm run build; serve dist (e.g. npx vite preview --port 5181 --strictPort OR a static server) in background; Playwright navigate, then evaluate to confirm cooking renders; optionally context.setOffline. If serving dist conflicts with port, use 5181. If too fiddly, instead assert offline-readiness via the built sw precache list. Then Brief v7 DONE -> research next gap (Lighthouse perf / a11y / recipe library) -> author Research-Brief-v8."
 }
