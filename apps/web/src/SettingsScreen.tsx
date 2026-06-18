@@ -8,6 +8,8 @@ export function SettingsScreen({
   onTogglePro,
   learnPace,
   onToggleLearn,
+  metric,
+  onToggleMetric,
   onExport,
   onReset,
   onBack,
@@ -16,6 +18,8 @@ export function SettingsScreen({
   onTogglePro: () => void;
   learnPace: boolean;
   onToggleLearn: () => void;
+  metric: boolean;
+  onToggleMetric: () => void;
   onExport: () => void;
   onReset: () => void;
   onBack: () => void;
@@ -38,6 +42,7 @@ export function SettingsScreen({
       <h3 className="meal-sec">Preferences</h3>
       <Toggle on={pro} onToggle={onTogglePro} label="Pro mode" desc="Let prep and cook interleave without nudges" />
       <Toggle on={learnPace} onToggle={onToggleLearn} label="Learn my pace" desc="Tune timings to how you actually cook" />
+      <Toggle on={metric} onToggle={onToggleMetric} label="Metric units" desc="Show amounts in millilitres" />
 
       <h3 className="meal-sec">Your data</h3>
       <p className="hint">Everything stays on this device. Nothing is uploaded.</p>

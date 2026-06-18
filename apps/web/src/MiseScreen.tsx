@@ -1,22 +1,22 @@
 import { useState } from "react";
 import { buildShoppingList, type RecipeGraph } from "@tutti/engine";
 import { requiredEquipment, labelFor, missingEquipment } from "./mise";
+import { displayAmount } from "./units";
 import type { KitchenUi } from "./kitchenModel";
 
 // Mise en place / "Get ready" (Brief v20). Gather ingredients + ready the equipment before the
 // first timer starts. Checkable, skippable, and honest about tools the kitchen may lack.
 
-const amt = (i: { amount?: number; unit?: string }) =>
-  i.amount !== undefined ? `${i.amount}${i.unit ? ` ${i.unit}` : ""}` : "to taste";
-
 export function MiseScreen({
   recipes,
   kitchen,
+  metric = false,
   onStart,
   onBack,
 }: {
   recipes: RecipeGraph[];
   kitchen: KitchenUi;
+  metric?: boolean;
   onStart: () => void;
   onBack: () => void;
 }) {
@@ -49,7 +49,7 @@ export function MiseScreen({
 
       <h3 className="meal-sec">Gather</h3>
       <div className="ing-sec">
-        {ingredients.map((i) => <Row key={`g|${i.name}|${i.unit ?? ""}`} k={`g|${i.name}|${i.unit ?? ""}`} label={i.name} sub={amt(i)} />)}
+        {ingredients.map((i) => <Row key={`g|${i.name}|${i.unit ?? ""}`} k={`g|${i.name}|${i.unit ?? ""}`} label={i.name} sub={displayAmount(i.amount, i.unit, i.toTaste, metric)} />)}
       </div>
 
       <h3 className="meal-sec">Equipment</h3>

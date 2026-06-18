@@ -4,6 +4,7 @@ import { usePersistentState } from "./state";
 import { colorFor } from "./dishColors";
 import { formatShoppingList, shareOrCopy, type ShareResult } from "./share";
 import { partitionByPantry, isStaple } from "./pantry";
+import { displayAmount } from "./units";
 
 const SHARE_MSG: Record<ShareResult, string> = {
   shared: "Shared ✓",
@@ -14,18 +15,17 @@ const SHARE_MSG: Record<ShareResult, string> = {
 // Consolidated shopping list (Doc 6; Brief v4 item 4). Combined = one merged list across dishes;
 // Separate = grouped per dish. Check-off persists. Dish color dots show who needs each line.
 
-const fmtAmount = (amount?: number, unit?: string, toTaste?: boolean) =>
-  amount !== undefined ? `${amount}${unit ? ` ${unit}` : ""}` : toTaste ? "to taste" : "";
-
 export function ShoppingScreen({
   recipes,
   onBack,
   pantry = [],
+  metric = false,
   onToggleStaple,
 }: {
   recipes: RecipeGraph[];
   onBack: () => void;
   pantry?: string[];
+  metric?: boolean;
   onToggleStaple?: (name: string) => void;
 }) {
   const [mode, setMode] = usePersistentState<"combined" | "separate">("tutti.shoppingMode", "combined");
@@ -54,7 +54,7 @@ export function ShoppingScreen({
           <span className="for">
             {item.recipeIds.map((id) => <span key={id} className="d" style={{ background: colorFor(id) }} title={id} />)}
           </span>
-          <span className="amt">{fmtAmount(item.amount, item.unit, item.toTaste)}</span>
+          <span className="amt">{displayAmount(item.amount, item.unit, item.toTaste, metric)}</span>
         </button>
         {onToggleStaple && (
           <button
@@ -114,7 +114,7 @@ export function ShoppingScreen({
                   <button key={key + i} className={`ing-row${isChecked(key) ? " tick" : ""}`} role="checkbox" aria-checked={isChecked(key)} onClick={() => toggle(key)}>
                     <span className="box">{isChecked(key) ? "✓" : ""}</span>
                     <span className="nm">{item.raw}</span>
-                    <span className="amt">{fmtAmount(item.amount, item.unit, item.amount === undefined)}</span>
+                    <span className="amt">{displayAmount(item.amount, item.unit, item.amount === undefined, metric)}</span>
                   </button>
                 );
               })}

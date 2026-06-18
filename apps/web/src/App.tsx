@@ -61,6 +61,7 @@ export function App() {
   const [detailRecipe, setDetailRecipe] = useState<RecipeGraph | null>(null);
   const [pantry, setPantry] = usePersistentState<Pantry>("tutti.pantry", [], isStringArray);
   const [people, setPeople] = usePersistentState<number>("tutti.people", 4, (v) => typeof v === "number");
+  const [metric, setMetric] = usePersistentState<boolean>("tutti.metric", false, (v) => typeof v === "boolean");
   const { canInstall, promptInstall } = useInstallPrompt();
   const paceAdjusted = Object.entries(pace).filter(([, m]) => Math.abs(m - 1) > 0.05);
   const focusAtRef = useRef<number | null>(null); // wall-clock boundary for honest actual-duration capture
@@ -240,6 +241,7 @@ export function App() {
         <RecipeDetailScreen
           recipe={detailRecipe}
           note={notes[detailRecipe.recipeId]}
+          metric={metric}
           onAdd={() => addCandidate(detailRecipe)}
           onBack={() => setScreen("browse")}
         />
@@ -248,6 +250,7 @@ export function App() {
           recipes={selectedRecipes.length ? selectedRecipes : allRecipes}
           onBack={() => setScreen("pick")}
           pantry={pantry}
+          metric={metric}
           onToggleStaple={(name) => setPantry((p) => toggleStaple(p, name))}
         />
       ) : screen === "meals" ? (
@@ -264,6 +267,8 @@ export function App() {
           onTogglePro={() => setPro(!pro)}
           learnPace={learnPace}
           onToggleLearn={() => setLearnPace(!learnPace)}
+          metric={metric}
+          onToggleMetric={() => setMetric(!metric)}
           onExport={() => { void shareOrCopy("Tutti data", exportData(localStorage)); }}
           onReset={() => {
             resetData(localStorage);
@@ -322,6 +327,7 @@ export function App() {
         <MiseScreen
           recipes={selectedRecipes.length ? selectedRecipes : thaliV1.recipes}
           kitchen={kitchen}
+          metric={metric}
           onStart={startCooking}
           onBack={() => setScreen("preview")}
         />

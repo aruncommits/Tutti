@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 82,
-  "lastTick": "2026-06-18T06:59:15.780Z",
-  "lastTickEpoch": 1781765955,
+  "iteration": 83,
+  "lastTick": "2026-06-18T07:02:36.647Z",
+  "lastTickEpoch": 1781766156,
   "phase": "brief-v29-units",
-  "nextResearchTheme": "Brief v28 DONE (a11y re-audit -> 100 restored after light-theme regression; structural a11y locks; 254 tests). NOTE: external redesign switched app to a LIGHT rice-paper theme (adapt, keep). Brief v29 authored (metric units toggle). NEXT: Brief v29 item 1 - apps/web/src/units.ts pure: convertAmount(amount,unit,metric):{amount?,unit?} (metric+US volume cup/cups*240, tbsp/tablespoon*15, tsp/teaspoon*5 -> ml; oz*28 -> g; else identity); roundNice (>=20 nearest 5 else nearest 1); displayAmount(amount,unit,toTaste,metric):string. units.test.ts (cup->ml, tbsp->ml, tsp->ml, off=identity, whole/clove unchanged, rounding). Then item 2 Settings Metric-units toggle (tutti.metric), item 3 apply displayAmount in Shopping/RecipeDetail/Mise, item 5 screen test."
+  "nextResearchTheme": "Brief v29 item 1 done (units convertAmount/displayAmount; 260 tests; RESUMED after 5th ~8h stall). NEXT: items 2-3+5 - App: const [metric,setMetric]=usePersistentState(\"tutti.metric\",false,(v)=>typeof v===\"boolean\"); SettingsScreen Preferences add a Metric-units toggle (props metric,onToggleMetric, desc Show amounts in millilitres). Pass metric to ShoppingScreen + RecipeDetailScreen + MiseScreen. In those, replace inline amount formatting with displayAmount(i.amount,i.unit,i.toTaste,metric) from ./units. item 5: a screen test (RecipeDetail or Shopping) - with metric a cup ingredient shows /ml/; without, original unit. Then Brief v29 done -> research + Brief v30."
 }

@@ -5,6 +5,7 @@ import { SettingsScreen } from "./SettingsScreen";
 const props = () => ({
   pro: false, onTogglePro: vi.fn(),
   learnPace: true, onToggleLearn: vi.fn(),
+  metric: false, onToggleMetric: vi.fn(),
   onExport: vi.fn(), onReset: vi.fn(), onBack: vi.fn(),
 });
 

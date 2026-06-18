@@ -25,7 +25,7 @@ describe("new screens a11y scaffolding (Brief v28 item 4)", () => {
   it("Settings exposes a heading and toggles whose name includes On/Off", () => {
     render(
       <SettingsScreen pro={false} onTogglePro={noop} learnPace onToggleLearn={noop}
-        onExport={noop} onReset={noop} onBack={noop} />,
+        metric={false} onToggleMetric={noop} onExport={noop} onReset={noop} onBack={noop} />,
     );
     expect(screen.getByRole("heading", { level: 2, name: /settings/i })).toBeInTheDocument();
     // accessible name carries the visible On/Off text (WCAG 2.5.3)

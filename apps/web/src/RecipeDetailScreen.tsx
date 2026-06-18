@@ -3,22 +3,22 @@ import { orderedSteps, recipeIngredients, recipeTotalMins } from "./recipeView";
 import { Stars } from "./Stars";
 import { colorFor } from "./dishColors";
 import { substitutesFor } from "./substitutions";
+import { displayAmount } from "./units";
 import type { RecipeNote } from "./recipeNotes";
 
 // Recipe detail / read view (Brief v19) — a control center, not a blog post: ingredients up top,
 // scannable numbered steps with phase + time + hands-free tags. Pure render of the RecipeGraph.
 
-const amt = (i: { amount?: number; unit?: string; toTaste?: boolean }) =>
-  i.amount !== undefined ? `${i.amount}${i.unit ? ` ${i.unit}` : ""}` : "to taste";
-
 export function RecipeDetailScreen({
   recipe,
   note,
+  metric = false,
   onAdd,
   onBack,
 }: {
   recipe: RecipeGraph;
   note?: RecipeNote;
+  metric?: boolean;
   onAdd: () => void;
   onBack: () => void;
 }) {
@@ -55,7 +55,7 @@ export function RecipeDetailScreen({
             <div key={`${i.name}|${i.unit ?? ""}`}>
               <div className="ing-row">
                 <span className="nm">{i.name}</span>
-                <span className="amt">{amt(i)}</span>
+                <span className="amt">{displayAmount(i.amount, i.unit, i.toTaste, metric)}</span>
               </div>
               {subs.length > 0 && (
                 <p className="sub-hint">
