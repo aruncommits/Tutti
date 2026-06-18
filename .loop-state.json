@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 85,
-  "lastTick": "2026-06-18T07:15:27.331Z",
-  "lastTickEpoch": 1781766927,
-  "phase": "brief-v30-e2e-journey",
-  "nextResearchTheme": "Brief v30 item 1 done (e2e journey Home->finale passes; 263 tests; RESUMED after 6th ~8h stall). NEXT: item 2 - plan-flow sub-journey in journey.test.tsx: from Home click Pick dishes link -> Set serve time button -> Build my plan -> await findByText (Preview lazy) /the score|serving at/i -> Start cooking -> Get ready (Mise) /get ready/i -> Start cooking -> assert Cook NOW/serving-at. Use findBy for lazy Preview/Mise; role/text queries. Item 3 fix any wiring it surfaces. Then Brief v30 done -> research + Brief v31."
+  "iteration": 86,
+  "lastTick": "2026-06-18T07:21:41.295Z",
+  "lastTickEpoch": 1781767301,
+  "phase": "brief-v31-print",
+  "nextResearchTheme": "Brief v30 DONE (e2e cook-journey tests, 2 journeys; 264 tests). Brief v31 authored (print support). NEXT: Brief v31 item 1 - @media print block in theme.css: @page margin 14mm; body #fff/#000; hide chrome (header,footer,.skip-link,.home-links,.subtabs,.kp-stepper,.kp-toggle,.staple-toggle,.browse-info,.mic,.scale-btn,.add-dish,.btn,.link,.sr-only,.no-print { display:none !important }); keep .zone/.ing-sec/.ing-row/.recipe-steps/.recipe-step/headings/.nm/.amt/.sub-hint; black text, no card bg/shadow; break-inside:avoid on rows/steps; .print-only shown only in print. Then item 2 a small Print button (btn ghost no-print) on ShoppingScreen + RecipeDetailScreen -> window.print() (guard typeof window). item 5 test Print button calls window.print (spy)."
 }
