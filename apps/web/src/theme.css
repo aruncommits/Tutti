@@ -1085,3 +1085,10 @@ header {
     animation: none !important;
   }
 }
+
+/* browse / library */
+.browse-search { width: 100%; }
+.browse-filters { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 14px; }
+.browse-filters .chip-toggle { min-height: 40px; }
+.browse-row { width: 100%; cursor: pointer; }
+.browse-add { margin-left: 10px; color: var(--accent); font-size: 13px; white-space: nowrap; }

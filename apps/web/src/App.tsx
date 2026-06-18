@@ -9,6 +9,7 @@ import { PreviewScreen } from "./PreviewScreen";
 import { AddRecipe } from "./AddRecipe";
 import { ShoppingScreen } from "./ShoppingScreen";
 import { StatsScreen, type LearnEvent } from "./StatsScreen";
+import { BrowseScreen } from "./BrowseScreen";
 import { shouldLearn } from "./learn";
 
 const ALL_DISHES = thaliV1.recipes.map((r) => r.recipeId);
@@ -119,6 +120,8 @@ export function App() {
         <KitchenScreen kitchen={kitchen} onChange={setKitchen} avoid={avoid} onToggleAvoid={toggleAvoid} onDone={() => setScreen("home")} />
       ) : screen === "addRecipe" ? (
         <AddRecipe onAdd={addCandidate} onBack={() => setScreen("home")} />
+      ) : screen === "browse" ? (
+        <BrowseScreen avoid={avoid} onPick={addCandidate} onBack={() => setScreen("home")} />
       ) : screen === "shopping" ? (
         <ShoppingScreen recipes={selectedRecipes.length ? selectedRecipes : allRecipes} onBack={() => setScreen("pick")} />
       ) : screen === "stats" ? (
@@ -163,6 +166,7 @@ export function App() {
           pro={pro}
           onTogglePro={() => setPro(!pro)}
           onStats={() => setScreen("stats")}
+          onBrowse={() => setScreen("browse")}
           paceNote={
             paceAdjusted.length
               ? "Calibrated to your pace: " +
@@ -188,6 +192,7 @@ function Home({
   pro,
   onTogglePro,
   onStats,
+  onBrowse,
   paceNote,
 }: {
   onStart: () => void;
@@ -196,6 +201,7 @@ function Home({
   pro: boolean;
   onTogglePro: () => void;
   onStats: () => void;
+  onBrowse: () => void;
   paceNote: string | null;
 }) {
   return (
@@ -204,6 +210,7 @@ function Home({
       {paceNote && <p className="hint">{paceNote}</p>}
       <button className="btn big-btn" onClick={onStart}>Start cooking</button>
       <div className="home-links">
+        <button className="link" onClick={onBrowse}>Browse recipes</button>
         <button className="link" onClick={onPick}>Pick dishes</button>
         <button className="link" onClick={onKitchen}>Your kitchen</button>
         <button className="link" onClick={onStats}>Your pace</button>

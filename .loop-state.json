@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 43,
-  "lastTick": "2026-06-18T10:28:04.3946893+08:00",
-  "lastTickEpoch": 1781749684,
+  "iteration": 44,
+  "lastTick": "2026-06-18T10:31:05.5825090+08:00",
+  "lastTickEpoch": 1781749866,
   "phase": "brief-v8-recipe-library",
-  "nextResearchTheme": "Brief v8 item 1 done (Golden Library: 6 verified veg South Indian recipes; 136 tests). NEXT: item 2 - pure browse helpers in apps/web/src/library.ts (web): LibraryEntry {recipe, totalMins (sum estMins), allergens (allergensOf), veg (no meat/fish/egg/crustacean/mollusc)} and filterLibrary(entries, {query, maxMins, avoidAllergens, vegOnly}) - search name+ingredient names, stackable filters; unit-test stacking/ingredient-search/allergen-exclusion. Then item 3 BrowseScreen, item 4 wire into pick, item 5 web tests."
+  "nextResearchTheme": "Brief v8 items 1-2 done (Golden Library + filterLibrary helpers; 143 tests). NEXT: item 3+4 - BrowseScreen.tsx over goldenLibrary using toLibraryEntries/filterLibrary: search box + filter chips (max-time presets e.g. <=20/<=40, veg-only default on, 'hide my allergens' using avoid-set); each row shows name + total time + allergen badges + dishColors dot; tap a row -> onAdd(recipe) which adds it to candidates+dishes (reuse addCandidate) and routes to pick. Add 'browse' to Screen union; reachable from Home ('Browse recipes'). Verify in browser. Then item 5 web test (BrowseScreen renders seeded dishes; a search term narrows)."
 }
