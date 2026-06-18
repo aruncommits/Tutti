@@ -1,4 +1,5 @@
 import { allergensOf, type RecipeGraph } from "@tutti/engine";
+import type { NotesMap } from "./recipeNotes";
 
 // Pure browse/search helpers for the recipe library (Brief v8 item 2). Derives display metadata
 // and supports stackable filtering (the #1 thing users want — combine, not pick-one). No DOM.
@@ -48,4 +49,23 @@ export function filterLibrary(entries: LibraryEntry[], opts: LibraryFilter = {})
     }
     return true;
   });
+}
+
+// Soft ordering for the library (Brief v38) — reorders without excluding (compose after filtering).
+export type SortKey = "default" | "quickest" | "rated" | "cooked";
+
+export function sortLibrary(entries: LibraryEntry[], key: SortKey, notes: NotesMap = {}): LibraryEntry[] {
+  const idx = new Map(entries.map((e, i) => [e.recipe.recipeId, i]));
+  const tie = (a: LibraryEntry, b: LibraryEntry) => idx.get(a.recipe.recipeId)! - idx.get(b.recipe.recipeId)!;
+  const arr = [...entries];
+  switch (key) {
+    case "quickest":
+      return arr.sort((a, b) => a.totalMins - b.totalMins || tie(a, b));
+    case "rated":
+      return arr.sort((a, b) => (notes[b.recipe.recipeId]?.rating ?? 0) - (notes[a.recipe.recipeId]?.rating ?? 0) || tie(a, b));
+    case "cooked":
+      return arr.sort((a, b) => (notes[b.recipe.recipeId]?.cookCount ?? 0) - (notes[a.recipe.recipeId]?.cookCount ?? 0) || tie(a, b));
+    default:
+      return arr;
+  }
 }

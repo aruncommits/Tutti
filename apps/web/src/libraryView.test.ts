@@ -47,3 +47,25 @@ describe("filterLibrary — stackable filters (Brief v8 item 2)", () => {
     expect(filterLibrary(entries, { vegOnly: true })).toHaveLength(entries.length);
   });
 });
+
+import { sortLibrary } from "./libraryView";
+
+describe("sortLibrary (Brief v38 item 1)", () => {
+  it("quickest orders ascending by total time", () => {
+    const out = sortLibrary(entries, "quickest");
+    for (let i = 1; i < out.length; i++) expect(out[i]!.totalMins).toBeGreaterThanOrEqual(out[i - 1]!.totalMins);
+  });
+  it("rated puts a high-rated recipe before an unrated one", () => {
+    const id = entries[3]!.recipe.recipeId; // some middle recipe
+    const out = sortLibrary(entries, "rated", { [id]: { rating: 5, cookCount: 0 } });
+    expect(out[0]!.recipe.recipeId).toBe(id);
+  });
+  it("cooked puts the most-cooked first", () => {
+    const id = entries[2]!.recipe.recipeId;
+    const out = sortLibrary(entries, "cooked", { [id]: { rating: 0, cookCount: 9 } });
+    expect(out[0]!.recipe.recipeId).toBe(id);
+  });
+  it("default keeps the original order", () => {
+    expect(sortLibrary(entries, "default").map((e) => e.recipe.recipeId)).toEqual(entries.map((e) => e.recipe.recipeId));
+  });
+});
