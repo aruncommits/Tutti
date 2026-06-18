@@ -703,7 +703,8 @@ header {
 .pick-main {
   display: flex;
   align-items: center;
-  gap: 12px;
+  flex-wrap: wrap; /* badges/duration/＋Add wrap instead of clipping on narrow phones */
+  gap: 8px 12px;
   width: 100%;
   padding: 14px 16px;
   background: none;
