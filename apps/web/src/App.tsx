@@ -2,6 +2,7 @@ import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import { applyEvent, compile, formatClock, parseClock, paceCategoryOf, scaleRecipe, thaliV1, updatePace, type MasterExecutionPlan, type PaceModel, type RecipeGraph } from "@tutti/engine";
 import { usePersistentState, type Screen } from "./state";
 import { Shell } from "./Shell";
+import { ErrorBoundary } from "./ErrorBoundary";
 import { CookScreen } from "./CookScreen"; // eager — the critical cook path must be instant
 import { DEFAULT_KITCHEN, toKitchenProfile, type KitchenUi } from "./kitchenModel";
 import type { LearnEvent } from "./StatsScreen";
@@ -209,6 +210,7 @@ export function App() {
     <Shell screen={screen} onNavigate={setScreen}>
       <div role="status" aria-live="polite" className="sr-only">{announce}</div>
       <main id="screen-main" ref={focusRef} tabIndex={-1} className="screen-focus">
+      <ErrorBoundary key={screen} onHome={() => setScreen("home")}>
       <Suspense fallback={<Loading />}>
 
       {screen === "cook" ? (
@@ -355,6 +357,7 @@ export function App() {
         <Stub screen={screen} onBack={() => setScreen("home")} onCook={startCooking} />
       )}
       </Suspense>
+      </ErrorBoundary>
       </main>
 
       <footer className="scaffold-note">

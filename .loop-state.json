@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 90,
-  "lastTick": "2026-06-18T07:51:52.558Z",
-  "lastTickEpoch": 1781769112,
-  "phase": "brief-v34-entry-trim",
-  "nextResearchTheme": "Brief v33 DONE (finished-dish photos; 274 tests; entry 189KB at the 190 budget edge). Brief v34 authored (reclaim entry headroom). NEXT: Brief v34 item 1 - in App.tsx change eager `import { PickScreen, ServeTimeScreen } from ./PlanFlow` to React.lazy named-export wrappers (const PickScreen = lazy(()=>import(./PlanFlow).then(m=>({default:m.PickScreen}))); same ServeTimeScreen). Keep CookScreen eager. Build; confirm perf-check entry drops well under 190 (target <=178). item 2 fix App-level tests that reach Pick/ServeTime synchronously -> findBy/await (journey.test Pick step; multidish/pickServings render PickScreen directly so unaffected). Keep budget at 190. Then Brief v34 done -> research + Brief v35."
+  "iteration": 91,
+  "lastTick": "2026-06-18T07:58:03.259Z",
+  "lastTickEpoch": 1781769483,
+  "phase": "brief-v35-error-boundary",
+  "nextResearchTheme": "Brief v34 DONE (entry trim 189->184KB; 274 tests). Brief v35 authored (error boundary). NEXT: Brief v35 item 1+2+4 - apps/web/src/ErrorBoundary.tsx class component (getDerivedStateFromError -> {error}; componentDidCatch -> console.error; render fallback .zone with h2 Something went wrong + line + 🏠 Back to home button calling onHome + this.setState({error:null}); else children). App: wrap routed Suspense/screen inside #screen-main with <ErrorBoundary key={screen} onHome={()=>setScreen(home)}> (header/Shell OUTSIDE). errorBoundary.test.tsx: throwing child -> fallback (suppress console.error spy); Back-to-home calls onHome + recovers; healthy child renders through. Then Brief v35 done -> research + Brief v36."
 }
