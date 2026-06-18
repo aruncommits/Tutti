@@ -1250,3 +1250,8 @@ header {
   .nm, .amt, .node-title, .recipe-step-title, .sub-hint, h1, h2, h3 { color: #000 !important; }
   .print-only { display: block !important; }
 }
+
+/* last-time notes resurfaced at cook time (Brief v32) */
+.last-note { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.last-note .nm { font-weight: 500; }
+.last-note .sub-hint { flex: 1 1 100%; margin: 2px 0 0; }

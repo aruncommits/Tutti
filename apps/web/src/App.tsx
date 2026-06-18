@@ -328,6 +328,7 @@ export function App() {
           recipes={selectedRecipes.length ? selectedRecipes : thaliV1.recipes}
           kitchen={kitchen}
           metric={metric}
+          notes={notes}
           onStart={startCooking}
           onBack={() => setScreen("preview")}
         />

@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 86,
-  "lastTick": "2026-06-18T07:21:41.295Z",
-  "lastTickEpoch": 1781767301,
-  "phase": "brief-v31-print",
-  "nextResearchTheme": "Brief v30 DONE (e2e cook-journey tests, 2 journeys; 264 tests). Brief v31 authored (print support). NEXT: Brief v31 item 1 - @media print block in theme.css: @page margin 14mm; body #fff/#000; hide chrome (header,footer,.skip-link,.home-links,.subtabs,.kp-stepper,.kp-toggle,.staple-toggle,.browse-info,.mic,.scale-btn,.add-dish,.btn,.link,.sr-only,.no-print { display:none !important }); keep .zone/.ing-sec/.ing-row/.recipe-steps/.recipe-step/headings/.nm/.amt/.sub-hint; black text, no card bg/shadow; break-inside:avoid on rows/steps; .print-only shown only in print. Then item 2 a small Print button (btn ghost no-print) on ShoppingScreen + RecipeDetailScreen -> window.print() (guard typeof window). item 5 test Print button calls window.print (spy)."
+  "iteration": 87,
+  "lastTick": "2026-06-18T07:28:34.690Z",
+  "lastTickEpoch": 1781767714,
+  "phase": "brief-v32-notes-at-cook-time",
+  "nextResearchTheme": "Brief v31 DONE (print support; 266 tests). Brief v32 authored (notes resurfaced at cook time). NEXT: Brief v32 items 1-2+5 - thread notes:NotesMap into MiseScreen (App passes notes); MiseScreen renders a quiet Last-time reminders block above Gather for each recipe in `recipes` with notes[r.recipeId]?.note or rating: dish name + colorFor dot + read-only <Stars value={rating}/> + Last time: <note>. Skip dishes without note/rating. import Stars, colorFor, NotesMap. App: pass notes={notes} to <MiseScreen>. Item 5: MiseScreen test - notes={{<recipeId>:{note:more tamarind,rating:4,cookCount:2}}} for a recipe in the meal shows note text + stars; empty notes -> no reminders block. Then Brief v32 done -> research + Brief v33."
 }
