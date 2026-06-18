@@ -13,12 +13,14 @@ export function RecipeDetailScreen({
   recipe,
   note,
   metric = false,
+  photo,
   onAdd,
   onBack,
 }: {
   recipe: RecipeGraph;
   note?: RecipeNote;
   metric?: boolean;
+  photo?: string;
   onAdd: () => void;
   onBack: () => void;
 }) {
@@ -32,6 +34,8 @@ export function RecipeDetailScreen({
         <span className="swatch" style={{ background: colorFor(recipe.recipeId) }} />
         <span>{recipe.name}</span>
       </h2>
+
+      {photo && <img className="dish-thumb dish-thumb-lg" src={photo} alt={`Your ${recipe.name}`} />}
 
       <p className="value recipe-meta">
         {recipeTotalMins(recipe)} min · serves {recipe.servings}

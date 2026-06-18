@@ -50,6 +50,8 @@ export function CookScreen({
   dishesForReview = [],
   onRate,
   onNote,
+  photos = {},
+  onPhoto,
 }: {
   plan: MasterExecutionPlan;
   pro?: boolean;
@@ -60,6 +62,8 @@ export function CookScreen({
   dishesForReview?: string[];
   onRate?: (id: string, n: number) => void;
   onNote?: (id: string, s: string) => void;
+  photos?: Record<string, string>;
+  onPhoto?: (id: string, file: File) => void;
 }) {
   const view = deriveViewState(plan);
   const allDone = view.active.length === 0 && view.queue.length === 0;
@@ -199,6 +203,13 @@ export function CookScreen({
                       {dishName(id)}
                     </span>
                     <Stars value={notes[id]?.rating ?? 0} onRate={(n) => onRate(id, n)} label={`Rate ${dishName(id)}`} />
+                    {onPhoto && (photos[id]
+                      ? <img className="dish-thumb" src={photos[id]} alt={`Your ${dishName(id)}`} />
+                      : <label className="btn ghost mini">📷 Photo
+                          <input type="file" accept="image/*" capture="environment" hidden
+                            aria-label={`Add a photo of ${dishName(id)}`}
+                            onChange={(e) => { const f = e.target.files?.[0]; if (f) onPhoto(id, f); }} />
+                        </label>)}
                     <input
                       className="review-note"
                       type="text"

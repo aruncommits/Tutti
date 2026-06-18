@@ -13,12 +13,14 @@ const ENTRIES = toLibraryEntries(goldenLibrary);
 export function BrowseScreen({
   avoid,
   notes = {},
+  photos = {},
   onPick,
   onDetails,
   onBack,
 }: {
   avoid: string[];
   notes?: NotesMap;
+  photos?: Record<string, string>;
   onPick: (r: RecipeGraph) => void;
   onDetails?: (r: RecipeGraph) => void;
   onBack: () => void;
@@ -68,7 +70,9 @@ export function BrowseScreen({
           <div key={e.recipe.recipeId} className="browse-line">
             <button className="pick-row browse-row" onClick={() => onPick(e.recipe)} aria-label={`Add ${e.recipe.name}`}>
               <span className="pick-main" style={{ pointerEvents: "none" }}>
-                <span className="swatch" style={{ background: colorFor(e.recipe.recipeId) }} />
+                {photos[e.recipe.recipeId]
+                  ? <img className="dish-thumb" src={photos[e.recipe.recipeId]} alt="" />
+                  : <span className="swatch" style={{ background: colorFor(e.recipe.recipeId) }} />}
                 <span className="node-title">{e.recipe.name}</span>
                 {note?.rating ? <Stars value={note.rating} /> : null}
                 {note && note.cookCount > 0 ? <span className="cooked-n">cooked {note.cookCount}×</span> : null}

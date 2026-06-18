@@ -15,6 +15,7 @@ export function MiseScreen({
   kitchen,
   metric = false,
   notes = {},
+  photos = {},
   onStart,
   onBack,
 }: {
@@ -22,6 +23,7 @@ export function MiseScreen({
   kitchen: KitchenUi;
   metric?: boolean;
   notes?: NotesMap;
+  photos?: Record<string, string>;
   onStart: () => void;
   onBack: () => void;
 }) {
@@ -61,6 +63,7 @@ export function MiseScreen({
             const n = notes[r.recipeId]!;
             return (
               <div className="last-note" key={r.recipeId}>
+                {photos[r.recipeId] && <img className="dish-thumb" src={photos[r.recipeId]} alt={`Your ${r.name}`} />}
                 <span className="swatch" style={{ background: colorFor(r.recipeId) }} />
                 <span className="nm">{r.name}</span>
                 {n.rating ? <Stars value={n.rating} /> : null}

@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 88,
-  "lastTick": "2026-06-18T07:34:35.509Z",
-  "lastTickEpoch": 1781768075,
+  "iteration": 89,
+  "lastTick": "2026-06-18T07:38:11.319Z",
+  "lastTickEpoch": 1781768291,
   "phase": "brief-v33-photos",
-  "nextResearchTheme": "Brief v32 DONE (notes resurfaced on Get-ready; 268 tests). Brief v33 authored (finished-dish photos). NEXT: Brief v33 item 1 - apps/web/src/photos.ts: type Photos=Record<string,string>; pure addPhoto(map,id,dataUrl,cap=12) immutable (set id; if Object.keys>cap drop oldest other key - keep deterministic by insertion order), removePhoto(map,id); resizeToThumb(file:File,max=160):Promise<string> feature-detected (Image+canvas; reject if no document/canvas - jsdom) -> canvas.toDataURL(image/jpeg,0.7). photos.test.ts pure helpers only (add/replace, cap drops oldest, remove, immutability). Then item 2 persist tutti.photos + finale capture in CookScreen, item 3 show thumb in RecipeDetail/Mise-last-time/Browse, item 5 screen test img renders when photo present."
+  "nextResearchTheme": "Brief v33 item 1 done (photos.ts store+resize; 272 tests; RESUMED after 8th ~8h stall). NOTE external refactor: App.tsx now imports Shell; SettingsScreen gained optional canInstall/onInstall/onPace props + Appearance section (light/dark auto). ADAPT keep. NEXT: Brief v33 items 2-3+5 - App: const [photos,setPhotos]=usePersistentState<Photos>(\"tutti.photos\",{},isPlainObject); onPhoto=(id,file)=>resizeToThumb(file).then(u=>setPhotos(p=>addPhoto(p,id,u))).catch(()=>{}); pass photos + onPhoto to CookScreen (finale capture: per just-cooked dish a label+hidden <input type=file accept=image/* capture=environment> -> onPhoto(id,file); show thumb+x if photos[id]); pass photos to RecipeDetail (header thumb), MiseScreen Last-time, BrowseScreen rows -> small rounded <img> when photos[id]. item 5: a screen test that a photos entry renders <img>. Then Brief v33 done -> research + Brief v34."
 }
