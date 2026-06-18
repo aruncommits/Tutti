@@ -2,6 +2,8 @@ import { useState } from "react";
 import { goldenLibrary, type RecipeGraph } from "@tutti/engine";
 import { toLibraryEntries, filterLibrary } from "./libraryView";
 import { colorFor } from "./dishColors";
+import { Stars } from "./Stars";
+import type { NotesMap } from "./recipeNotes";
 
 // Browse the seeded Golden Library (Doc 7 §4; Brief v8 items 3-4). Search by name/ingredient with
 // stackable filters (max time, veg-only, hide-my-allergens). Tapping a dish adds it to the meal.
@@ -10,10 +12,12 @@ const ENTRIES = toLibraryEntries(goldenLibrary);
 
 export function BrowseScreen({
   avoid,
+  notes = {},
   onPick,
   onBack,
 }: {
   avoid: string[];
+  notes?: NotesMap;
   onPick: (r: RecipeGraph) => void;
   onBack: () => void;
 }) {
@@ -56,17 +60,22 @@ export function BrowseScreen({
         <div className="idle">No recipes match — loosen a filter.</div>
       ) : (
         <div className="card-grid">
-        {filtered.map((e) => (
+        {filtered.map((e) => {
+          const note = notes[e.recipe.recipeId];
+          return (
           <button key={e.recipe.recipeId} className="pick-row browse-row" onClick={() => onPick(e.recipe)} aria-label={`Add ${e.recipe.name}`}>
             <span className="pick-main" style={{ pointerEvents: "none" }}>
               <span className="swatch" style={{ background: colorFor(e.recipe.recipeId) }} />
               <span className="node-title">{e.recipe.name}</span>
+              {note?.rating ? <Stars value={note.rating} /> : null}
+              {note && note.cookCount > 0 ? <span className="cooked-n">cooked {note.cookCount}×</span> : null}
               {e.allergens.map((a) => <span key={a} className="badge-allergen" title="contains">{a}</span>)}
               <span className="dur">{e.totalMins}m</span>
               <span className="browse-add">+ Add</span>
             </span>
           </button>
-        ))}
+          );
+        })}
         </div>
       )}
 

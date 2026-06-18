@@ -8,6 +8,7 @@ import type { LearnEvent } from "./StatsScreen";
 import { shouldLearn } from "./learn";
 import { addSaved, addRecent, removeMeal, type SavedMeal } from "./meals";
 import { formatPlan, shareOrCopy } from "./share";
+import { recordCook, setRating, setNote, type NotesMap } from "./recipeNotes";
 
 // Secondary screens are lazy-loaded so the initial/cook bundle stays lean (Brief v10).
 // AddRecipe pulls @tutti/ingest, so splitting it keeps the parser out of the entry chunk.
@@ -47,6 +48,7 @@ export function App() {
   const [learnPace, setLearnPace] = usePersistentState<boolean>("tutti.learnPace", true);
   const [events, setEvents] = usePersistentState<LearnEvent[]>("tutti.events", []);
   const [meals, setMeals] = usePersistentState<SavedMeal[]>("tutti.meals", []);
+  const [notes, setNotes] = usePersistentState<NotesMap>("tutti.recipeNotes", {});
   const paceAdjusted = Object.entries(pace).filter(([, m]) => Math.abs(m - 1) > 0.05);
   const focusAtRef = useRef<number | null>(null); // wall-clock boundary for honest actual-duration capture
   const allRecipes = [...thaliV1.recipes, ...candidates];
@@ -118,10 +120,13 @@ export function App() {
     setScreen("cook");
   };
   const reset = () => {
-    // A finished cook becomes a "recently cooked" meal for one-tap re-cooking (Brief v12).
+    // A finished cook becomes a "recently cooked" meal (Brief v12) and bumps each dish's cook
+    // count for the notes/ratings cookbook (Brief v17).
     if (dishes.length) {
-      const rec: SavedMeal = { id: `r${Date.now()}`, name: `Cooked ${new Date().toLocaleDateString()}`, dishIds: dishes, servings: servingsFactor, target, savedAt: Date.now(), kind: "recent" };
+      const at = Date.now();
+      const rec: SavedMeal = { id: `r${at}`, name: `Cooked ${new Date().toLocaleDateString()}`, dishIds: dishes, servings: servingsFactor, target, savedAt: at, kind: "recent" };
       setMeals((m) => addRecent(m, rec));
+      setNotes((nm) => dishes.reduce((acc, id) => recordCook(acc, id, at), nm));
     }
     setPlan(previewPlan ?? compile(thaliV1.recipes, toKitchenProfile(kitchen), target, pace));
     setScreen("home");
@@ -179,13 +184,23 @@ export function App() {
       <Suspense fallback={<Loading />}>
 
       {screen === "cook" ? (
-        <CookScreen plan={plan} pro={pro} onComplete={complete} onUndo={undo} onReset={reset} />
+        <CookScreen
+          plan={plan}
+          pro={pro}
+          onComplete={complete}
+          onUndo={undo}
+          onReset={reset}
+          notes={notes}
+          dishesForReview={[...new Set(plan.nodes.map((n) => n.recipeId))]}
+          onRate={(id, n) => setNotes((m) => setRating(m, id, n))}
+          onNote={(id, s) => setNotes((m) => setNote(m, id, s))}
+        />
       ) : screen === "kitchen" ? (
         <KitchenScreen kitchen={kitchen} onChange={setKitchen} avoid={avoid} onToggleAvoid={toggleAvoid} onDone={() => setScreen("home")} />
       ) : screen === "addRecipe" ? (
         <AddRecipe onAdd={addCandidate} onBack={() => setScreen("home")} />
       ) : screen === "browse" ? (
-        <BrowseScreen avoid={avoid} onPick={addCandidate} onBack={() => setScreen("home")} />
+        <BrowseScreen avoid={avoid} notes={notes} onPick={addCandidate} onBack={() => setScreen("home")} />
       ) : screen === "shopping" ? (
         <ShoppingScreen recipes={selectedRecipes.length ? selectedRecipes : allRecipes} onBack={() => setScreen("pick")} />
       ) : screen === "meals" ? (

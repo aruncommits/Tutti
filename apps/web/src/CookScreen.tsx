@@ -10,6 +10,8 @@ import { colorFor, dishName } from "./dishColors";
 import { useSpeech } from "./useSpeech";
 import { parseVoiceCommand } from "./voice";
 import { requestNotifyPermission, notifyReady } from "./notify";
+import { Stars } from "./Stars";
+import type { NotesMap } from "./recipeNotes";
 
 function speak(text: string) {
   const synth = (window as unknown as { speechSynthesis?: { cancel: () => void; speak: (u: unknown) => void } }).speechSynthesis;
@@ -43,12 +45,20 @@ export function CookScreen({
   onComplete,
   onUndo,
   onReset,
+  notes = {},
+  dishesForReview = [],
+  onRate,
+  onNote,
 }: {
   plan: MasterExecutionPlan;
   pro?: boolean;
   onComplete: (id: string) => void;
   onUndo: (id: string) => void;
   onReset: () => void;
+  notes?: NotesMap;
+  dishesForReview?: string[];
+  onRate?: (id: string, n: number) => void;
+  onNote?: (id: string, s: string) => void;
 }) {
   const view = deriveViewState(plan);
   const allDone = view.active.length === 0 && view.queue.length === 0;
@@ -178,6 +188,28 @@ export function CookScreen({
         {allDone ? (
           <div className="finale">
             <div className="big">Dinner is served</div>
+            {onRate && dishesForReview.length > 0 && (
+              <div className="review" aria-label="Rate what you cooked">
+                <p className="review-h">How did it go?</p>
+                {dishesForReview.map((id) => (
+                  <div className="review-row" key={id}>
+                    <span className="review-name">
+                      <span className="swatch" style={{ background: colorFor(id) }} />
+                      {dishName(id)}
+                    </span>
+                    <Stars value={notes[id]?.rating ?? 0} onRate={(n) => onRate(id, n)} label={`Rate ${dishName(id)}`} />
+                    <input
+                      className="review-note"
+                      type="text"
+                      placeholder="note for next time…"
+                      defaultValue={notes[id]?.note ?? ""}
+                      aria-label={`Note for ${dishName(id)}`}
+                      onChange={(e) => onNote?.(id, e.target.value)}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
             <button className="btn" onClick={onReset}>Cook it again</button>
           </div>
         ) : view.active.length ? (

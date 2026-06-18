@@ -1244,3 +1244,16 @@ button:focus-visible, a:focus-visible, input:focus-visible,
 .lane-1 { background: #7fd1ff; }   /* Cook 2 */
 .lane-2 { background: #9be58c; }   /* Cook 3 */
 .lane-3 { background: #f3a0c2; }   /* Cook 4 */
+
+/* recipe notes & ratings (Brief v17) */
+.stars { display: inline-flex; gap: 2px; }
+.star { background: none; border: none; cursor: pointer; font-size: 20px; line-height: 1; color: var(--accent); padding: 2px; }
+.star:not(.on) { color: var(--faint); }
+.stars-ro { color: var(--accent); font-size: 12px; letter-spacing: 1px; margin-left: 6px; }
+.cooked-n { font-size: 11px; color: var(--faint); margin-left: 6px; }
+.review { margin: 14px 0; text-align: left; }
+.review-h { font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); margin-bottom: 8px; }
+.review-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 8px 0; border-top: 1px solid var(--line); }
+.review-name { display: flex; align-items: center; gap: 8px; min-width: 120px; flex: 1; }
+.review-note { flex: 1 1 100%; font-family: inherit; font-size: 13px; padding: 8px 10px; border-radius: 8px;
+  border: 1px solid var(--card-edge); background: var(--bg2); color: var(--ink); }
