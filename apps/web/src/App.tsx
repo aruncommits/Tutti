@@ -10,6 +10,7 @@ import { addSaved, addRecent, removeMeal, type SavedMeal } from "./meals";
 import { formatPlan, shareOrCopy } from "./share";
 import { recordCook, setRating, setNote, type NotesMap } from "./recipeNotes";
 import { toggleStaple, type Pantry } from "./pantry";
+import { exportData, resetData } from "./appData";
 import { suggestMeal, type Suggestion } from "./suggest";
 
 // Secondary screens are lazy-loaded so the initial/cook bundle stays lean (Brief v10).
@@ -18,6 +19,7 @@ const KitchenScreen = lazy(() => import("./KitchenScreen").then((m) => ({ defaul
 const MealsScreen = lazy(() => import("./MealsScreen").then((m) => ({ default: m.MealsScreen })));
 const RecipeDetailScreen = lazy(() => import("./RecipeDetailScreen").then((m) => ({ default: m.RecipeDetailScreen })));
 const MiseScreen = lazy(() => import("./MiseScreen").then((m) => ({ default: m.MiseScreen })));
+const SettingsScreen = lazy(() => import("./SettingsScreen").then((m) => ({ default: m.SettingsScreen })));
 const OnboardingScreen = lazy(() => import("./OnboardingScreen").then((m) => ({ default: m.OnboardingScreen })));
 const PreviewScreen = lazy(() => import("./PreviewScreen").then((m) => ({ default: m.PreviewScreen })));
 const AddRecipe = lazy(() => import("./AddRecipe").then((m) => ({ default: m.AddRecipe })));
@@ -31,7 +33,7 @@ const ALL_DISHES = thaliV1.recipes.map((r) => r.recipeId);
 
 const SCREEN_NAMES: Record<Screen, string> = {
   onboarding: "Welcome", kitchen: "Your kitchen", home: "Home", addRecipe: "Add a dish",
-  browse: "Browse recipes", recipe: "Recipe", shopping: "Shopping list", stats: "Your pace", meals: "Your meals", pick: "Pick dishes",
+  browse: "Browse recipes", recipe: "Recipe", shopping: "Shopping list", stats: "Your pace", meals: "Your meals", settings: "Settings", pick: "Pick dishes",
   serveTime: "Serve time", preview: "Plan preview", ready: "Get ready", cook: "Cook mode", done: "Done",
 };
 
@@ -241,6 +243,21 @@ export function App() {
           onRemove={(id) => setMeals((m) => removeMeal(m, id))}
           onBack={() => setScreen("home")}
         />
+      ) : screen === "settings" ? (
+        <SettingsScreen
+          pro={pro}
+          onTogglePro={() => setPro(!pro)}
+          learnPace={learnPace}
+          onToggleLearn={() => setLearnPace(!learnPace)}
+          onExport={() => { void shareOrCopy("Tutti data", exportData(localStorage)); }}
+          onReset={() => {
+            resetData(localStorage);
+            setPace({}); setEvents([]); setMeals([]); setNotes({}); setPantry([]);
+            setDishes(ALL_DISHES); setLearnPace(true); setPro(false);
+            setScreen("home");
+          }}
+          onBack={() => setScreen("home")}
+        />
       ) : screen === "stats" ? (
         <StatsScreen
           pace={pace}
@@ -301,6 +318,7 @@ export function App() {
           onStats={() => setScreen("stats")}
           onBrowse={() => setScreen("browse")}
           onMeals={() => setScreen("meals")}
+          onSettings={() => setScreen("settings")}
           suggestion={suggestion}
           onCookSuggested={() => restoreMeal(suggestion.meal)}
           paceNote={
@@ -332,6 +350,7 @@ function Home({
   onStats,
   onBrowse,
   onMeals,
+  onSettings,
   suggestion,
   onCookSuggested,
   paceNote,
@@ -344,6 +363,7 @@ function Home({
   onStats: () => void;
   onBrowse: () => void;
   onMeals: () => void;
+  onSettings: () => void;
   suggestion: Suggestion;
   onCookSuggested: () => void;
   paceNote: string | null;
@@ -368,6 +388,7 @@ function Home({
         <button className="link" onClick={onPick}>Pick dishes</button>
         <button className="link" onClick={onKitchen}>Your kitchen</button>
         <button className="link" onClick={onStats}>Your pace</button>
+        <button className="link" onClick={onSettings}>Settings</button>
       </div>
       <div className="kp-row" style={{ marginTop: 16 }}>
         <span className="kp-label">Pro mode<br /><small style={{ color: "var(--faint)" }}>interleave prep &amp; cook freely; no nudges</small></span>

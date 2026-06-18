@@ -1222,3 +1222,8 @@ header {
 .staple-toggle.on { filter: none; background: rgba(134,207,77,0.18); border-color: var(--poriyal); }
 .pantry-sec { color: var(--faint); }
 .pantry-grid { opacity: 0.7; }
+
+/* settings danger actions (Brief v22) */
+.btn.danger { background: var(--accent-deep); color: #fff; }
+.btn.ghost.danger { background: none; border: 1px solid var(--accent-deep); color: var(--accent-deep); }
+.kp-desc { display: block; font-size: 12px; color: var(--faint); font-weight: 400; margin-top: 2px; }

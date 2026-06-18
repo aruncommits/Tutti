@@ -21,19 +21,20 @@ export function suggestMeal(meals: SavedMeal[], notes: NotesMap, opts: { nowMs: 
   if (!meals.length) return null;
 
   const scored = meals.map((meal) => {
-    const ratings = meal.dishIds.map((id) => notes[id]?.rating).filter((r): r is number => typeof r === "number");
+    const dishIds = meal.dishIds ?? []; // tolerate legacy/partial persisted meals
+    const ratings = dishIds.map((id) => notes[id]?.rating).filter((r): r is number => typeof r === "number");
     const ratingAvg = ratings.length ? ratings.reduce((a, b) => a + b, 0) / ratings.length : null;
     const ratingTerm = ratingAvg ?? 3; // neutral when we have no opinion yet
 
-    const recencyMs = Math.max(meal.savedAt, ...meal.dishIds.map((id) => notes[id]?.lastCookedAt ?? 0));
+    const recencyMs = Math.max(meal.savedAt ?? 0, ...dishIds.map((id) => notes[id]?.lastCookedAt ?? 0));
     const varietyTerm = (Math.min(daysSince(recencyMs, opts.nowMs), 14) / 14) * 2; // 0..2
 
-    return { meal, ratingAvg, ratingTerm, varietyTerm, score: ratingTerm + varietyTerm };
+    return { meal, dishCount: dishIds.length, ratingAvg, ratingTerm, varietyTerm, score: ratingTerm + varietyTerm };
   });
 
   scored.sort((a, b) =>
     b.score - a.score ||
-    b.meal.dishIds.length - a.meal.dishIds.length ||
+    b.dishCount - a.dishCount ||
     (a.meal.id < b.meal.id ? -1 : 1),
   );
   const top = scored[0]!;

@@ -12,6 +12,7 @@ export type Screen =
   | "shopping"
   | "stats"
   | "meals"
+  | "settings"
   | "pick"
   | "serveTime"
   | "preview"

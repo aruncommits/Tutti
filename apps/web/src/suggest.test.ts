@@ -41,6 +41,12 @@ describe("suggestMeal (Brief v18 item 1)", () => {
     expect(s.meal.id).toBe("fresh");
   });
 
+  it("tolerates a legacy/malformed meal missing dishIds", () => {
+    const bad = { id: "legacy", name: "old", target: "19:30:00" } as unknown as SavedMeal;
+    expect(() => suggestMeal([bad], {}, { nowMs: NOW })).not.toThrow();
+    expect(suggestMeal([bad], {}, { nowMs: NOW })!.meal.id).toBe("legacy");
+  });
+
   it("explains an unrated, long-ago meal as something different", () => {
     const s = suggestMeal([meal("x", ["a"], daysAgo(30))], {}, { nowMs: NOW })!;
     expect(s.reason).toMatch(/haven't made this in a while|something different/i);

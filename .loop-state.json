@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 68,
-  "lastTick": "2026-06-18T13:00:07.2620896+08:00",
-  "lastTickEpoch": 1781758807,
+  "iteration": 69,
+  "lastTick": "2026-06-18T13:03:38.8892073+08:00",
+  "lastTickEpoch": 1781759019,
   "phase": "brief-v22-settings-data",
-  "nextResearchTheme": "Brief v21 DONE (pantry staples; 212 tests). Brief v22 authored (settings & data export/reset). NEXT: Brief v22 item 1 - apps/web/src/appData.ts pure over a storage interface: tuttiKeys(store), exportData(store):string (JSON of all tutti.* keys, pretty), resetData(store):string[] (removeItem each tutti.* key, return removed). appData.test.ts with a fake storage: export captures only tutti.* (ignores other keys); reset removes+returns them. Then item 2 SettingsScreen (lazy, 'settings' screen: Preferences group Pro+learnPace toggles, Your-data group export + two-step Reset-everything), item 3 wire Home 'Settings' link + App handlers (onExport=shareOrCopy('Tutti data', exportData(localStorage)); onReset=resetData(localStorage)+reset states+home), item 5 tests."
+  "nextResearchTheme": "Brief v22 item 1 done (appData export/reset; 216 tests). NEXT: items 2-3+5 - SettingsScreen.tsx (lazy, 'settings' screen): props pro,onTogglePro,learnPace,onToggleLearn,onExport,onReset,onBack. Preferences group: Pro mode toggle (kp-toggle) + desc, Learn-my-pace toggle. Your-data group: 'Everything stays on this device.' + Export button (onExport) + two-step Reset-everything (first tap arms 'Tap again to erase everything', second tap onReset; honest copy). Add 'settings' to Screen union + SCREEN_NAMES. App: lazy SettingsScreen; Home 'Settings' link -> setScreen('settings'); route passes pro/learnPace + setters; onExport=()=>void shareOrCopy('Tutti data', exportData(localStorage)); onReset=()=>{resetData(localStorage); setPace({}); setEvents([]); setMeals([]); setNotes({}); setPantry([]); setDishes(ALL_DISHES); setScreen('home');}. Item 5: SettingsScreen test (toggles+buttons present; Reset needs confirm tap before onReset). Then Brief v22 done -> research + Brief v23."
 }
