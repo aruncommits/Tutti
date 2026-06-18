@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 65,
-  "lastTick": "2026-06-18T12:43:47.0132256+08:00",
-  "lastTickEpoch": 1781757827,
-  "phase": "brief-v20-mise-en-place",
-  "nextResearchTheme": "Brief v20 item 1 done (mise.ts requiredEquipment/missingEquipment/labelFor; 205 tests). NEXT: items 2-3+5 - MiseScreen.tsx (lazy, 'ready' screen): props recipes, kitchen, onStart, onBack. Checkable Ingredients (buildShoppingList -> local checked state) + checkable Equipment (requiredEquipment -> labelFor) + warning banner listing missingEquipment(recipes,kitchen) ('Heads up - uses X; your kitchen does not list one. You can still cook.'); big 'Start cooking' -> onStart; Back. Add 'ready' to Screen union + SCREEN_NAMES. App: route screen==='ready' -> <MiseScreen recipes={selectedRecipes.length?selectedRecipes:thaliV1.recipes} kitchen={kitchen} onStart={startCooking} onBack={()=>setScreen('preview')}/>. PreviewScreen 'Start cooking' -> setScreen('ready') (keep skippable). Item 5: mise tests done + MiseScreen render test (shows ingredients+equipment+missing warning when blender:false; Start cooking calls onStart). Then Brief v20 done -> research + Brief v21."
+  "iteration": 66,
+  "lastTick": "2026-06-18T12:50:21.6040719+08:00",
+  "lastTickEpoch": 1781758222,
+  "phase": "brief-v21-pantry-staples",
+  "nextResearchTheme": "Brief v20 DONE (mise en place Get-ready; 207 tests). Brief v21 authored (pantry staples). NEXT: Brief v21 item 1 - apps/web/src/pantry.ts: type Pantry=string[]; isStaple(name,pantry) via normalizeIngredientName from @tutti/engine; toggleStaple(pantry,name) add/remove normalized; partitionByPantry(items,pantry)->{toBuy,staples}. pantry.test.ts (normalized match 'Salt' vs 'salt to taste'; toggle add/remove; partition splits). Then item 2 ShoppingScreen: usePersistentState tutti.pantry from App, split combined via partitionByPantry into 'To buy' + 'In your pantry (N)' groups, per-row 'always have' toggle -> toggleStaple. item 3 Share uses toBuy only. item 5 Shopping test marking moves item to pantry group. NOTE external edits: index.html title now 'Tutti — the whole meal, ready at once' (adapt, keep)."
 }
