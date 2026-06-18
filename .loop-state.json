@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 71,
-  "lastTick": "2026-06-18T05:15:56.689Z",
-  "lastTickEpoch": 1781759756,
-  "phase": "brief-v23-resilient-persistence",
-  "nextResearchTheme": "Brief v23 items 1-2 done (readPersisted + validators; 229 tests). NEXT: items 3+5 - apply validators to App critical usePersistentState calls (screen->isScreen, dishes->isStringArray, candidates->Array.isArray, target->isClock, avoid->isStringArray, servingsFactor/pace/notes->isPlainObject, events->Array.isArray, meals->isMealArray, pantry->isStringArray; minimal, no typecheck break). Item 5: appResilience.test.tsx - seed malformed tutti.meals=[{id:x}] + bogus tutti.screen + non-array tutti.dishes, render <App/>, assert Home renders + no throw. Then Brief v23 DONE -> research + Brief v24."
+  "iteration": 72,
+  "lastTick": "2026-06-18T05:21:07.685Z",
+  "lastTickEpoch": 1781760067,
+  "phase": "brief-v24-adjustable-timers",
+  "nextResearchTheme": "Brief v23 DONE (resilient persistence: every persisted key validated, self-heals; 230 tests). Brief v24 authored (adjustable cook timers). NEXT: Brief v24 item 1 - apps/web/src/timer.ts pure extendRemaining(remaining, id, addSec) -> new map with max(0,(remaining[id]??0)+addSec) for id only (immutable; seed from 0 if absent). timer.test.ts (adds immutably, floors at 0, seeds-from-absent). Then item 2 +1m/+5m buttons on started passive cards in CookScreen (call setRemaining(extendRemaining) + delete id from notifiedRef so v15 alert re-fires), item 5 CookScreen test (started passive exposes +1m/+5m; click no-throw)."
 }
