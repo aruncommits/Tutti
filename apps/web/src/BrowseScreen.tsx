@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { goldenLibrary, type RecipeGraph } from "@tutti/engine";
-import { toLibraryEntries, filterLibrary } from "./libraryView";
+import { toLibraryEntries, filterLibrary, sortLibrary, type SortKey } from "./libraryView";
 import { colorFor } from "./dishColors";
 import { Stars } from "./Stars";
 import type { NotesMap } from "./recipeNotes";
@@ -29,13 +29,18 @@ export function BrowseScreen({
   const [maxMins, setMaxMins] = useState<number | null>(null);
   const [vegOnly, setVegOnly] = useState(true);
   const [hideAllergens, setHideAllergens] = useState(true);
+  const [sort, setSort] = useState<SortKey>("default");
 
-  const filtered = filterLibrary(ENTRIES, {
-    query,
-    maxMins: maxMins ?? undefined,
-    vegOnly,
-    avoidAllergens: hideAllergens ? avoid : [],
-  });
+  const filtered = sortLibrary(
+    filterLibrary(ENTRIES, {
+      query,
+      maxMins: maxMins ?? undefined,
+      vegOnly,
+      avoidAllergens: hideAllergens ? avoid : [],
+    }),
+    sort,
+    notes,
+  );
 
   return (
     <section className="zone" aria-label="Browse recipes">
@@ -58,6 +63,13 @@ export function BrowseScreen({
         {avoid.length > 0 && (
           <button className={`chip-toggle${hideAllergens ? " on" : ""}`} role="switch" aria-checked={hideAllergens} onClick={() => setHideAllergens(!hideAllergens)}>hide my allergens</button>
         )}
+      </div>
+
+      <div className="browse-filters" role="group" aria-label="Sort">
+        <span className="kp-label" style={{ alignSelf: "center" }}>Sort</span>
+        {([["Default", "default"], ["Quickest", "quickest"], ["Top rated", "rated"], ["Most cooked", "cooked"]] as [string, SortKey][]).map(([label, key]) => (
+          <button key={key} className={`chip-toggle${sort === key ? " on" : ""}`} aria-pressed={sort === key} onClick={() => setSort(key)}>{label}</button>
+        ))}
       </div>
 
       {filtered.length === 0 ? (

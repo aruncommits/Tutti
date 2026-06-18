@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 93,
-  "lastTick": "2026-06-18T08:17:13.853Z",
-  "lastTickEpoch": 1781770633,
+  "iteration": 94,
+  "lastTick": "2026-06-18T08:22:01.153Z",
+  "lastTickEpoch": 1781770921,
   "phase": "brief-v38-browse-sort",
-  "nextResearchTheme": "Brief v37 DONE (library 11 recipes; 281 tests). Brief v38 authored (sort the library). NEXT: Brief v38 item 1 - in apps/web/src/libraryView.ts add type SortKey=default|quickest|rated|cooked + sortLibrary(entries,key,notes:NotesMap):LibraryEntry[] stable copy (quickest=totalMins asc; rated=notes[id]?.rating??0 desc; cooked=notes[id]?.cookCount??0 desc; default=copy unchanged; tie-break original index). import NotesMap type. libraryView.test add sortLibrary tests (each key + stable + default unchanged). Then item 2 BrowseScreen labelled Sort chip row (Default/Quickest/Top rated/Most cooked, chip-toggle aria-pressed) useState SortKey, apply sortLibrary(filterLibrary(...),sort,notes) after filtering; item 5 Browse test quickest puts shortest first + count unchanged. Then Brief v38 done -> research + Brief v39."
+  "nextResearchTheme": "Brief v38 item 1 done (sortLibrary; 285 tests). NEXT: items 2+5 - BrowseScreen: import { sortLibrary, type SortKey } from ./libraryView; const [sort,setSort]=useState<SortKey>(default); after computing filtered=filterLibrary(...), const ordered=sortLibrary(filtered,sort,notes); render ordered rows. Add a labelled Sort row ABOVE/with the filters: a small label Sort + chip-toggle buttons Default/Quickest/Top rated/Most cooked (aria-pressed sort===key). Keep the count = ordered.length. item 5: browse.test or new - click Quickest -> first row is the shortest-time dish; clicking sort does not change the result count. Verify in browser. Then Brief v38 done -> research + Brief v39 (onboarding polish / second cuisine / competitor)."
 }
