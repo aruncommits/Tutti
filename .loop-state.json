@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 48,
-  "lastTick": "2026-06-18T11:00:27.6070981+08:00",
-  "lastTickEpoch": 1781751628,
-  "phase": "brief-v11-motion",
-  "nextResearchTheme": "Brief v10 DONE (code-splitting; entry 173KB, ingest deferred, 8 chunks, perf-check gate; 147 tests). Brief v11 authored (motion polish, CSS-only, reduced-motion gated). NEXT: Brief v11 item 1 - CSS @keyframes rise (opacity 0/translateY 8px -> none, ~180ms var(--ease)) on .now-card enter; CAUTION the passive countdown card re-renders every second so scope the animation so it doesn't replay each tick (use a modifier class for active cards, or animation only on appearance). Extend the prefers-reduced-motion block to null it. Then item 2 promotion highlight, item 3 screen-change fade, item 5 verify in browser + toggle reduced motion."
+  "iteration": 49,
+  "lastTick": "2026-06-18T11:05:57.1943827+08:00",
+  "lastTickEpoch": 1781751957,
+  "phase": "brief-v12-saved-meals",
+  "nextResearchTheme": "Brief v11 DONE (motion polish, CSS-only, reduced-motion gated; verified anim applied; 147 tests). Brief v12 authored (saved meals & recent history). NEXT: Brief v12 item 1 - apps/web/src/meals.ts: SavedMeal interface {id,name,dishIds,servings,target,savedAt,kind:'saved'|'recent'} + pure helpers addSaved/addRecent(prepend,dedupe by dishIds-set,cap~10)/removeMeal; meals.test.ts for dedupe/cap/order. Then item 2 persist+save action (Pick/Preview), item 3 auto-record recent on finish, item 4 'Your meals' screen+restore, item 5 tests+verify."
 }
