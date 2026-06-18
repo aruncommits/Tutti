@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 61,
-  "lastTick": "2026-06-18T12:21:09.8336925+08:00",
-  "lastTickEpoch": 1781756470,
-  "phase": "brief-v18-suggestion",
-  "nextResearchTheme": "Brief v18 item 1 done (suggestMeal ranking; 194 tests). NEXT: items 2-3+5 - Home suggestion card. In App compute const suggestion = suggestMeal(meals, notes, {nowMs: Date.now()}); pass to Home with onCookSuggested = (meal)=>restoreMeal(meal). Home renders a 'Tonight?' card when suggestion: meal.name + reason + 'Cook this' button -> onCookSuggested(suggestion.meal). Fallback (item 3): when meals empty, App passes a synthetic suggestion {meal:{id:'thali',name:'South Indian thali',dishIds:ALL_DISHES,servings:{},target,savedAt:0,kind:'saved'}, reason:'A great first meal to try'} so new users still get a suggestion. Item 5: Home/App test that the suggestion card renders + 'Cook this' restores (lands in pick or sets dishes). Verify in browser. Then Brief v18 done -> research + author Brief v19."
+  "iteration": 62,
+  "lastTick": "2026-06-18T12:27:51.8485785+08:00",
+  "lastTickEpoch": 1781756872,
+  "phase": "brief-v19-recipe-detail",
+  "nextResearchTheme": "Brief v18 DONE (Home suggestion card; 196 tests). Brief v19 authored (recipe detail/read view). NEXT: Brief v19 item 1 - apps/web/src/recipeView.ts pure: orderedSteps(recipe):TaskNode[] (topo order respecting dependencies - check if engine exports topoSort from index; else small local Kahn), recipeIngredients(recipe):ShareItem[] (reuse buildShoppingList([recipe]) mapped to {name,amount,unit,toTaste}), recipeTotalMins(recipe). recipeView.test.ts: ordering respects deps (a node never before its dep), ingredients aggregate. Then item 2 RecipeDetailScreen (lazy) + 'recipe' screen, item 3 open from Browse (details affordance distinct from +Add) + App detailRecipe state, item 5 tests."
 }
