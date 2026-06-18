@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 73,
-  "lastTick": "2026-06-18T05:23:29.109Z",
-  "lastTickEpoch": 1781760209,
-  "phase": "brief-v24-adjustable-timers",
-  "nextResearchTheme": "Brief v24 item 1 done (extendRemaining; 234 tests). RESUMED after ~8h usage-limit stall. NEXT: items 2+5 - in CookScreen started-passive branch (ticking!==undefined, where the cooking-label + Done render), add +1m/+5m buttons calling setRemaining(r=>extendRemaining(r,n.nodeId,60|300)) AND notifiedRef.current.delete(n.nodeId) so v15 ready-notify re-fires at new zero; aria-label Add 1/5 minutes to <title>; works ticking>0 or ===0; keep big Done + ready label. import extendRemaining. CSS .mini if needed. Item 5: CookScreen test - render plan, click a passive Start, assert +1m/+5m controls appear + click no-throw. Then Brief v24 done -> research + Brief v25."
+  "iteration": 75,
+  "lastTick": "2026-06-18T06:03:31.323Z",
+  "lastTickEpoch": 1781762611,
+  "phase": "brief-v25-substitutions",
+  "nextResearchTheme": "Brief v24 DONE (adjustable +1m/+5m timers; 235 tests). RESUMED after 2nd ~8.6h usage-limit stall. Brief v25 authored (ingredient substitutions). NEXT: Brief v25 item 1 - apps/web/src/substitutions.ts: interface Substitute{swap;note?}; frozen SUBSTITUTIONS keyed by normalizeIngredientName for ~12-15 South Indian items (tamarind->lemon+pinch sugar; ghee->neutral oil; curry leaves->omit; grated coconut->omit/yogurt; mustard seeds->omit; urad dal->omit; chana dal->roasted gram; green chili->red chili powder; jaggery->brown sugar; asafoetida->garlic powder pinch; sesame oil->any neutral oil; coconut oil->neutral oil; yogurt->buttermilk). substitutesFor(name):Substitute[] (normalize query). substitutions.test.ts (known/unknown/normalized). Then item 2 surface in RecipeDetailScreen (subtle hint per ingredient with swaps), item 5 RecipeDetail test."
 }
