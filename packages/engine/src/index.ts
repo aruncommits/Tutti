@@ -5,6 +5,7 @@
 export * from "./types";
 export { validate, isAcyclic } from "./validate";
 export { thaliV1, type SessionFixture } from "./golden";
+export { goldenLibrary } from "./library";
 export {
   topoSort,
   criticalPathMethod,

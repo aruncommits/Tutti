@@ -1,0 +1,121 @@
+{
+  "recipes": [
+    {
+      "recipeId": "rec_chutney", "name": "Coconut Chutney", "version": 1, "servings": 4, "verified": true, "cuisine": "South Indian",
+      "nodes": [
+        { "nodeId": "cc_1", "recipeId": "rec_chutney", "title": "Grind coconut, chana dal & green chili", "phase": "prep", "attention": "active",
+          "duration": { "estMins": 6, "minMins": 4, "maxMins": 9, "elastic": true },
+          "ingredients": [ { "name": "grated coconut", "amount": 1, "unit": "cup" }, { "name": "roasted chana dal", "amount": 2, "unit": "tbsp" }, { "name": "green chili", "amount": 2, "unit": "whole" }, { "name": "ginger", "amount": 1, "unit": "inch" }, { "name": "salt", "amount": 0.5, "unit": "tsp" } ],
+          "resources": [ { "category": "blender", "count": 1, "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "cc_2", "recipeId": "rec_chutney", "title": "Temper mustard, urad dal & curry leaves", "phase": "cook", "attention": "active",
+          "duration": { "estMins": 3, "minMins": 2, "maxMins": 4, "elastic": false },
+          "ingredients": [ { "name": "coconut oil", "amount": 1, "unit": "tbsp" }, { "name": "mustard seeds", "amount": 1, "unit": "tsp" }, { "name": "urad dal", "amount": 1, "unit": "tsp" }, { "name": "curry leaves", "amount": 1, "unit": "sprig" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["small"], "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "cc_3", "recipeId": "rec_chutney", "title": "Stir tempering into the chutney & serve", "phase": "serve", "attention": "active",
+          "duration": { "estMins": 1, "minMins": 1, "maxMins": 2, "elastic": false },
+          "ingredients": [], "resources": [], "dependencies": ["cc_1", "cc_2"] }
+      ]
+    },
+    {
+      "recipeId": "rec_rasam", "name": "Tomato Rasam", "version": 1, "servings": 4, "verified": true, "cuisine": "South Indian",
+      "nodes": [
+        { "nodeId": "ra_1", "recipeId": "rec_rasam", "title": "Chop tomatoes & crush garlic", "phase": "prep", "attention": "active",
+          "duration": { "estMins": 5, "minMins": 4, "maxMins": 8, "elastic": true },
+          "ingredients": [ { "name": "tomatoes", "amount": 3, "unit": "whole", "preparedState": "chopped" }, { "name": "garlic", "amount": 3, "unit": "clove" } ],
+          "resources": [ { "category": "cutting_board", "count": 1, "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "ra_2", "recipeId": "rec_rasam", "title": "Simmer tomatoes with tamarind & rasam powder", "phase": "cook", "attention": "passive",
+          "duration": { "estMins": 12, "minMins": 10, "maxMins": 16, "elastic": false },
+          "ingredients": [ { "name": "tamarind pulp", "amount": 0.5, "unit": "cup" }, { "name": "rasam powder", "amount": 2, "unit": "tsp" }, { "name": "water", "amount": 3, "unit": "cup" }, { "name": "salt", "amount": 1, "unit": "tsp" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["large"], "heldFor": "duration" } ], "dependencies": ["ra_1"] },
+        { "nodeId": "ra_3", "recipeId": "rec_rasam", "title": "Temper mustard, cumin & curry leaves", "phase": "cook", "attention": "active",
+          "duration": { "estMins": 3, "minMins": 2, "maxMins": 4, "elastic": false },
+          "ingredients": [ { "name": "ghee", "amount": 1, "unit": "tbsp" }, { "name": "mustard seeds", "amount": 1, "unit": "tsp" }, { "name": "cumin seeds", "amount": 1, "unit": "tsp" }, { "name": "curry leaves", "amount": 1, "unit": "sprig" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["small"], "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "ra_4", "recipeId": "rec_rasam", "title": "Add tempering, froth & serve", "phase": "serve", "attention": "active",
+          "duration": { "estMins": 2, "minMins": 1, "maxMins": 3, "elastic": false },
+          "ingredients": [ { "name": "coriander", "amount": 2, "unit": "tbsp" } ], "resources": [], "dependencies": ["ra_2", "ra_3"] }
+      ]
+    },
+    {
+      "recipeId": "rec_curdrice", "name": "Curd Rice", "version": 1, "servings": 4, "verified": true, "cuisine": "South Indian",
+      "nodes": [
+        { "nodeId": "cr_1", "recipeId": "rec_curdrice", "title": "Cook rice soft", "phase": "cook", "attention": "passive",
+          "duration": { "estMins": 18, "minMins": 16, "maxMins": 22, "elastic": false },
+          "ingredients": [ { "name": "rice", "amount": 1, "unit": "cup" }, { "name": "water", "amount": 2.5, "unit": "cup" } ],
+          "resources": [ { "category": "pressure_cooker", "count": 1, "heldFor": "duration" }, { "category": "burner", "count": 1, "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "cr_2", "recipeId": "rec_curdrice", "title": "Cool & mash the rice", "phase": "prep", "attention": "active",
+          "duration": { "estMins": 5, "minMins": 4, "maxMins": 8, "elastic": false },
+          "ingredients": [], "resources": [], "dependencies": ["cr_1"] },
+        { "nodeId": "cr_3", "recipeId": "rec_curdrice", "title": "Mix in yogurt, milk & salt", "phase": "prep", "attention": "active",
+          "duration": { "estMins": 3, "minMins": 2, "maxMins": 4, "elastic": false },
+          "ingredients": [ { "name": "yogurt", "amount": 1.5, "unit": "cup" }, { "name": "milk", "amount": 0.25, "unit": "cup" }, { "name": "salt", "amount": 0.5, "unit": "tsp" } ],
+          "resources": [], "dependencies": ["cr_2"] },
+        { "nodeId": "cr_4", "recipeId": "rec_curdrice", "title": "Temper, fold in & serve", "phase": "serve", "attention": "active",
+          "duration": { "estMins": 3, "minMins": 2, "maxMins": 4, "elastic": false },
+          "ingredients": [ { "name": "coconut oil", "amount": 1, "unit": "tbsp" }, { "name": "mustard seeds", "amount": 1, "unit": "tsp" }, { "name": "urad dal", "amount": 1, "unit": "tsp" }, { "name": "curry leaves", "amount": 1, "unit": "sprig" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["small"], "heldFor": "duration" } ], "dependencies": ["cr_3"] }
+      ]
+    },
+    {
+      "recipeId": "rec_lemonrice", "name": "Lemon Rice", "version": 1, "servings": 4, "verified": true, "cuisine": "South Indian",
+      "nodes": [
+        { "nodeId": "lr_1", "recipeId": "rec_lemonrice", "title": "Cook rice & cool", "phase": "cook", "attention": "passive",
+          "duration": { "estMins": 18, "minMins": 16, "maxMins": 22, "elastic": false },
+          "ingredients": [ { "name": "rice", "amount": 1.5, "unit": "cup" }, { "name": "water", "amount": 3, "unit": "cup" } ],
+          "resources": [ { "category": "pressure_cooker", "count": 1, "heldFor": "duration" }, { "category": "burner", "count": 1, "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "lr_2", "recipeId": "rec_lemonrice", "title": "Temper peanuts, mustard, urad dal & turmeric", "phase": "cook", "attention": "active",
+          "duration": { "estMins": 4, "minMins": 3, "maxMins": 6, "elastic": false },
+          "ingredients": [ { "name": "sesame oil", "amount": 2, "unit": "tbsp" }, { "name": "peanuts", "amount": 3, "unit": "tbsp" }, { "name": "mustard seeds", "amount": 1, "unit": "tsp" }, { "name": "urad dal", "amount": 1, "unit": "tsp" }, { "name": "turmeric", "amount": 0.5, "unit": "tsp" }, { "name": "curry leaves", "amount": 1, "unit": "sprig" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["large"], "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "lr_3", "recipeId": "rec_lemonrice", "title": "Toss rice with tempering & lemon, serve", "phase": "serve", "attention": "active",
+          "duration": { "estMins": 3, "minMins": 2, "maxMins": 4, "elastic": false },
+          "ingredients": [ { "name": "lemon", "amount": 1, "unit": "whole" }, { "name": "salt", "amount": 1, "unit": "tsp" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["large"], "heldFor": "duration" } ], "dependencies": ["lr_1", "lr_2"] }
+      ]
+    },
+    {
+      "recipeId": "rec_beetroot", "name": "Beetroot Poriyal", "version": 1, "servings": 4, "verified": true, "cuisine": "South Indian",
+      "nodes": [
+        { "nodeId": "bp_1", "recipeId": "rec_beetroot", "title": "Grate the beetroot", "phase": "prep", "attention": "active",
+          "duration": { "estMins": 8, "minMins": 6, "maxMins": 12, "elastic": true },
+          "ingredients": [ { "name": "beetroot", "amount": 2, "unit": "whole", "preparedState": "grated" } ],
+          "resources": [ { "category": "cutting_board", "count": 1, "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "bp_2", "recipeId": "rec_beetroot", "title": "Temper mustard & urad dal", "phase": "cook", "attention": "active",
+          "duration": { "estMins": 3, "minMins": 2, "maxMins": 4, "elastic": false },
+          "ingredients": [ { "name": "coconut oil", "amount": 1, "unit": "tbsp" }, { "name": "mustard seeds", "amount": 1, "unit": "tsp" }, { "name": "urad dal", "amount": 1, "unit": "tsp" }, { "name": "dried red chili", "amount": 1, "unit": "whole" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["small"], "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "bp_3", "recipeId": "rec_beetroot", "title": "Sauté beetroot till tender", "phase": "cook", "attention": "active",
+          "duration": { "estMins": 12, "minMins": 10, "maxMins": 16, "elastic": false },
+          "ingredients": [ { "name": "grated beetroot", "amount": 2, "unit": "whole" }, { "name": "salt", "amount": 0.5, "unit": "tsp" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["small"], "heldFor": "duration" } ], "dependencies": ["bp_1", "bp_2"] },
+        { "nodeId": "bp_4", "recipeId": "rec_beetroot", "title": "Add grated coconut, toss & serve", "phase": "serve", "attention": "active",
+          "duration": { "estMins": 2, "minMins": 1, "maxMins": 3, "elastic": false },
+          "ingredients": [ { "name": "grated coconut", "amount": 3, "unit": "tbsp" } ], "resources": [], "dependencies": ["bp_3"] }
+      ]
+    },
+    {
+      "recipeId": "rec_upma", "name": "Vegetable Upma", "version": 1, "servings": 4, "verified": true, "cuisine": "South Indian",
+      "nodes": [
+        { "nodeId": "up_1", "recipeId": "rec_upma", "title": "Chop carrot & beans", "phase": "prep", "attention": "active",
+          "duration": { "estMins": 7, "minMins": 5, "maxMins": 11, "elastic": true },
+          "ingredients": [ { "name": "carrot", "amount": 1, "unit": "whole", "preparedState": "chopped" }, { "name": "green beans", "amount": 10, "unit": "whole", "preparedState": "chopped" } ],
+          "resources": [ { "category": "cutting_board", "count": 1, "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "up_2", "recipeId": "rec_upma", "title": "Dry-roast the rava", "phase": "cook", "attention": "active",
+          "duration": { "estMins": 4, "minMins": 3, "maxMins": 6, "elastic": false },
+          "ingredients": [ { "name": "rava", "amount": 1, "unit": "cup" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["large"], "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "up_3", "recipeId": "rec_upma", "title": "Temper & sauté the vegetables", "phase": "cook", "attention": "active",
+          "duration": { "estMins": 6, "minMins": 4, "maxMins": 9, "elastic": false },
+          "ingredients": [ { "name": "ghee", "amount": 1, "unit": "tbsp" }, { "name": "mustard seeds", "amount": 1, "unit": "tsp" }, { "name": "urad dal", "amount": 1, "unit": "tsp" }, { "name": "curry leaves", "amount": 1, "unit": "sprig" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["large"], "heldFor": "duration" } ], "dependencies": ["up_1"] },
+        { "nodeId": "up_4", "recipeId": "rec_upma", "title": "Add water & rava, cook to fluffy", "phase": "cook", "attention": "passive",
+          "duration": { "estMins": 8, "minMins": 6, "maxMins": 11, "elastic": false },
+          "ingredients": [ { "name": "water", "amount": 2.5, "unit": "cup" }, { "name": "salt", "amount": 1, "unit": "tsp" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["large"], "heldFor": "duration" } ], "dependencies": ["up_2", "up_3"] },
+        { "nodeId": "up_5", "recipeId": "rec_upma", "title": "Fluff & serve", "phase": "serve", "attention": "active",
+          "duration": { "estMins": 1, "minMins": 1, "maxMins": 2, "elastic": false },
+          "ingredients": [], "resources": [], "dependencies": ["up_4"] }
+      ]
+    }
+  ]
+}

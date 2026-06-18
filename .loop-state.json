@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 41,
-  "lastTick": "2026-06-18T10:17:43.0543874+08:00",
-  "lastTickEpoch": 1781749063,
-  "phase": "brief-v7-pwa-offline",
-  "nextResearchTheme": "Brief v7 items 1+3 done (PWA installable; self-hosted fonts; 38 woff2 precached; true offline; 132 tests). Adapted to external 'in concert' redesign (Bodoni/Instrument/Spline, PreviewScreen score/tempo). NEXT: item 5 - offline Playwright verification: \npm run build; serve dist (e.g. npx vite preview --port 5181 --strictPort OR a static server) in background; Playwright navigate, then evaluate to confirm cooking renders; optionally context.setOffline. If serving dist conflicts with port, use 5181. If too fiddly, instead assert offline-readiness via the built sw precache list. Then Brief v7 DONE -> research next gap (Lighthouse perf / a11y / recipe library) -> author Research-Brief-v8."
+  "iteration": 42,
+  "lastTick": "2026-06-18T10:22:51.6977874+08:00",
+  "lastTickEpoch": 1781749372,
+  "phase": "brief-v8-recipe-library",
+  "nextResearchTheme": "Brief v7 DONE (offline-first PWA, gate-enforced; 132 tests). Brief v8 authored (seeded recipe library + search). NEXT: Brief v8 item 1 - seed packages/engine/fixtures/library.json with ~6-8 verified veg South Indian RecipeGraphs (valid TaskNode schema: acyclic, resources, active/passive, durations, ingredients, verified:true), add typed export goldenLibrary: RecipeGraph[] from engine, and a test asserting validate(each).ok. Then item 2 filterLibrary + LibraryEntry helpers, item 3 BrowseScreen, item 4 wire into pick, item 5 tests."
 }
