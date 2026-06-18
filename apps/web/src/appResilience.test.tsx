@@ -16,7 +16,7 @@ describe("App resilience to corrupt persisted data (Brief v23 item 5)", () => {
 
   it("renders Home without throwing despite garbage in every key", () => {
     expect(() => render(<App />)).not.toThrow();
-    // bogus screen falls back to home
-    expect(screen.getByRole("heading", { level: 2, name: /tonight/i })).toBeInTheDocument();
+    // bogus screen falls back to home (the meal-plan builder)
+    expect(screen.getByRole("heading", { level: 2, name: /plan a meal/i })).toBeInTheDocument();
   });
 });

@@ -1,7 +1,8 @@
 import { Suspense, lazy, useEffect, useRef, useState } from "react";
-import { applyEvent, compile, formatClock, parseClock, paceCategoryOf, scaleRecipe, thaliV1, updatePace, type MasterExecutionPlan, type PaceModel, type RecipeGraph } from "@tutti/engine";
+import { applyEvent, compile, formatClock, parseClock, paceCategoryOf, scaleRecipe, thaliV1, goldenLibrary, updatePace, type MasterExecutionPlan, type PaceModel, type RecipeGraph } from "@tutti/engine";
 import { usePersistentState, type Screen } from "./state";
 import { Shell } from "./Shell";
+import { Builder } from "./Builder";
 import { ErrorBoundary } from "./ErrorBoundary";
 import { CookScreen } from "./CookScreen"; // eager — the critical cook path must be instant
 import { DEFAULT_KITCHEN, toKitchenProfile, type KitchenUi } from "./kitchenModel";
@@ -15,7 +16,6 @@ import { exportData, resetData } from "./appData";
 import { isStringArray, isPlainObject, isMealArray, isScreen, isClock } from "./validators";
 import { factorForPeople } from "./servings";
 import { useInstallPrompt } from "./useInstallPrompt";
-import { suggestMeal, type Suggestion } from "./suggest";
 import { addPhoto, resizeToThumb, type Photos } from "./photos";
 
 // Secondary screens are lazy-loaded so the initial/cook bundle stays lean (Brief v10).
@@ -37,7 +37,13 @@ const ServeTimeScreen = lazy(() => import("./PlanFlow").then((m) => ({ default: 
 
 const Loading = () => <div className="idle" role="status">Loading…</div>;
 
-const ALL_DISHES = thaliV1.recipes.map((r) => r.recipeId);
+// Sample recipes available to search/resolve (golden library + the thali demo). These seed the
+// searchable pool only — NONE are pre-selected. Tutti is a general meal-plan builder, not a thali.
+const SAMPLE_RECIPES: RecipeGraph[] = (() => {
+  const map = new Map<string, RecipeGraph>();
+  for (const r of [...goldenLibrary, ...thaliV1.recipes]) map.set(r.recipeId, r);
+  return [...map.values()];
+})();
 
 const SCREEN_NAMES: Record<Screen, string> = {
   onboarding: "Welcome", kitchen: "Your kitchen", home: "Home", addRecipe: "Add a dish",
@@ -49,8 +55,9 @@ export function App() {
   const [screen, setScreen] = usePersistentState<Screen>("tutti.screen", "home", isScreen);
   const [onboarded, setOnboarded] = usePersistentState<boolean>("tutti.onboarded", false);
   const [kitchen, setKitchen] = usePersistentState<KitchenUi>("tutti.kitchen", DEFAULT_KITCHEN, isPlainObject);
-  const [dishes, setDishes] = usePersistentState<string[]>("tutti.dishes", ALL_DISHES, isStringArray);
-  const [target, setTarget] = usePersistentState<string>("tutti.target", thaliV1.targetServeTime, isClock);
+  const [dishes, setDishes] = usePersistentState<string[]>("tutti.dishes", [], isStringArray);
+  // Optional serve time: null = cook ASAP (start now). Set only when the user opts into a time.
+  const [serveAt, setServeAt] = usePersistentState<string | null>("tutti.serveAt", null, (v) => v === null || isClock(v));
   const [pro, setPro] = usePersistentState<boolean>("tutti.pro", false);
   const [candidates, setCandidates] = usePersistentState<RecipeGraph[]>("tutti.candidates", [], Array.isArray);
   const [avoid, setAvoid] = usePersistentState<string[]>("tutti.avoid", [], isStringArray);
@@ -72,9 +79,13 @@ export function App() {
     resizeToThumb(file).then((u) => setPhotos((p) => addPhoto(p, id, u))).catch(() => { /* unsupported / too big */ });
   };
   const { canInstall, promptInstall } = useInstallPrompt();
-  const paceAdjusted = Object.entries(pace).filter(([, m]) => Math.abs(m - 1) > 0.05);
   const focusAtRef = useRef<number | null>(null); // wall-clock boundary for honest actual-duration capture
-  const allRecipes = [...thaliV1.recipes, ...candidates];
+  // candidates (user-added / browsed) take precedence over the sample pool when ids collide.
+  const allRecipes = (() => {
+    const map = new Map<string, RecipeGraph>();
+    for (const r of [...SAMPLE_RECIPES, ...candidates]) map.set(r.recipeId, r);
+    return [...map.values()];
+  })();
   const toggleAvoid = (a: string) => setAvoid((p) => (p.includes(a) ? p.filter((x) => x !== a) : [...p, a]));
   const factorOf = (id: string) => servingsFactor[id] ?? 1;
   const setFactor = (id: string, f: number) => setServingsFactor((p) => ({ ...p, [id]: f }));
@@ -89,13 +100,26 @@ export function App() {
     });
   };
   const scaled = (r: RecipeGraph) => (factorOf(r.recipeId) === 1 ? r : scaleRecipe(r, factorOf(r.recipeId)));
+  // Initial plan is EMPTY (no thali). The user builds their own; this is just a valid placeholder.
   const [plan, setPlan] = usePersistentState<MasterExecutionPlan>(
     "tutti.plan",
-    compile(thaliV1.recipes, thaliV1.kitchenProfile, thaliV1.targetServeTime, pace),
+    compile([], toKitchenProfile(DEFAULT_KITCHEN), "19:00:00", pace),
   );
 
-  // live preview for the pick/serve-time screens (pure, cheap to recompute)
+  const nowMins = (() => {
+    const d = new Date();
+    return d.getHours() * 60 + d.getMinutes();
+  })();
+
+  // Live preview (pure, cheap to recompute). Serve time is OPTIONAL: when the user hasn't set one
+  // we cook ASAP — a probe compile measures the hands-on span, then we anchor the serve to now+span.
   const selectedRecipes = allRecipes.filter((r) => dishes.includes(r.recipeId)).map(scaled);
+  const probe = selectedRecipes.length
+    ? compile(selectedRecipes, toKitchenProfile(kitchen), serveAt ?? "20:00:00", pace)
+    : null;
+  const span = probe ? parseClock(probe.projectedServeTime) - parseClock(probe.startTime) : 0;
+  const asapServe = formatClock(nowMins + span);
+  const target = serveAt ?? asapServe; // effective serve time fed to compile
   const previewPlan = selectedRecipes.length
     ? compile(selectedRecipes, toKitchenProfile(kitchen), target, pace)
     : null;
@@ -109,13 +133,9 @@ export function App() {
     ? Math.max(0, (parseClock(soloPlan.projectedServeTime) - parseClock(soloPlan.startTime)) - makespan)
     : null;
   const setCooks = (n: number) => setKitchen((k) => ({ ...k, cooks: Math.max(1, Math.min(4, n)) }));
-  const nowMins = (() => {
-    const d = new Date();
-    return d.getHours() * 60 + d.getMinutes();
-  })();
   const startMins = parseClock(target) - makespan;
-  const feasible = startMins >= nowMins;
-  const earliestServe = formatClock(nowMins + makespan);
+  const feasible = serveAt ? startMins >= nowMins : true; // cooking ASAP is always feasible
+  const earliestServe = asapServe;
 
   const complete = (id: string) => {
     // Honest pace learning (Doc 10 Loop A): measure real elapsed time between completions and feed
@@ -141,14 +161,16 @@ export function App() {
   const addCandidate = (g: RecipeGraph) => {
     setCandidates((prev) => [...prev.filter((c) => c.recipeId !== g.recipeId), g]);
     setDishes((prev) => (prev.includes(g.recipeId) ? prev : [...prev, g.recipeId]));
-    setScreen("pick");
+    setScreen("home"); // adding a recipe returns to the builder
   };
   const buildPlan = () => {
-    setPlan(previewPlan ?? compile(thaliV1.recipes, toKitchenProfile(kitchen), target, pace));
+    if (!previewPlan) return; // need at least one recipe — no thali fallback
+    setPlan(previewPlan);
     setScreen("preview");
   };
   const startCooking = () => {
-    setPlan(previewPlan ?? compile(thaliV1.recipes, toKitchenProfile(kitchen), target, pace));
+    if (!previewPlan) return;
+    setPlan(previewPlan);
     focusAtRef.current = Date.now(); // first completion measures from cook start
     setScreen("cook");
   };
@@ -161,7 +183,7 @@ export function App() {
       setMeals((m) => addRecent(m, rec));
       setNotes((nm) => dishes.reduce((acc, id) => recordCook(acc, id, at), nm));
     }
-    setPlan(previewPlan ?? compile(thaliV1.recipes, toKitchenProfile(kitchen), target, pace));
+    setPlan(previewPlan ?? plan);
     setScreen("home");
   };
   // Save the current plan as a named meal (Brief v12).
@@ -174,16 +196,9 @@ export function App() {
     const known = new Set(allRecipes.map((r) => r.recipeId));
     setDishes(meal.dishIds.filter((id) => known.has(id)));
     setServingsFactor(meal.servings);
-    setTarget(meal.target);
-    setScreen("pick");
+    setServeAt(meal.target ?? null);
+    setScreen("home");
   };
-  // "What should I cook tonight?" (Brief v18) — rank the user's own meals, or a starter for new users.
-  const suggestion: Suggestion =
-    suggestMeal(meals, notes, { nowMs: Date.now() }) ?? {
-      meal: { id: "starter", name: "South Indian thali", dishIds: ALL_DISHES, servings: {}, target, savedAt: 0, kind: "saved" },
-      reason: "A great first meal to try",
-    };
-
   // Screen-change a11y (Doc 7 §12): move focus to the new screen and announce it (SPA route fix).
   const [announce, setAnnounce] = useState("");
   const focusRef = useRef<HTMLElement>(null);
@@ -280,7 +295,7 @@ export function App() {
           onReset={() => {
             resetData(localStorage);
             setPace({}); setEvents([]); setMeals([]); setNotes({}); setPantry([]);
-            setDishes(ALL_DISHES); setLearnPace(true); setPro(false);
+            setDishes([]); setServeAt(null); setLearnPace(true); setPro(false);
             setScreen("home");
           }}
           onBack={() => setScreen("home")}
@@ -313,7 +328,7 @@ export function App() {
       ) : screen === "serveTime" ? (
         <ServeTimeScreen
           target={target}
-          onChange={setTarget}
+          onChange={(c) => setServeAt(c)}
           startTime={previewPlan?.startTime ?? target}
           feasible={feasible}
           earliestServe={earliestServe}
@@ -332,7 +347,7 @@ export function App() {
         />
       ) : screen === "ready" ? (
         <MiseScreen
-          recipes={selectedRecipes.length ? selectedRecipes : thaliV1.recipes}
+          recipes={selectedRecipes}
           kitchen={kitchen}
           metric={metric}
           notes={notes}
@@ -341,17 +356,23 @@ export function App() {
           onBack={() => setScreen("preview")}
         />
       ) : screen === "home" ? (
-        <Home
-          onStart={startCooking}
-          onPlan={() => setScreen("pick")}
-          suggestion={suggestion}
-          onCookSuggested={() => restoreMeal(suggestion.meal)}
-          paceNote={
-            paceAdjusted.length
-              ? "Calibrated to your pace: " +
-                paceAdjusted.map(([c, m]) => `${c} ${m > 1 ? "+" : ""}${Math.round((m - 1) * 100)}%`).join(", ")
-              : null
-          }
+        <Builder
+          selected={selectedRecipes}
+          factorOf={factorOf}
+          onSetFactor={setFactor}
+          onRemove={toggleDish}
+          peopleTarget={people}
+          onPeople={setPeopleScaled}
+          serveAt={serveAt}
+          onServeAt={setServeAt}
+          soloMins={soloMins}
+          interleavedMins={makespan}
+          feasible={feasible}
+          earliestServe={earliestServe}
+          onBuild={buildPlan}
+          onSearch={() => setScreen("browse")}
+          onPaste={() => setScreen("addRecipe")}
+          onAskAI={() => setScreen("addRecipe")}
         />
       ) : (
         <Stub screen={screen} onBack={() => setScreen("home")} onCook={startCooking} />
@@ -364,40 +385,6 @@ export function App() {
         Tutti — the whole meal, ready at once. Cooks fully offline; nothing leaves your device.
       </footer>
     </Shell>
-  );
-}
-
-function Home({
-  onStart,
-  onPlan,
-  suggestion,
-  onCookSuggested,
-  paceNote,
-}: {
-  onStart: () => void;
-  onPlan: () => void;
-  suggestion: Suggestion;
-  onCookSuggested: () => void;
-  paceNote: string | null;
-}) {
-  return (
-    <section className="zone" aria-label="Home">
-      <h2 className="zone-h"><span>Tonight</span></h2>
-
-      <div className="suggest-card">
-        <div className="suggest-h">Tonight?</div>
-        <div className="suggest-name">{suggestion.meal.name}</div>
-        <div className="hint">{suggestion.reason}</div>
-        <button className="btn" onClick={onCookSuggested}>Cook this</button>
-      </div>
-
-      <p className="value">A South Indian thali — three dishes, all hot together in about 45 minutes.</p>
-      {paceNote && <p className="hint">{paceNote}</p>}
-      <div className="home-cta">
-        <button className="btn big-btn" onClick={onStart}>Start cooking</button>
-        <button className="btn ghost big-btn" onClick={onPlan}>Pick dishes</button>
-      </div>
-    </section>
   );
 }
 

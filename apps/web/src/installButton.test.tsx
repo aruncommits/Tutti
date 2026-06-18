@@ -13,7 +13,7 @@ describe("Install Tutti button (Brief v27 items 2+5)", () => {
 
   it("is hidden when the app is not installable", () => {
     render(<App />);
-    expect(screen.getByRole("heading", { level: 2, name: /tonight/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: /plan a meal/i })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /install tutti/i })).toBeNull();
   });
 });
