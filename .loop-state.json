@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 81,
-  "lastTick": "2026-06-18T06:30:33.827Z",
-  "lastTickEpoch": 1781764233,
-  "phase": "brief-v28-a11y-perf-reaudit",
-  "nextResearchTheme": "Brief v27 DONE (install prompt; 251 tests). Brief v28 authored (a11y+perf re-audit). NEXT: Brief v28 items 1-2 - run Chrome DevTools MCP lighthouse_audit (mobile, navigation) on http://localhost:5180 home; then navigate browse/recipe/ready/settings via localStorage screen + audit a heavy one; collect failing audits (contrast on --faint/.dur/.sub-hint/.kp-desc, unlabeled inputs, heading-order, icon-button names). Fix critical/serious minimally (aria-labels, bump contrast token, headings). Re-run audit -> a11y 100. Item 4: add structural a11y tests for new screens (RecipeDetail/Mise/Settings have h2; icon buttons named). Keep gate green; record scores in commit."
+  "iteration": 82,
+  "lastTick": "2026-06-18T06:59:15.780Z",
+  "lastTickEpoch": 1781765955,
+  "phase": "brief-v29-units",
+  "nextResearchTheme": "Brief v28 DONE (a11y re-audit -> 100 restored after light-theme regression; structural a11y locks; 254 tests). NOTE: external redesign switched app to a LIGHT rice-paper theme (adapt, keep). Brief v29 authored (metric units toggle). NEXT: Brief v29 item 1 - apps/web/src/units.ts pure: convertAmount(amount,unit,metric):{amount?,unit?} (metric+US volume cup/cups*240, tbsp/tablespoon*15, tsp/teaspoon*5 -> ml; oz*28 -> g; else identity); roundNice (>=20 nearest 5 else nearest 1); displayAmount(amount,unit,toTaste,metric):string. units.test.ts (cup->ml, tbsp->ml, tsp->ml, off=identity, whole/clove unchanged, rounding). Then item 2 Settings Metric-units toggle (tutti.metric), item 3 apply displayAmount in Shopping/RecipeDetail/Mise, item 5 screen test."
 }
