@@ -1,45 +1,8 @@
-import { ALLERGENS, type KitchenProfile } from "@tutti/engine";
+import { ALLERGENS } from "@tutti/engine";
+import type { KitchenUi } from "./kitchenModel";
 
-// Kitchen Profile (Doc 7 §3) — Level-0 coarse counts the resource allocator reads. Fast taps,
-// no typing. Sensible defaults so a user can skip and cook immediately.
-
-export interface KitchenUi {
-  cooks: number;
-  burners: number;
-  cuttingBoards: number;
-  pans: number;
-  oven: boolean;
-  pressureCooker: boolean;
-  microwave: boolean;
-  blender: boolean;
-  counter: "small" | "medium" | "large";
-}
-
-export const DEFAULT_KITCHEN: KitchenUi = {
-  cooks: 1,
-  burners: 2,
-  cuttingBoards: 1,
-  pans: 2,
-  oven: false,
-  pressureCooker: true,
-  microwave: true,
-  blender: true,
-  counter: "small",
-};
-
-/** Map the UI model to the engine's KitchenProfile (Doc 2 §2.3, Level 0). */
-export function toKitchenProfile(k: KitchenUi): KitchenProfile {
-  const resources = [
-    { category: "burner", count: k.burners },
-    { category: "cutting_board", count: k.cuttingBoards },
-    { category: "pan", count: k.pans, capabilities: ["small", "large"] },
-  ];
-  if (k.oven) resources.push({ category: "oven", count: 1, capabilities: [] });
-  if (k.pressureCooker) resources.push({ category: "pressure_cooker", count: 1, capabilities: [] });
-  if (k.microwave) resources.push({ category: "microwave", count: 1, capabilities: [] });
-  if (k.blender) resources.push({ category: "blender", count: 1, capabilities: [] });
-  return { cooks: k.cooks, resources };
-}
+// Kitchen Profile screen (Doc 7 §3). The model (KitchenUi/DEFAULT_KITCHEN/toKitchenProfile) lives
+// in kitchenModel.ts so App can use it eagerly while this component is lazy-loaded (Brief v10).
 
 function Stepper({ label, value, min, onChange }: { label: string; value: number; min: number; onChange: (v: number) => void }) {
   return (

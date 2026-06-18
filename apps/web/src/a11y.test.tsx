@@ -15,11 +15,12 @@ describe("App accessibility scaffolding (Brief v9)", () => {
     expect(screen.getByRole("link", { name: /skip to content/i })).toBeInTheDocument();
   });
 
-  it("exposes a focusable main screen region with a heading", () => {
+  it("exposes a focusable main screen region with a heading", async () => {
     const { container } = render(<App />);
     const region = container.querySelector("#screen-main");
     expect(region).toBeInTheDocument();
     expect(region?.getAttribute("tabindex")).toBe("-1");
-    expect(screen.getByRole("heading", { level: 2, name: /browse recipes/i })).toBeInTheDocument();
+    // BrowseScreen is lazy-loaded — await its heading through Suspense
+    expect(await screen.findByRole("heading", { level: 2, name: /browse recipes/i })).toBeInTheDocument();
   });
 });

@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 46,
-  "lastTick": "2026-06-18T10:42:33.2013071+08:00",
-  "lastTickEpoch": 1781750553,
-  "phase": "brief-v9-accessibility",
-  "nextResearchTheme": "Brief v9 items 2-3 done (screen-change focus+announce, skip link, focus ring; 145 tests). NEXT: item 1 - ensure every screen has a visible h2 heading (Home + Stub lack one; add). item 4 already partly done (skip link). item 5 - axe audit via Chrome DevTools MCP against http://localhost:5180 (navigate Home/Browse/Pick/Cook, run accessibility/lighthouse, fix critical/serious) + a jsdom test (a11y.test.tsx) asserting the role=status live region + skip link render in App. Then Brief v9 DONE -> research perf/bundle or motion -> author Brief v10."
+  "iteration": 47,
+  "lastTick": "2026-06-18T10:51:42.9688632+08:00",
+  "lastTickEpoch": 1781751103,
+  "phase": "brief-v10-performance",
+  "nextResearchTheme": "Brief v9 DONE (a11y, Lighthouse Accessibility 100 / Best Practices 100; 147 tests). Brief v10 authored (route code-splitting). NEXT: Brief v10 item 1 - React.lazy the secondary screens in App (AddRecipe/BrowseScreen/ShoppingScreen/StatsScreen/PreviewScreen/KitchenScreen/OnboardingScreen via lazy(()=>import(...).then(m=>({default:m.Name})))), keep CookScreen+engine eager, wrap routed <main> content in one Suspense with an accessible 'Loading...' fallback. Fix any App-level tests needing findBy/await. Verify build splits (ingest out of entry) + gate green. Then item 2 perf-check budget, item 4 lighthouse before/after."
 }

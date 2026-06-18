@@ -1,16 +1,23 @@
-import { useEffect, useRef, useState } from "react";
+import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import { applyEvent, compile, formatClock, parseClock, paceCategoryOf, scaleRecipe, thaliV1, updatePace, type MasterExecutionPlan, type PaceModel, type RecipeGraph } from "@tutti/engine";
 import { usePersistentState, type Screen } from "./state";
-import { CookScreen } from "./CookScreen";
-import { KitchenScreen, DEFAULT_KITCHEN, toKitchenProfile, type KitchenUi } from "./KitchenScreen";
-import { OnboardingScreen } from "./OnboardingScreen";
-import { PickScreen, ServeTimeScreen } from "./PlanFlow";
-import { PreviewScreen } from "./PreviewScreen";
-import { AddRecipe } from "./AddRecipe";
-import { ShoppingScreen } from "./ShoppingScreen";
-import { StatsScreen, type LearnEvent } from "./StatsScreen";
-import { BrowseScreen } from "./BrowseScreen";
+import { CookScreen } from "./CookScreen"; // eager — the critical cook path must be instant
+import { PickScreen, ServeTimeScreen } from "./PlanFlow"; // eager — central planning flow
+import { DEFAULT_KITCHEN, toKitchenProfile, type KitchenUi } from "./kitchenModel";
+import type { LearnEvent } from "./StatsScreen";
 import { shouldLearn } from "./learn";
+
+// Secondary screens are lazy-loaded so the initial/cook bundle stays lean (Brief v10).
+// AddRecipe pulls @tutti/ingest, so splitting it keeps the parser out of the entry chunk.
+const KitchenScreen = lazy(() => import("./KitchenScreen").then((m) => ({ default: m.KitchenScreen })));
+const OnboardingScreen = lazy(() => import("./OnboardingScreen").then((m) => ({ default: m.OnboardingScreen })));
+const PreviewScreen = lazy(() => import("./PreviewScreen").then((m) => ({ default: m.PreviewScreen })));
+const AddRecipe = lazy(() => import("./AddRecipe").then((m) => ({ default: m.AddRecipe })));
+const ShoppingScreen = lazy(() => import("./ShoppingScreen").then((m) => ({ default: m.ShoppingScreen })));
+const StatsScreen = lazy(() => import("./StatsScreen").then((m) => ({ default: m.StatsScreen })));
+const BrowseScreen = lazy(() => import("./BrowseScreen").then((m) => ({ default: m.BrowseScreen })));
+
+const Loading = () => <div className="idle" role="status">Loading…</div>;
 
 const ALL_DISHES = thaliV1.recipes.map((r) => r.recipeId);
 
@@ -117,7 +124,9 @@ export function App() {
     return (
       <div className="wrap">
         <main>
-          <OnboardingScreen onDone={() => { setOnboarded(true); setScreen("kitchen"); }} />
+          <Suspense fallback={<Loading />}>
+            <OnboardingScreen onDone={() => { setOnboarded(true); setScreen("kitchen"); }} />
+          </Suspense>
         </main>
       </div>
     );
@@ -137,6 +146,7 @@ export function App() {
 
       <div role="status" aria-live="polite" className="sr-only">{announce}</div>
       <main id="screen-main" ref={focusRef} tabIndex={-1} className="screen-focus">
+      <Suspense fallback={<Loading />}>
 
       {screen === "cook" ? (
         <CookScreen plan={plan} pro={pro} onComplete={complete} onUndo={undo} onReset={reset} />
@@ -201,6 +211,7 @@ export function App() {
       ) : (
         <Stub screen={screen} onBack={() => setScreen("home")} onCook={startCooking} />
       )}
+      </Suspense>
       </main>
 
       <footer className="scaffold-note">
