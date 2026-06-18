@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 83,
-  "lastTick": "2026-06-18T07:02:36.647Z",
-  "lastTickEpoch": 1781766156,
-  "phase": "brief-v29-units",
-  "nextResearchTheme": "Brief v29 item 1 done (units convertAmount/displayAmount; 260 tests; RESUMED after 5th ~8h stall). NEXT: items 2-3+5 - App: const [metric,setMetric]=usePersistentState(\"tutti.metric\",false,(v)=>typeof v===\"boolean\"); SettingsScreen Preferences add a Metric-units toggle (props metric,onToggleMetric, desc Show amounts in millilitres). Pass metric to ShoppingScreen + RecipeDetailScreen + MiseScreen. In those, replace inline amount formatting with displayAmount(i.amount,i.unit,i.toTaste,metric) from ./units. item 5: a screen test (RecipeDetail or Shopping) - with metric a cup ingredient shows /ml/; without, original unit. Then Brief v29 done -> research + Brief v30."
+  "iteration": 84,
+  "lastTick": "2026-06-18T07:11:37.218Z",
+  "lastTickEpoch": 1781766697,
+  "phase": "brief-v30-e2e-journey",
+  "nextResearchTheme": "Brief v29 DONE (metric units toggle; 262 tests). Brief v30 authored (e2e cook-journey test). NEXT: Brief v30 item 1 - apps/web/src/journey.test.tsx: seed tutti.onboarded=true + tutti.screen=home, render <App/>, click Start cooking (getByRole button /start cooking/i), assert NOW region + Serving-at clock present, then loop (cap ~40 iters) clicking any /cooks itself/i (passive start) or /done/i (active) button found each pass until the finale, assert findByText /dinner is served/i. Use role/text queries; getAllByRole+filter; await/findBy for lazy. Item 2 plan-flow sub-journey (Pick->serveTime->Build->Preview findBy->Start->Get ready->Start->Cook). Item 3 fix any wiring the journey surfaces. Keep gate green."
 }
