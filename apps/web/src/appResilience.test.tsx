@@ -14,9 +14,9 @@ describe("App resilience to corrupt persisted data (Brief v23 item 5)", () => {
     localStorage.setItem("tutti.recipeNotes", "42");         // not an object
   });
 
-  it("renders Home without throwing despite garbage in every key", () => {
+  it("renders Home without throwing despite garbage in every key", async () => {
     expect(() => render(<App />)).not.toThrow();
-    // bogus screen falls back to home (the meal-plan builder)
-    expect(screen.getByRole("heading", { level: 2, name: /plan a meal/i })).toBeInTheDocument();
+    // bogus screen falls back to home (the meal-plan builder, lazy-loaded via Suspense)
+    expect(await screen.findByRole("heading", { level: 2, name: /plan a meal/i }, { timeout: 3000 })).toBeInTheDocument();
   });
 });

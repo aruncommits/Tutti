@@ -11,9 +11,9 @@ describe("Install Tutti button (Brief v27 items 2+5)", () => {
     localStorage.setItem("tutti.screen", '"home"');
   });
 
-  it("is hidden when the app is not installable", () => {
+  it("is hidden when the app is not installable", async () => {
     render(<App />);
-    expect(screen.getByRole("heading", { level: 2, name: /plan a meal/i })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 2, name: /plan a meal/i }, { timeout: 3000 })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /install tutti/i })).toBeNull();
   });
 });

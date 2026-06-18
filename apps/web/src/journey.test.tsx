@@ -34,7 +34,8 @@ describe("cook journey (Brief v30 item 1)", () => {
     localStorage.setItem("tutti.dishes", JSON.stringify(thaliV1.recipes.map((r) => r.recipeId)));
     render(<App />);
 
-    fireEvent.click(screen.getByRole("button", { name: /build plan/i }));
+    // Builder is lazy-loaded — await it, then build.
+    fireEvent.click(await screen.findByRole("button", { name: /build plan/i }, LAZY));
     // Preview (lazy) → start → Get ready (lazy) → start → Cook
     fireEvent.click(await screen.findByRole("button", { name: /start cooking/i }, LAZY));
     fireEvent.click(await screen.findByRole("button", { name: /start cooking/i }, LAZY));
@@ -49,8 +50,8 @@ describe("cook journey (Brief v30 item 1)", () => {
   it("adds a recipe via Search and builds a plan", async () => {
     render(<App />);
 
-    // Empty builder → search the library → add the first recipe → it lands in the plan.
-    fireEvent.click(screen.getByRole("button", { name: /search recipes/i }));
+    // Empty builder (lazy) → search the library → add the first recipe → it lands in the plan.
+    fireEvent.click(await screen.findByRole("button", { name: /search recipes/i }, LAZY));
     const adds = await screen.findAllByRole("button", { name: /^add /i }, LAZY);
     fireEvent.click(adds[0]!);
 

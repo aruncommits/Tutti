@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PasteParser, fetchRecipeFromUrl, type ParseResult } from "@tutti/ingest";
 import type { RecipeGraph } from "@tutti/engine";
+import { askAiForRecipe, fetchAiUsage, type AiUsage } from "./aiClient";
 
-// Add-dish screen (Brief v3 item 5, Doc 5 §7): three ways to bring a recipe in. Paste and Find
-// online are key-free (deterministic JSON-LD / heuristic parse); Ask AI needs a server + API key
-// (the browser can't safely call the LLM), so it's flagged here. Parsed recipes are "unverified"
-// until a human approves them, and the engine validate() gate guards every one.
+// Add-dish screen (Brief v3 item 5, Doc 5 §7): four ways to bring a recipe in. Paste and Find
+// online are key-free (deterministic JSON-LD / heuristic parse). Ask AI is app-provided: the
+// browser asks our server (which holds the keys), gets recipe text back, and parses it with the
+// same pipeline. Parsed recipes are "unverified" until approved; the engine validate() gate guards every one.
 
 type Tab = "paste" | "online" | "ai";
 
@@ -13,9 +14,15 @@ export function AddRecipe({ onAdd, onBack }: { onAdd: (g: RecipeGraph) => void; 
   const [tab, setTab] = useState<Tab>("paste");
   const [text, setText] = useState("");
   const [url, setUrl] = useState("");
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [aiUsage, setAiUsage] = useState<AiUsage | null | undefined>(undefined); // undefined = not checked
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ParseResult | null>(null);
+
+  useEffect(() => {
+    if (tab === "ai" && aiUsage === undefined) void fetchAiUsage().then(setAiUsage);
+  }, [tab, aiUsage]);
 
   const run = async (fn: () => Promise<ParseResult>) => {
     setBusy(true); setError(null); setResult(null);
@@ -30,6 +37,12 @@ export function AddRecipe({ onAdd, onBack }: { onAdd: (g: RecipeGraph) => void; 
 
   const parsePaste = () => run(() => new PasteParser().parse({ source: "paste", text }));
   const parseUrl = () => run(() => fetchRecipeFromUrl(url));
+  // Ask the app's AI for a recipe, then parse the returned text with the same paste pipeline.
+  const askAi = () => run(async () => {
+    const ai = await askAiForRecipe(aiPrompt);
+    if (ai.remaining !== undefined) setAiUsage((u) => (u ? { ...u, remaining: ai.remaining!, used: u.free - ai.remaining! } : u));
+    return new PasteParser().parse({ source: "paste", text: ai.text });
+  });
 
   const graph = result?.graph ?? null;
   const ok = result?.validation.ok ?? false;
@@ -62,11 +75,19 @@ export function AddRecipe({ onAdd, onBack }: { onAdd: (g: RecipeGraph) => void; 
       )}
 
       {tab === "ai" && (
-        <div className="idle">
-          <b>Ask AI</b> turns a rough idea into a full recipe. It needs a server with an API key, so
-          it's not available in this local build. Add <code>ANTHROPIC_API_KEY</code> and a backend to
-          enable it — the parser is ready (<code>@tutti/ingest/ai</code>).
-        </div>
+        <>
+          <p className="value">Describe what you want — Tutti's AI writes the full recipe, then it joins your plan.</p>
+          <textarea className="paste-area" rows={3} value={aiPrompt} placeholder={"e.g. a quick paneer butter masala for 4, not too spicy"} onChange={(e) => setAiPrompt(e.target.value)} aria-label="Describe the recipe" />
+          <button className="btn big-btn" disabled={busy || !aiPrompt.trim() || aiUsage === null} onClick={askAi}>
+            {busy ? "Writing…" : "✨ Generate recipe"}
+          </button>
+          {aiUsage === null && (
+            <p className="hint">AI isn't set up on this server yet. Add a provider key to <code>apps/web/.env</code> (see <code>.env.example</code>) and restart.</p>
+          )}
+          {aiUsage && (
+            <p className="hint">{aiUsage.remaining} of {aiUsage.free} free AI recipes left. Powered by {aiUsage.providers.join(" · ") || "your configured provider"}.</p>
+          )}
+        </>
       )}
 
       {error && <p className="alert">Couldn't parse that: {error}</p>}
