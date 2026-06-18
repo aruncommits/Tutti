@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 78,
-  "lastTick": "2026-06-18T06:15:28.970Z",
-  "lastTickEpoch": 1781763328,
-  "phase": "brief-v26-meal-servings",
-  "nextResearchTheme": "Brief v26 item 1 done (factorForPeople; 245 tests). NEXT: items 2-3+5 - App: const [people,setPeople]=usePersistentState(\"tutti.people\",4,(v)=>typeof v===\"number\"); pass peopleTarget=people + onPeople=(n)=>{const c=Math.max(1,Math.min(40,n)); setPeople(c); selectedRecipes.forEach(r=>setFactor(r.recipeId, factorForPeople(r.servings,c)));} to PickScreen. import factorForPeople. PickScreen: add a meal-level Cooking-for-N stepper (props peopleTarget,onPeople) near top with -/+ (aria Fewer/More people, >=40px) showing the count. Per-dish 1x/2x/3x chips unchanged (still override). item 5: PickScreen test - More people button calls onPeople. Verify browser (Cooking for 8 -> dishes 2x). Then Brief v26 done -> research + Brief v27."
+  "iteration": 79,
+  "lastTick": "2026-06-18T06:22:37.819Z",
+  "lastTickEpoch": 1781763757,
+  "phase": "brief-v27-install-prompt",
+  "nextResearchTheme": "Brief v26 DONE (cooking-for-N scaler, verified; 247 tests). Brief v27 authored (install prompt). NEXT: Brief v27 item 1 - apps/web/src/useInstallPrompt.ts: hook adding beforeinstallprompt listener (preventDefault+store event in state) + appinstalled listener (clear); returns {canInstall, promptInstall:()=>Promise<void> calling evt.prompt() then clearing}; SSR/jsdom-safe (typeof window guard; no event->canInstall false; no-op). Local BeforeInstallPromptEvent type {preventDefault();prompt():Promise<void>;userChoice}. useInstallPrompt.test.ts (renderHook: jsdom canInstall false + promptInstall no-throw; dispatch fake beforeinstallprompt with prompt stub -> canInstall true + promptInstall calls stub.prompt). Then item 2 Home Install Tutti button (canInstall) -> promptInstall, item 5 verify."
 }
