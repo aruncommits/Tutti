@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 69,
-  "lastTick": "2026-06-18T13:03:38.8892073+08:00",
-  "lastTickEpoch": 1781759019,
-  "phase": "brief-v22-settings-data",
-  "nextResearchTheme": "Brief v22 item 1 done (appData export/reset; 216 tests). NEXT: items 2-3+5 - SettingsScreen.tsx (lazy, 'settings' screen): props pro,onTogglePro,learnPace,onToggleLearn,onExport,onReset,onBack. Preferences group: Pro mode toggle (kp-toggle) + desc, Learn-my-pace toggle. Your-data group: 'Everything stays on this device.' + Export button (onExport) + two-step Reset-everything (first tap arms 'Tap again to erase everything', second tap onReset; honest copy). Add 'settings' to Screen union + SCREEN_NAMES. App: lazy SettingsScreen; Home 'Settings' link -> setScreen('settings'); route passes pro/learnPace + setters; onExport=()=>void shareOrCopy('Tutti data', exportData(localStorage)); onReset=()=>{resetData(localStorage); setPace({}); setEvents([]); setMeals([]); setNotes({}); setPantry([]); setDishes(ALL_DISHES); setScreen('home');}. Item 5: SettingsScreen test (toggles+buttons present; Reset needs confirm tap before onReset). Then Brief v22 done -> research + Brief v23."
+  "iteration": 70,
+  "lastTick": "2026-06-18T13:12:16.3862921+08:00",
+  "lastTickEpoch": 1781759536,
+  "phase": "brief-v23-resilient-persistence",
+  "nextResearchTheme": "Brief v22 DONE (settings + data export/reset; hardened suggestMeal; 219 tests). Brief v23 authored (resilient persistence). NEXT: Brief v23 item 1+2 - extract pure readPersisted(raw:string|null, initial, validate?) from usePersistentState (state.ts) [bad JSON->initial; valid-but-fails-validate->initial; passing->parsed] and add optional validate param to usePersistentState; apps/web/src/validators.ts pure guards isStringArray/isPlainObject/isMealArray/isScreen/isClock; tests for readPersisted + validators. Then item 3 apply validators to App's critical usePersistentState calls, item 5 App-level test that malformed tutti.meals + bogus tutti.screen still render (no throw)."
 }

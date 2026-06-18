@@ -31,12 +31,30 @@ export const SCREEN_ORDER: Screen[] = [
   "done",
 ];
 
+/**
+ * Pure read of a persisted value (Brief v23): falls back to `initial` on missing key, unparseable
+ * JSON, OR a parsed value that fails `validate` — so legacy/corrupt data self-heals, never crashes.
+ */
+export function readPersisted<T>(raw: string | null, initial: T, validate?: (v: unknown) => boolean): T {
+  if (raw === null) return initial;
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (validate && !validate(parsed)) return initial;
+    return parsed as T;
+  } catch {
+    return initial;
+  }
+}
+
 /** useState mirrored to localStorage so an in-progress session survives reload (Doc 1 P4). */
-export function usePersistentState<T>(key: string, initial: T): [T, (v: T | ((p: T) => T)) => void] {
+export function usePersistentState<T>(
+  key: string,
+  initial: T,
+  validate?: (v: unknown) => boolean,
+): [T, (v: T | ((p: T) => T)) => void] {
   const [value, setValue] = useState<T>(() => {
     try {
-      const raw = localStorage.getItem(key);
-      return raw !== null ? (JSON.parse(raw) as T) : initial;
+      return readPersisted(localStorage.getItem(key), initial, validate);
     } catch {
       return initial;
     }
