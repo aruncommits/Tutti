@@ -1,0 +1,49 @@
+import { describe, it, expect } from "vitest";
+import { goldenLibrary } from "@tutti/engine";
+import { toLibraryEntries, filterLibrary } from "./libraryView";
+
+const entries = toLibraryEntries(goldenLibrary);
+const names = (es: ReturnType<typeof toLibraryEntries>) => es.map((e) => e.recipe.name);
+
+describe("toLibraryEntries (Brief v8 item 2)", () => {
+  it("derives totalMins, allergens, and veg for each recipe", () => {
+    const lemon = entries.find((e) => e.recipe.recipeId === "rec_lemonrice")!;
+    expect(lemon.totalMins).toBeGreaterThan(0);
+    expect(lemon.allergens).toContain("peanuts");
+    expect(lemon.veg).toBe(true); // all seeded dishes are vegetarian
+  });
+});
+
+describe("filterLibrary — stackable filters (Brief v8 item 2)", () => {
+  it("returns all entries with no filters", () => {
+    expect(filterLibrary(entries)).toHaveLength(entries.length);
+  });
+
+  it("searches by recipe name", () => {
+    expect(names(filterLibrary(entries, { query: "rasam" }))).toContain("Tomato Rasam");
+  });
+
+  it("searches by an ingredient name not in the title", () => {
+    // 'tamarind' appears only in ingredients (Rasam), not in any recipe name
+    const hits = names(filterLibrary(entries, { query: "tamarind" }));
+    expect(hits).toContain("Tomato Rasam");
+    expect(hits).not.toContain("Curd Rice");
+  });
+
+  it("excludes recipes containing an avoided allergen", () => {
+    const hits = names(filterLibrary(entries, { avoidAllergens: ["peanuts"] }));
+    expect(hits).not.toContain("Lemon Rice"); // has peanuts
+    expect(hits).toContain("Coconut Chutney");
+  });
+
+  it("stacks query + maxMins together", () => {
+    const all = filterLibrary(entries, { query: "rice" }); // Curd Rice + Lemon Rice
+    const quick = filterLibrary(entries, { query: "rice", maxMins: 20 });
+    expect(quick.length).toBeLessThanOrEqual(all.length);
+    for (const e of quick) expect(e.totalMins).toBeLessThanOrEqual(20);
+  });
+
+  it("vegOnly keeps every seeded dish (all vegetarian)", () => {
+    expect(filterLibrary(entries, { vegOnly: true })).toHaveLength(entries.length);
+  });
+});

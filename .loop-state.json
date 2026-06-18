@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 42,
-  "lastTick": "2026-06-18T10:22:51.6977874+08:00",
-  "lastTickEpoch": 1781749372,
+  "iteration": 43,
+  "lastTick": "2026-06-18T10:28:04.3946893+08:00",
+  "lastTickEpoch": 1781749684,
   "phase": "brief-v8-recipe-library",
-  "nextResearchTheme": "Brief v7 DONE (offline-first PWA, gate-enforced; 132 tests). Brief v8 authored (seeded recipe library + search). NEXT: Brief v8 item 1 - seed packages/engine/fixtures/library.json with ~6-8 verified veg South Indian RecipeGraphs (valid TaskNode schema: acyclic, resources, active/passive, durations, ingredients, verified:true), add typed export goldenLibrary: RecipeGraph[] from engine, and a test asserting validate(each).ok. Then item 2 filterLibrary + LibraryEntry helpers, item 3 BrowseScreen, item 4 wire into pick, item 5 tests."
+  "nextResearchTheme": "Brief v8 item 1 done (Golden Library: 6 verified veg South Indian recipes; 136 tests). NEXT: item 2 - pure browse helpers in apps/web/src/library.ts (web): LibraryEntry {recipe, totalMins (sum estMins), allergens (allergensOf), veg (no meat/fish/egg/crustacean/mollusc)} and filterLibrary(entries, {query, maxMins, avoidAllergens, vegOnly}) - search name+ingredient names, stackable filters; unit-test stacking/ingredient-search/allergen-exclusion. Then item 3 BrowseScreen, item 4 wire into pick, item 5 web tests."
 }
