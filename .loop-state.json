@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 49,
-  "lastTick": "2026-06-18T11:05:57.1943827+08:00",
-  "lastTickEpoch": 1781751957,
+  "iteration": 50,
+  "lastTick": "2026-06-18T11:10:02.1540723+08:00",
+  "lastTickEpoch": 1781752202,
   "phase": "brief-v12-saved-meals",
-  "nextResearchTheme": "Brief v11 DONE (motion polish, CSS-only, reduced-motion gated; verified anim applied; 147 tests). Brief v12 authored (saved meals & recent history). NEXT: Brief v12 item 1 - apps/web/src/meals.ts: SavedMeal interface {id,name,dishIds,servings,target,savedAt,kind:'saved'|'recent'} + pure helpers addSaved/addRecent(prepend,dedupe by dishIds-set,cap~10)/removeMeal; meals.test.ts for dedupe/cap/order. Then item 2 persist+save action (Pick/Preview), item 3 auto-record recent on finish, item 4 'Your meals' screen+restore, item 5 tests+verify."
+  "nextResearchTheme": "Brief v12 item 1 done (meals.ts model+helpers; 154 tests). NEXT: items 2-4 - in App: usePersistentState<SavedMeal[]>('tutti.meals',[]); a 'Save this meal' action on Preview (capture dishes+servingsFactor+target, id=m+Date.now(), savedAt=Date.now(), kind:saved, name default) via addSaved; auto-record a kind:recent meal when a cook finishes (in reset() or when view all-done -> addRecent); add 'meals' to Screen union + MealsScreen.tsx (list saved+recent, dish-color dots + count, tap restores setDishes/setServingsFactor/setTarget -> setScreen('pick'), remove x) reachable from Home 'Your meals'. Then item 5 web test restore sets selection + browser verify."
 }

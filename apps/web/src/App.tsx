@@ -6,10 +6,12 @@ import { PickScreen, ServeTimeScreen } from "./PlanFlow"; // eager — central p
 import { DEFAULT_KITCHEN, toKitchenProfile, type KitchenUi } from "./kitchenModel";
 import type { LearnEvent } from "./StatsScreen";
 import { shouldLearn } from "./learn";
+import { addSaved, addRecent, removeMeal, type SavedMeal } from "./meals";
 
 // Secondary screens are lazy-loaded so the initial/cook bundle stays lean (Brief v10).
 // AddRecipe pulls @tutti/ingest, so splitting it keeps the parser out of the entry chunk.
 const KitchenScreen = lazy(() => import("./KitchenScreen").then((m) => ({ default: m.KitchenScreen })));
+const MealsScreen = lazy(() => import("./MealsScreen").then((m) => ({ default: m.MealsScreen })));
 const OnboardingScreen = lazy(() => import("./OnboardingScreen").then((m) => ({ default: m.OnboardingScreen })));
 const PreviewScreen = lazy(() => import("./PreviewScreen").then((m) => ({ default: m.PreviewScreen })));
 const AddRecipe = lazy(() => import("./AddRecipe").then((m) => ({ default: m.AddRecipe })));
@@ -23,7 +25,7 @@ const ALL_DISHES = thaliV1.recipes.map((r) => r.recipeId);
 
 const SCREEN_NAMES: Record<Screen, string> = {
   onboarding: "Welcome", kitchen: "Your kitchen", home: "Home", addRecipe: "Add a dish",
-  browse: "Browse recipes", shopping: "Shopping list", stats: "Your pace", pick: "Pick dishes",
+  browse: "Browse recipes", shopping: "Shopping list", stats: "Your pace", meals: "Your meals", pick: "Pick dishes",
   serveTime: "Serve time", preview: "Plan preview", cook: "Cook mode", done: "Done",
 };
 
@@ -43,6 +45,7 @@ export function App() {
   const [pace, setPace] = usePersistentState<PaceModel>("tutti.pace", {});
   const [learnPace, setLearnPace] = usePersistentState<boolean>("tutti.learnPace", true);
   const [events, setEvents] = usePersistentState<LearnEvent[]>("tutti.events", []);
+  const [meals, setMeals] = usePersistentState<SavedMeal[]>("tutti.meals", []);
   const paceAdjusted = Object.entries(pace).filter(([, m]) => Math.abs(m - 1) > 0.05);
   const focusAtRef = useRef<number | null>(null); // wall-clock boundary for honest actual-duration capture
   const allRecipes = [...thaliV1.recipes, ...candidates];
@@ -106,8 +109,26 @@ export function App() {
     setScreen("cook");
   };
   const reset = () => {
+    // A finished cook becomes a "recently cooked" meal for one-tap re-cooking (Brief v12).
+    if (dishes.length) {
+      const rec: SavedMeal = { id: `r${Date.now()}`, name: `Cooked ${new Date().toLocaleDateString()}`, dishIds: dishes, servings: servingsFactor, target, savedAt: Date.now(), kind: "recent" };
+      setMeals((m) => addRecent(m, rec));
+    }
     setPlan(previewPlan ?? compile(thaliV1.recipes, toKitchenProfile(kitchen), target, pace));
     setScreen("home");
+  };
+  // Save the current plan as a named meal (Brief v12).
+  const saveMeal = () => {
+    const meal: SavedMeal = { id: `m${Date.now()}`, name: `Meal of ${new Date().toLocaleDateString()}`, dishIds: dishes, servings: servingsFactor, target, savedAt: Date.now(), kind: "saved" };
+    setMeals((m) => addSaved(m, meal));
+  };
+  // Restore a saved/recent meal: load its dishes, servings, serve time, then drop into Pick to tweak.
+  const restoreMeal = (meal: SavedMeal) => {
+    const known = new Set(allRecipes.map((r) => r.recipeId));
+    setDishes(meal.dishIds.filter((id) => known.has(id)));
+    setServingsFactor(meal.servings);
+    setTarget(meal.target);
+    setScreen("pick");
   };
 
   // Screen-change a11y (Doc 7 §12): move focus to the new screen and announce it (SPA route fix).
@@ -158,6 +179,14 @@ export function App() {
         <BrowseScreen avoid={avoid} onPick={addCandidate} onBack={() => setScreen("home")} />
       ) : screen === "shopping" ? (
         <ShoppingScreen recipes={selectedRecipes.length ? selectedRecipes : allRecipes} onBack={() => setScreen("pick")} />
+      ) : screen === "meals" ? (
+        <MealsScreen
+          meals={meals}
+          recipes={allRecipes}
+          onRestore={restoreMeal}
+          onRemove={(id) => setMeals((m) => removeMeal(m, id))}
+          onBack={() => setScreen("home")}
+        />
       ) : screen === "stats" ? (
         <StatsScreen
           pace={pace}
@@ -191,7 +220,7 @@ export function App() {
           onBuild={buildPlan}
         />
       ) : screen === "preview" ? (
-        <PreviewScreen plan={plan} onStart={() => setScreen("cook")} onEdit={() => setScreen("pick")} />
+        <PreviewScreen plan={plan} onStart={() => setScreen("cook")} onEdit={() => setScreen("pick")} onSave={saveMeal} />
       ) : screen === "home" ? (
         <Home
           onStart={startCooking}
@@ -201,6 +230,7 @@ export function App() {
           onTogglePro={() => setPro(!pro)}
           onStats={() => setScreen("stats")}
           onBrowse={() => setScreen("browse")}
+          onMeals={() => setScreen("meals")}
           paceNote={
             paceAdjusted.length
               ? "Calibrated to your pace: " +
@@ -229,6 +259,7 @@ function Home({
   onTogglePro,
   onStats,
   onBrowse,
+  onMeals,
   paceNote,
 }: {
   onStart: () => void;
@@ -238,6 +269,7 @@ function Home({
   onTogglePro: () => void;
   onStats: () => void;
   onBrowse: () => void;
+  onMeals: () => void;
   paceNote: string | null;
 }) {
   return (
@@ -248,6 +280,7 @@ function Home({
       <button className="btn big-btn" onClick={onStart}>Start cooking</button>
       <div className="home-links">
         <button className="link" onClick={onBrowse}>Browse recipes</button>
+        <button className="link" onClick={onMeals}>Your meals</button>
         <button className="link" onClick={onPick}>Pick dishes</button>
         <button className="link" onClick={onKitchen}>Your kitchen</button>
         <button className="link" onClick={onStats}>Your pace</button>
