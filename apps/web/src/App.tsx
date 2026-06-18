@@ -8,6 +8,7 @@ import { PickScreen, ServeTimeScreen } from "./PlanFlow";
 import { PreviewScreen } from "./PreviewScreen";
 import { AddRecipe } from "./AddRecipe";
 import { ShoppingScreen } from "./ShoppingScreen";
+import { StatsScreen, type LearnEvent } from "./StatsScreen";
 
 const ALL_DISHES = thaliV1.recipes.map((r) => r.recipeId);
 
@@ -25,7 +26,8 @@ export function App() {
   // Fed into compile() so elastic estimates adjust. Populated by telemetry in the learning loop
   // (Brief v6) — kept honest here: empty until real data exists, so it's identity by default.
   const [pace, setPace] = usePersistentState<PaceModel>("tutti.pace", {});
-  const [learnPace] = usePersistentState<boolean>("tutti.learnPace", true);
+  const [learnPace, setLearnPace] = usePersistentState<boolean>("tutti.learnPace", true);
+  const [events, setEvents] = usePersistentState<LearnEvent[]>("tutti.events", []);
   const paceAdjusted = Object.entries(pace).filter(([, m]) => Math.abs(m - 1) > 0.05);
   const focusAtRef = useRef<number | null>(null); // wall-clock boundary for honest actual-duration capture
   const allRecipes = [...thaliV1.recipes, ...candidates];
@@ -62,7 +64,10 @@ export function App() {
     if (learnPace && node && node.attention === "active" && node.duration.elastic && focusAtRef.current != null) {
       const actualMins = (now - focusAtRef.current) / 60000;
       if (actualMins >= 0.3 * node.duration.minMins && actualMins <= 3 * node.duration.maxMins) {
-        setPace((p) => updatePace(p, { category: paceCategoryOf(node), actualMins, estMins: node.duration.estMins }));
+        const category = paceCategoryOf(node);
+        setPace((p) => updatePace(p, { category, actualMins, estMins: node.duration.estMins }));
+        const ev: LearnEvent = { type: "node_completed", recipeId: node.recipeId, nodeId: id, category, plannedMins: node.duration.estMins, actualMins: Math.round(actualMins * 10) / 10, at: now };
+        setEvents((e) => [...e, ev].slice(-200));
       }
     }
     focusAtRef.current = now;
@@ -115,6 +120,15 @@ export function App() {
         <AddRecipe onAdd={addCandidate} onBack={() => setScreen("home")} />
       ) : screen === "shopping" ? (
         <ShoppingScreen recipes={selectedRecipes.length ? selectedRecipes : allRecipes} onBack={() => setScreen("pick")} />
+      ) : screen === "stats" ? (
+        <StatsScreen
+          pace={pace}
+          events={events}
+          learnPace={learnPace}
+          onToggleLearn={() => setLearnPace(!learnPace)}
+          onForget={() => { setPace({}); setEvents([]); }}
+          onBack={() => setScreen("home")}
+        />
       ) : screen === "pick" ? (
         <PickScreen
           recipes={allRecipes}
@@ -147,6 +161,7 @@ export function App() {
           onKitchen={() => setScreen("kitchen")}
           pro={pro}
           onTogglePro={() => setPro(!pro)}
+          onStats={() => setScreen("stats")}
           paceNote={
             paceAdjusted.length
               ? "Calibrated to your pace: " +
@@ -171,6 +186,7 @@ function Home({
   onKitchen,
   pro,
   onTogglePro,
+  onStats,
   paceNote,
 }: {
   onStart: () => void;
@@ -178,6 +194,7 @@ function Home({
   onKitchen: () => void;
   pro: boolean;
   onTogglePro: () => void;
+  onStats: () => void;
   paceNote: string | null;
 }) {
   return (
@@ -188,6 +205,7 @@ function Home({
       <div className="home-links">
         <button className="link" onClick={onPick}>Pick dishes</button>
         <button className="link" onClick={onKitchen}>Your kitchen</button>
+        <button className="link" onClick={onStats}>Your pace</button>
       </div>
       <div className="kp-row" style={{ marginTop: 16 }}>
         <span className="kp-label">Pro mode<br /><small style={{ color: "var(--faint)" }}>interleave prep &amp; cook freely; no nudges</small></span>

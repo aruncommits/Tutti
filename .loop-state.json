@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 36,
-  "lastTick": "2026-06-18T03:35:11.6858972+08:00",
-  "lastTickEpoch": 1781724912,
+  "iteration": 37,
+  "lastTick": "2026-06-18T03:38:48.7460892+08:00",
+  "lastTickEpoch": 1781725129,
   "phase": "brief-v6-learning-loop",
-  "nextResearchTheme": "ROADMAP COMPLETE: Phases 0-4 + Track C delivered (125 tests). Brief v6 authored (Doc 10 Loop A on-device learning). NEXT: Brief v6 item 1 - honest actual-duration capture in CookScreen: stamp Date.now() when a task becomes focus / prior completes; on complete compute gap; guard outliers (<0.3*minMins or >3*maxMins ignored); only elastic active tasks. No fabrication. (item 2 feeds updatePace behind tutti.learnPace opt-in -> populates tutti.pace already fed into compile.)"
+  "nextResearchTheme": "Brief v6 items 1-2 done (honest on-device pace learning feeding tutti.pace; 125 tests). NEXT: item 3 - capped tutti.events log (push {type:node_completed,recipeId,nodeId,category,plannedMins,actualMins,at}, keep last ~200) recorded alongside the pace update in complete(). Then item 4 - Stats/pace view (screen from Home): per-category multipliers + plain-language explanation + estimate-error MAE + 'forget my learning' (clears pace+events) + 'everything stays on this device' line. Then item 5 tests (outlier guard + opt-in gate)."
 }
