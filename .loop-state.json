@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 56,
-  "lastTick": "2026-06-18T11:53:11.4004391+08:00",
-  "lastTickEpoch": 1781754791,
+  "iteration": 57,
+  "lastTick": "2026-06-18T11:57:15.9113931+08:00",
+  "lastTickEpoch": 1781755036,
   "phase": "brief-v16-share-export",
-  "nextResearchTheme": "Brief v15 DONE (timer notifications wired + tested; 172 tests). Brief v16 authored (share/export). NEXT: Brief v16 item 1 - apps/web/src/share.ts: pure formatShoppingList(items):string + formatPlan(plan,dishNames):string, and shareOrCopy(title,text):Promise<'shared'|'copied'|'failed'> (navigator.share if available, AbortError->'shared' quiet; else navigator.clipboard.writeText->'copied'; else 'failed'); feature-detected/jsdom-safe. share.test.ts for formatters + shareOrCopy branch selection with mocked navigator (cleaned up). Then item 2 Share button on ShoppingScreen (+Copied! aria-live), item 3 Share plan on PreviewScreen, item 5 ShoppingScreen test."
+  "nextResearchTheme": "Brief v16 item 1 done (share.ts formatters + shareOrCopy; 178 tests). NEXT: items 2-3+5 - ShoppingScreen 'Share list' button: builds items from buildShoppingList(recipes) (combined), calls shareOrCopy('Tutti shopping list', formatShoppingList(items)); show inline aria-live status (Copied!/Shared/Couldn't copy) via useState. PreviewScreen 'Share plan' button using formatPlan(plan, dishNames) - dishNames from plan recipeIds via dishName. ShoppingScreen test: Share button present + clicking calls shareOrCopy (mock the module). Verify in browser. Then Brief v16 done -> research + author Brief v17."
 }

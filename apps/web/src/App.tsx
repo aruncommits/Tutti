@@ -7,6 +7,7 @@ import { DEFAULT_KITCHEN, toKitchenProfile, type KitchenUi } from "./kitchenMode
 import type { LearnEvent } from "./StatsScreen";
 import { shouldLearn } from "./learn";
 import { addSaved, addRecent, removeMeal, type SavedMeal } from "./meals";
+import { formatPlan, shareOrCopy } from "./share";
 
 // Secondary screens are lazy-loaded so the initial/cook bundle stays lean (Brief v10).
 // AddRecipe pulls @tutti/ingest, so splitting it keeps the parser out of the entry chunk.
@@ -231,7 +232,13 @@ export function App() {
           soonerMins={soonerMins}
         />
       ) : screen === "preview" ? (
-        <PreviewScreen plan={plan} onStart={() => setScreen("cook")} onEdit={() => setScreen("pick")} onSave={saveMeal} />
+        <PreviewScreen
+          plan={plan}
+          onStart={() => setScreen("cook")}
+          onEdit={() => setScreen("pick")}
+          onSave={saveMeal}
+          onShare={() => { void shareOrCopy("Tutti plan", formatPlan(plan, selectedRecipes.map((r) => r.name))); }}
+        />
       ) : screen === "home" ? (
         <Home
           onStart={startCooking}

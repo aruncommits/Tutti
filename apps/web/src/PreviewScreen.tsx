@@ -17,11 +17,13 @@ export function PreviewScreen({
   onStart,
   onEdit,
   onSave,
+  onShare,
 }: {
   plan: MasterExecutionPlan;
   onStart: () => void;
   onEdit: () => void;
   onSave?: () => void;
+  onShare?: () => void;
 }) {
   const start = parseClock(plan.startTime);
   const total = Math.max(1, parseClock(plan.projectedServeTime) - start);
@@ -65,7 +67,10 @@ export function PreviewScreen({
         <button className="btn" onClick={onStart}>Start cooking</button>
         <button className="btn ghost" onClick={onEdit}>Edit</button>
       </div>
-      {onSave && <button className="link" onClick={onSave}>Save this meal</button>}
+      <div className="home-links">
+        {onSave && <button className="link" onClick={onSave}>Save this meal</button>}
+        {onShare && <button className="link" onClick={onShare}>Share plan</button>}
+      </div>
     </section>
   );
 }

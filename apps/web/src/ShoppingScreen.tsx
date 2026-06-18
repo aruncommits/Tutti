@@ -1,6 +1,14 @@
+import { useState } from "react";
 import { buildShoppingList, normalizeIngredientName, type RecipeGraph } from "@tutti/engine";
 import { usePersistentState } from "./state";
 import { colorFor } from "./dishColors";
+import { formatShoppingList, shareOrCopy, type ShareResult } from "./share";
+
+const SHARE_MSG: Record<ShareResult, string> = {
+  shared: "Shared ✓",
+  copied: "Copied to clipboard ✓",
+  failed: "Couldn't share — select the text to copy it",
+};
 
 // Consolidated shopping list (Doc 6; Brief v4 item 4). Combined = one merged list across dishes;
 // Separate = grouped per dish. Check-off persists. Dish color dots show who needs each line.
@@ -15,6 +23,11 @@ export function ShoppingScreen({ recipes, onBack }: { recipes: RecipeGraph[]; on
   const toggle = (key: string) => setChecked((p) => (p.includes(key) ? p.filter((k) => k !== key) : [...p, key]));
 
   const combined = buildShoppingList(recipes);
+  const [shareMsg, setShareMsg] = useState<string | null>(null);
+  const onShare = async () => {
+    const text = formatShoppingList(combined.map((i) => ({ name: i.name, amount: i.amount, unit: i.unit, toTaste: i.toTaste })));
+    setShareMsg(SHARE_MSG[await shareOrCopy("Tutti shopping list", text)]);
+  };
 
   return (
     <section className="zone" aria-label="Shopping list">
@@ -71,6 +84,8 @@ export function ShoppingScreen({ recipes, onBack }: { recipes: RecipeGraph[]; on
         })
       )}
 
+      <button className="btn ghost" style={{ marginTop: 14 }} onClick={onShare}>📤 Share list</button>
+      {shareMsg && <p className="hint" aria-live="polite">{shareMsg}</p>}
       <div className="home-links"><button className="link" onClick={onBack}>Back</button></div>
     </section>
   );
