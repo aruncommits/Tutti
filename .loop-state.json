@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 52,
-  "lastTick": "2026-06-18T11:24:07.4832388+08:00",
-  "lastTickEpoch": 1781753048,
-  "phase": "brief-v13-cook-with-help",
-  "nextResearchTheme": "Brief v13 item 1 done (engine multi-cook parallelism locked: 2 cooks strictly shorten thali; 160 tests). NEXT: items 2-4 - surface cook-count in the planning flow. In App, the live preview already uses toKitchenProfile(kitchen) which carries kitchen.cooks. Add a compact 'Cooking with help?' hands stepper (1-4) to the ServeTimeScreen (or PreviewScreen) that edits kitchen.cooks via setKitchen. Item 3: when cooks>1, also compute the solo plan (compile with cooks:1) and show honest delta 'ready N min sooner than solo' (or 'about the same' if no saving). Pass needed props down. Item 5: web test that bumping cooks changes shown serve time/delta + browser verify thali faster with 2 cooks."
+  "iteration": 53,
+  "lastTick": "2026-06-18T11:32:37.7416770+08:00",
+  "lastTickEpoch": 1781753558,
+  "phase": "brief-v14-hands-lanes",
+  "nextResearchTheme": "Brief v13 DONE (cook-with-help visible: 2 cooks -> 15min less, surfaced+tested; 164 tests). Brief v14 authored (hands-lanes who-does-what). NEXT: Brief v14 item 1 - in packages/engine/src/schedule.ts forward pass, capture which hands-unit index each active task is assigned and record schedule[nodeId].hand (0-based; undefined for passive). Add hand? to ScheduledTask type. Engine test (hands.test or extend cooks.test): compile thali cooks:2 ample kitchen -> some instant has 2 active tasks on DISTINCT hands, and no two simultaneously-active tasks share a hand (exclusivity invariant). Then item 2 surface hand in viewstate, item 3 lane chips in CookScreen when cooks>1 (You/Cook 2), item 4 glanceability, item 5 tests+browser verify."
 }

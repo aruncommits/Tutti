@@ -29,6 +29,18 @@
   --display: "Bodoni Moda", "Times New Roman", serif;
   --body: "Instrument Sans", system-ui, sans-serif;
   --mono: "Spline Sans Mono", ui-monospace, monospace;
+
+  /* ---- fluid foundation (responsive: 320px phone → 1440px desktop) ---- */
+  --wrap: 720px;                                  /* reading column; widens on desktop */
+  --gutter: clamp(16px, 4vw, 40px);               /* page side padding */
+  --reading: 70ch;                                /* max line length for prose */
+  --fs-time: clamp(2.1rem, 7vw, 2.8rem);          /* .time */
+  --fs-display-lg: clamp(1.9rem, 5.2vw, 2.6rem);  /* .ob-title, .finale .big */
+  --fs-display-md: clamp(1.25rem, 3.6vw, 1.55rem);/* .now-title */
+  --fs-brand: clamp(1.35rem, 4vw, 1.6rem);        /* .brand */
+}
+@media (min-width: 1024px) {
+  :root { --wrap: 1080px; } /* desktop: expand into the space */
 }
 * {
   box-sizing: border-box;
@@ -58,9 +70,11 @@ body {
   border-radius: 6px;
 }
 .wrap {
-  max-width: 720px;
+  max-width: var(--wrap);
   margin: 0 auto;
-  padding: 22px 20px 90px;
+  padding: clamp(16px, 3vw, 24px) var(--gutter) calc(72px + env(safe-area-inset-bottom));
+  padding-left: max(var(--gutter), env(safe-area-inset-left));
+  padding-right: max(var(--gutter), env(safe-area-inset-right));
 }
 
 /* ---- masthead: a concert program header ---- */
@@ -117,7 +131,7 @@ header {
 .brand {
   font-family: var(--display);
   font-weight: 600;
-  font-size: 25px;
+  font-size: var(--fs-brand);
   letter-spacing: 0.01em;
   line-height: 1;
 }
@@ -165,7 +179,7 @@ header {
 }
 .time {
   font-family: var(--mono);
-  font-size: 36px;
+  font-size: var(--fs-time);
   font-weight: 500;
   letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums;
@@ -381,7 +395,7 @@ header {
 }
 .now-title {
   font-family: var(--display);
-  font-size: 23px;
+  font-size: var(--fs-display-md);
   font-weight: 600;
   line-height: 1.15;
   margin-bottom: 10px;

@@ -5,7 +5,7 @@
 // Pure functions over plain data. No LLM, no UI, no clock on the cooking path.
 
 import type { KitchenProfile, ResourceRequirement, ScheduleEntry, TaskNode } from "./types";
-import { capacityOf, nodeRequirements, normalizeKitchen } from "./resources";
+import { HANDS, capacityOf, nodeRequirements, normalizeKitchen } from "./resources";
 import { formatClock, parseClock } from "./time";
 
 /** Deterministic topological order (Kahn's, ties broken by nodeId for stable output). */
@@ -124,6 +124,7 @@ interface Interval {
 export interface ForwardScheduleEntry {
   start: number; // minutes from t0
   end: number;
+  hand?: number; // 0-based hands-lane for active tasks (Brief v14); undefined for passive
 }
 
 export interface ForwardSchedule {
@@ -218,6 +219,9 @@ export function scheduleForward(nodes: TaskNode[], kitchen: KitchenProfile): For
   const timeline = new Map<string, Interval[]>();
   const entries: Record<string, ForwardScheduleEntry> = {};
   const scheduled = new Set<string>();
+  // Hands-lanes (Brief v14): track per-cook occupancy so each active task gets a concrete cook.
+  // The forward pass already guarantees ≤ `cooks` concurrent active tasks, so a free lane exists.
+  const handLanes: Interval[][] = Array.from({ length: Math.max(1, capOf(HANDS)) }, () => []);
 
   const depsScheduled = (n: TaskNode) => n.dependencies.every((d) => !byId.has(d) || scheduled.has(d));
 
@@ -232,7 +236,14 @@ export function scheduleForward(nodes: TaskNode[], kitchen: KitchenProfile): For
     const dur = node.duration.estMins;
     const start = earliestFeasibleStart(reqs, capOf, timeline, minStart, dur);
     const end = start + dur;
-    entries[id] = { start, end };
+    // Assign the lowest-index free hands-lane for an active task's window (exclusive use).
+    let hand: number | undefined;
+    if (reqs.some((r) => r.category === HANDS)) {
+      const j = handLanes.findIndex((lane) => lane.every((iv) => iv.end <= start || iv.start >= end));
+      hand = j >= 0 ? j : 0; // a free lane always exists given capacity; degrade to 0 defensively
+      handLanes[hand]!.push({ start, end });
+    }
+    entries[id] = { start, end, hand };
     for (const req of reqs) {
       const list = timeline.get(req.category) ?? [];
       for (let i = 0; i < req.count; i++) list.push({ start, end });
@@ -315,6 +326,7 @@ export function anchor(
       earliestStart: e.start,
       latestStart: latestStart.get(id)!,
       slackMins: latestStart.get(id)! - e.start,
+      hand: e.hand,
     };
   }
 

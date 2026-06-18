@@ -80,6 +80,7 @@ export interface ScheduleEntry {
   earliestStart: number; // minutes from t0
   latestStart: number;
   slackMins: number;
+  hand?: number; // 0-based hands-unit (cook) assigned to an active task; undefined for passive (Brief v14)
 }
 
 export interface MasterExecutionPlan {

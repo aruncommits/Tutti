@@ -519,6 +519,7 @@ exports[`compile — MasterExecutionPlan (Doc 2 §2.4, §4) > matches the golden
   "schedule": {
     "kz_1": {
       "earliestStart": 30,
+      "hand": 0,
       "latestStart": 30,
       "plannedEnd": "19:15:00",
       "plannedStart": "19:09:00",
@@ -526,6 +527,7 @@ exports[`compile — MasterExecutionPlan (Doc 2 §2.4, §4) > matches the golden
     },
     "kz_2": {
       "earliestStart": 0,
+      "hand": 0,
       "latestStart": 21,
       "plannedEnd": "18:46:00",
       "plannedStart": "18:39:00",
@@ -533,6 +535,7 @@ exports[`compile — MasterExecutionPlan (Doc 2 §2.4, §4) > matches the golden
     },
     "kz_3": {
       "earliestStart": 10,
+      "hand": 0,
       "latestStart": 25,
       "plannedEnd": "18:52:00",
       "plannedStart": "18:49:00",
@@ -540,6 +543,7 @@ exports[`compile — MasterExecutionPlan (Doc 2 §2.4, §4) > matches the golden
     },
     "kz_4": {
       "earliestStart": 13,
+      "hand": 0,
       "latestStart": 28,
       "plannedEnd": "19:00:00",
       "plannedStart": "18:52:00",
@@ -547,6 +551,7 @@ exports[`compile — MasterExecutionPlan (Doc 2 §2.4, §4) > matches the golden
     },
     "kz_5": {
       "earliestStart": 36,
+      "hand": undefined,
       "latestStart": 36,
       "plannedEnd": "19:30:00",
       "plannedStart": "19:15:00",
@@ -554,6 +559,7 @@ exports[`compile — MasterExecutionPlan (Doc 2 §2.4, §4) > matches the golden
     },
     "po_1": {
       "earliestStart": 21,
+      "hand": 0,
       "latestStart": 30,
       "plannedEnd": "19:09:00",
       "plannedStart": "19:00:00",
@@ -561,6 +567,7 @@ exports[`compile — MasterExecutionPlan (Doc 2 §2.4, §4) > matches the golden
     },
     "po_2": {
       "earliestStart": 36,
+      "hand": 0,
       "latestStart": 36,
       "plannedEnd": "19:18:00",
       "plannedStart": "19:15:00",
@@ -568,6 +575,7 @@ exports[`compile — MasterExecutionPlan (Doc 2 §2.4, §4) > matches the golden
     },
     "po_3": {
       "earliestStart": 39,
+      "hand": 0,
       "latestStart": 39,
       "plannedEnd": "19:28:00",
       "plannedStart": "19:18:00",
@@ -575,6 +583,7 @@ exports[`compile — MasterExecutionPlan (Doc 2 §2.4, §4) > matches the golden
     },
     "po_4": {
       "earliestStart": 49,
+      "hand": 0,
       "latestStart": 49,
       "plannedEnd": "19:30:00",
       "plannedStart": "19:28:00",
@@ -582,6 +591,7 @@ exports[`compile — MasterExecutionPlan (Doc 2 §2.4, §4) > matches the golden
     },
     "ri_1": {
       "earliestStart": 7,
+      "hand": 0,
       "latestStart": 23,
       "plannedEnd": "18:49:00",
       "plannedStart": "18:46:00",
@@ -589,6 +599,7 @@ exports[`compile — MasterExecutionPlan (Doc 2 §2.4, §4) > matches the golden
     },
     "ri_2": {
       "earliestStart": 10,
+      "hand": undefined,
       "latestStart": 26,
       "plannedEnd": "19:09:00",
       "plannedStart": "18:49:00",
@@ -596,6 +607,7 @@ exports[`compile — MasterExecutionPlan (Doc 2 §2.4, §4) > matches the golden
     },
     "ri_3": {
       "earliestStart": 30,
+      "hand": undefined,
       "latestStart": 46,
       "plannedEnd": "19:14:00",
       "plannedStart": "19:09:00",
