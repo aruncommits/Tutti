@@ -16,6 +16,7 @@ import { isStringArray, isPlainObject, isMealArray, isScreen, isClock } from "./
 import { factorForPeople } from "./servings";
 import { useInstallPrompt } from "./useInstallPrompt";
 import { suggestMeal, type Suggestion } from "./suggest";
+import { addPhoto, resizeToThumb, type Photos } from "./photos";
 
 // Secondary screens are lazy-loaded so the initial/cook bundle stays lean (Brief v10).
 // AddRecipe pulls @tutti/ingest, so splitting it keeps the parser out of the entry chunk.
@@ -63,6 +64,10 @@ export function App() {
   const [pantry, setPantry] = usePersistentState<Pantry>("tutti.pantry", [], isStringArray);
   const [people, setPeople] = usePersistentState<number>("tutti.people", 4, (v) => typeof v === "number");
   const [metric, setMetric] = usePersistentState<boolean>("tutti.metric", false, (v) => typeof v === "boolean");
+  const [photos, setPhotos] = usePersistentState<Photos>("tutti.photos", {}, isPlainObject);
+  const onPhoto = (id: string, file: File) => {
+    resizeToThumb(file).then((u) => setPhotos((p) => addPhoto(p, id, u))).catch(() => { /* unsupported / too big */ });
+  };
   const { canInstall, promptInstall } = useInstallPrompt();
   const paceAdjusted = Object.entries(pace).filter(([, m]) => Math.abs(m - 1) > 0.05);
   const focusAtRef = useRef<number | null>(null); // wall-clock boundary for honest actual-duration capture
@@ -215,6 +220,8 @@ export function App() {
           dishesForReview={[...new Set(plan.nodes.map((n) => n.recipeId))]}
           onRate={(id, n) => setNotes((m) => setRating(m, id, n))}
           onNote={(id, s) => setNotes((m) => setNote(m, id, s))}
+          photos={photos}
+          onPhoto={onPhoto}
         />
       ) : screen === "kitchen" ? (
         <KitchenScreen kitchen={kitchen} onChange={setKitchen} avoid={avoid} onToggleAvoid={toggleAvoid} onDone={() => setScreen("home")} />
@@ -224,6 +231,7 @@ export function App() {
         <BrowseScreen
           avoid={avoid}
           notes={notes}
+          photos={photos}
           onPick={addCandidate}
           onDetails={(r) => { setDetailRecipe(r); setScreen("recipe"); }}
           onBack={() => setScreen("home")}
@@ -233,6 +241,7 @@ export function App() {
           recipe={detailRecipe}
           note={notes[detailRecipe.recipeId]}
           metric={metric}
+          photo={photos[detailRecipe.recipeId]}
           onAdd={() => addCandidate(detailRecipe)}
           onBack={() => setScreen("browse")}
         />
@@ -323,6 +332,7 @@ export function App() {
           kitchen={kitchen}
           metric={metric}
           notes={notes}
+          photos={photos}
           onStart={startCooking}
           onBack={() => setScreen("preview")}
         />

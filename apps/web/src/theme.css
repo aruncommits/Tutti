@@ -606,7 +606,7 @@ header {
 
 /* ---- onboarding ---- */
 .onboarding {
-  min-height: min(70vh, 560px);
+  min-height: min(70dvh, 560px);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -795,7 +795,7 @@ header {
 .url-input {
   width: 100%;
   font-family: inherit;
-  font-size: 14px;
+  font-size: 16px; /* >=16px so iOS Safari doesn't zoom on focus */
   padding: 12px 14px;
   margin-bottom: 12px;
   border-radius: 12px;
@@ -1008,8 +1008,8 @@ header {
 }
 /* simmering = a light tint of the dish colour, hands free */
 .gantt-bar.passive {
-  background: color-mix(in srgb, currentColor 22%, white) !important;
-  border: 1.5px solid color-mix(in srgb, currentColor 45%, white);
+  background: color-mix(in srgb, currentColor 24%, var(--surface)) !important;
+  border: 1.5px solid color-mix(in srgb, currentColor 50%, var(--surface));
   box-shadow: none;
 }
 @keyframes phrase-in {
@@ -1184,7 +1184,7 @@ header {
 .review-h { font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); margin-bottom: 8px; }
 .review-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 8px 0; border-top: 1px solid var(--line); }
 .review-name { display: flex; align-items: center; gap: 8px; min-width: 120px; flex: 1; }
-.review-note { flex: 1 1 100%; font-family: inherit; font-size: 13px; padding: 8px 10px; border-radius: 8px;
+.review-note { flex: 1 1 100%; font-family: inherit; font-size: 16px; padding: 8px 10px; border-radius: 8px;
   border: 1px solid var(--card-edge); background: var(--surface); color: var(--ink); }
 
 /* "what should I cook?" suggestion */
@@ -1255,3 +1255,216 @@ header {
 .last-note { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--line); }
 .last-note .nm { font-weight: 500; }
 .last-note .sub-hint { flex: 1 1 100%; margin: 2px 0 0; }
+
+/* =====================================================================
+   APP SHELL — sidebar on desktop, bottom tab bar on phones, settings gear.
+   Mobile-first: single column + fixed bottom nav; ≥960px swaps to a
+   sticky sidebar + a comfortable content column. (Replaces .wrap for the
+   main app; onboarding still uses .wrap.)
+   ===================================================================== */
+:root { --content: 880px; }
+
+.shell { width: 100%; }
+.content-col {
+  width: 100%;
+  max-width: 940px;
+  margin: 0 auto;
+  padding: clamp(12px, 3vw, 20px) var(--gutter) calc(76px + env(safe-area-inset-bottom));
+  padding-left: max(var(--gutter), env(safe-area-inset-left));
+  padding-right: max(var(--gutter), env(safe-area-inset-right));
+}
+
+/* shared nav icon */
+.nav-ico { width: 22px; height: 22px; display: block; flex: none; }
+
+/* mobile top bar (logo + gear) */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding-top: env(safe-area-inset-top);
+}
+.gear-btn {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  display: grid;
+  place-items: center;
+  border: none;
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+}
+.gear-btn:hover,
+.gear-btn.on { color: var(--accent-deep); }
+
+/* desktop sidebar (hidden on mobile) */
+.sidebar { display: none; }
+
+/* bottom tab bar (mobile) */
+.bottom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  display: flex;
+  justify-content: space-around;
+  align-items: stretch;
+  gap: 2px;
+  padding: 6px 4px;
+  padding-bottom: calc(6px + env(safe-area-inset-bottom));
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  -webkit-backdrop-filter: saturate(1.4) blur(12px);
+  backdrop-filter: saturate(1.4) blur(12px);
+  border-top: 1px solid var(--line);
+}
+.tab {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 2px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 10.5px;
+  font-weight: 600;
+  border-radius: 10px;
+}
+.tab.on { color: var(--accent-deep); }
+.tab.on .nav-ico { transform: translateY(-1px); }
+
+@media (min-width: 960px) {
+  .shell {
+    display: grid;
+    grid-template-columns: 248px minmax(0, 1fr);
+    gap: clamp(20px, 3vw, 48px);
+    max-width: 1340px;
+    margin: 0 auto;
+    padding: 0 clamp(16px, 2.5vw, 40px);
+  }
+  .topbar { display: none; }
+  .bottom-nav { display: none; }
+  .content-col {
+    max-width: var(--content);
+    margin: 0;
+    padding: clamp(22px, 3vw, 40px) 0 64px;
+  }
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    padding: 22px 8px;
+  }
+  .sidebar-top { padding: 0 8px 16px; }
+  .side-nav { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+  .sidebar-foot { padding-top: 8px; border-top: 1px solid var(--line); }
+  .side-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: 12px;
+    border: none;
+    background: none;
+    color: var(--muted);
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+  }
+  .side-link .nav-ico { width: 20px; height: 20px; }
+  .side-link:hover { background: var(--bg-tint); color: var(--ink); }
+  .side-link.on { background: var(--accent-soft); color: var(--accent-deep); font-weight: 600; }
+}
+
+/* home: two primary actions side-by-side on wider screens, stacked on phones */
+.home-cta { display: flex; flex-wrap: wrap; gap: 12px; margin: 8px 0 16px; }
+.home-cta .big-btn { width: auto; margin: 0; flex: 1 1 200px; }
+
+/* settings: a row that navigates (Your pace) */
+.settings-link {
+  width: 100%;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+.settings-chevron { color: var(--faint); font-size: 22px; line-height: 1; }
+
+/* Don't let primary buttons become banners on desktop. */
+@media (min-width: 760px) {
+  .big-btn,
+  .suggest-card .btn,
+  .add-dish,
+  .act .btn { max-width: 24rem; }
+  .home-cta .big-btn { max-width: none; } /* the pair shares the row */
+}
+
+/* Comfortable touch targets on touch devices. */
+@media (pointer: coarse) {
+  .scale-btn,
+  .kp-toggle,
+  .chip-toggle,
+  .subtab,
+  .tab,
+  .gear-btn,
+  .side-link,
+  .link { min-height: 44px; }
+}
+
+/* keep nav chrome out of print */
+@media print {
+  .sidebar, .topbar, .bottom-nav, .gear-btn { display: none !important; }
+}
+
+/* =====================================================================
+   AUTO DARK MODE — warm espresso variant, follows the device setting.
+   Overrides tokens only; every component reads vars, so the whole app
+   re-themes. Drop-shadows become hairlines (invisible on dark).
+   ===================================================================== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1b1611;
+    --bg-tint: #272019;
+    --surface: #2a221b;
+    --ink: #f1e8da;
+    --muted: #b7aa96;
+    --faint: #8f8270;
+
+    --accent: #e07a45;
+    --accent-deep: #c75d33;
+    --accent-soft: rgba(224, 122, 69, 0.16);
+
+    --card: #2a221b;
+    --card-strong: #342a21;
+    --card-edge: rgba(245, 236, 222, 0.1);
+    --line: rgba(245, 236, 222, 0.08);
+    --staff: rgba(245, 236, 222, 0.12);
+
+    --shadow: 0 0 0 1px var(--card-edge), 0 8px 24px -16px rgba(0, 0, 0, 0.6);
+    --shadow-sm: 0 0 0 1px var(--card-edge);
+  }
+  body {
+    background-image: linear-gradient(180deg, #211a14, var(--bg) 260px);
+  }
+  .btn { color: #1b1208; } /* dark ink on the brighter terracotta reads better */
+  .nudge { color: #9bd587; background: rgba(79, 154, 58, 0.16); }
+  .bottom-nav { background: color-mix(in srgb, var(--surface) 88%, transparent); }
+}
+
+/* finished-dish photos (Brief v33) */
+.dish-thumb { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; flex: none; }
+.dish-thumb-lg { width: 100%; max-width: 320px; height: auto; max-height: 220px; border-radius: 14px; margin: 4px 0 12px; }
+@media print { .dish-thumb, .dish-thumb-lg { display: none !important; } }
