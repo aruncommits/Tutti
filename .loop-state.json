@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 80,
-  "lastTick": "2026-06-18T06:25:00.080Z",
-  "lastTickEpoch": 1781763900,
-  "phase": "brief-v27-install-prompt",
-  "nextResearchTheme": "Brief v27 item 1 done (useInstallPrompt; 250 tests; RESUMED after 4th ~8h stall). NEXT: items 2+5 - App: const {canInstall, promptInstall}=useInstallPrompt(); pass canInstall + onInstall=promptInstall to <Home>. Home: add props canInstall:boolean, onInstall:()=>void; when canInstall render a subtle button (className btn ghost) in home-links: \"Install Tutti\" -> onInstall. Hidden otherwise. item 5: a Home render test (render App OR Home with canInstall true + onInstall spy) asserting the Install button appears + click calls onInstall; and that it is absent when canInstall false. Then Brief v27 done -> research + Brief v28 (photos/units/onboarding/other)."
+  "iteration": 81,
+  "lastTick": "2026-06-18T06:30:33.827Z",
+  "lastTickEpoch": 1781764233,
+  "phase": "brief-v28-a11y-perf-reaudit",
+  "nextResearchTheme": "Brief v27 DONE (install prompt; 251 tests). Brief v28 authored (a11y+perf re-audit). NEXT: Brief v28 items 1-2 - run Chrome DevTools MCP lighthouse_audit (mobile, navigation) on http://localhost:5180 home; then navigate browse/recipe/ready/settings via localStorage screen + audit a heavy one; collect failing audits (contrast on --faint/.dur/.sub-hint/.kp-desc, unlabeled inputs, heading-order, icon-button names). Fix critical/serious minimally (aria-labels, bump contrast token, headings). Re-run audit -> a11y 100. Item 4: add structural a11y tests for new screens (RecipeDetail/Mise/Settings have h2; icon buttons named). Keep gate green; record scores in commit."
 }

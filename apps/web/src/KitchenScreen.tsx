@@ -21,7 +21,7 @@ function Toggle({ label, on, onToggle }: { label: string; on: boolean; onToggle:
   return (
     <div className="kp-row">
       <span className="kp-label">{label}</span>
-      <button className={`kp-toggle${on ? " on" : ""}`} role="switch" aria-checked={on} aria-label={label} onClick={onToggle}>
+      <button className={`kp-toggle${on ? " on" : ""}`} role="switch" aria-checked={on} aria-label={`${label}, ${on ? "On" : "Off"}`} onClick={onToggle}>
         {on ? "On" : "Off"}
       </button>
     </div>

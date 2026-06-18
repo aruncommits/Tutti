@@ -15,7 +15,7 @@
   --bg2: #ffffff;      /* legacy alias → white surface */
   --ink: #2c2117;      /* roasted-spice near-black */
   --muted: #7c6e5b;    /* warm taupe */
-  --faint: #a99e8b;    /* faint warm — small labels */
+  --faint: #6e6354;    /* faint warm — small labels (>=4.5:1 on cream, Brief v28) */
 
   /* clay-pot terracotta */
   --accent: #c75d33;
@@ -576,7 +576,7 @@ header {
   border-radius: 20px;
   border: 1px solid var(--card-edge);
   background: var(--bg-tint);
-  color: var(--muted);
+  color: var(--ink); /* off-state label needs >=4.5:1 on the tint (Brief v28) */
   cursor: pointer;
 }
 .kp-toggle.on {

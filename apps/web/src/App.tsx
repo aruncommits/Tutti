@@ -202,7 +202,7 @@ export function App() {
         Skip to content
       </a>
       <header>
-        <button className="logo" onClick={() => setScreen("home")} aria-label="Home">
+        <button className="logo" onClick={() => setScreen("home")} aria-label="Tutti — home">
           <div className="mark">T</div>
           <div className="brand">Tutti<small>the whole meal, ready at once</small></div>
         </button>
@@ -416,7 +416,7 @@ function Home({
       </div>
       <div className="kp-row" style={{ marginTop: 16 }}>
         <span className="kp-label">Pro mode<br /><small style={{ color: "var(--faint)" }}>interleave prep &amp; cook freely; no nudges</small></span>
-        <button className={`kp-toggle${pro ? " on" : ""}`} role="switch" aria-checked={pro} aria-label="Pro mode" onClick={onTogglePro}>
+        <button className={`kp-toggle${pro ? " on" : ""}`} role="switch" aria-checked={pro} aria-label={`Pro mode, ${pro ? "On" : "Off"}`} onClick={onTogglePro}>
           {pro ? "On" : "Off"}
         </button>
       </div>

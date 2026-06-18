@@ -64,7 +64,7 @@ export function StatsScreen({
 
       <div className="kp-row" style={{ marginTop: 12 }}>
         <span className="kp-label">Learn from my cooking</span>
-        <button className={`kp-toggle${learnPace ? " on" : ""}`} role="switch" aria-checked={learnPace} aria-label="Learn from my cooking" onClick={onToggleLearn}>
+        <button className={`kp-toggle${learnPace ? " on" : ""}`} role="switch" aria-checked={learnPace} aria-label={`Learn from my cooking, ${learnPace ? "On" : "Off"}`} onClick={onToggleLearn}>
           {learnPace ? "On" : "Off"}
         </button>
       </div>

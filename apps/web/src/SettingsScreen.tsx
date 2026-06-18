@@ -25,7 +25,7 @@ export function SettingsScreen({
   const Toggle = ({ on, onToggle, label, desc }: { on: boolean; onToggle: () => void; label: string; desc: string }) => (
     <div className="kp-row">
       <span className="kp-label">{label}<small className="kp-desc">{desc}</small></span>
-      <button className={`kp-toggle${on ? " on" : ""}`} role="switch" aria-checked={on} aria-label={label} onClick={onToggle}>
+      <button className={`kp-toggle${on ? " on" : ""}`} role="switch" aria-checked={on} aria-label={`${label}, ${on ? "On" : "Off"}`} onClick={onToggle}>
         {on ? "On" : "Off"}
       </button>
     </div>
