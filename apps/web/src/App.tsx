@@ -15,6 +15,7 @@ import { suggestMeal, type Suggestion } from "./suggest";
 // AddRecipe pulls @tutti/ingest, so splitting it keeps the parser out of the entry chunk.
 const KitchenScreen = lazy(() => import("./KitchenScreen").then((m) => ({ default: m.KitchenScreen })));
 const MealsScreen = lazy(() => import("./MealsScreen").then((m) => ({ default: m.MealsScreen })));
+const RecipeDetailScreen = lazy(() => import("./RecipeDetailScreen").then((m) => ({ default: m.RecipeDetailScreen })));
 const OnboardingScreen = lazy(() => import("./OnboardingScreen").then((m) => ({ default: m.OnboardingScreen })));
 const PreviewScreen = lazy(() => import("./PreviewScreen").then((m) => ({ default: m.PreviewScreen })));
 const AddRecipe = lazy(() => import("./AddRecipe").then((m) => ({ default: m.AddRecipe })));
@@ -28,7 +29,7 @@ const ALL_DISHES = thaliV1.recipes.map((r) => r.recipeId);
 
 const SCREEN_NAMES: Record<Screen, string> = {
   onboarding: "Welcome", kitchen: "Your kitchen", home: "Home", addRecipe: "Add a dish",
-  browse: "Browse recipes", shopping: "Shopping list", stats: "Your pace", meals: "Your meals", pick: "Pick dishes",
+  browse: "Browse recipes", recipe: "Recipe", shopping: "Shopping list", stats: "Your pace", meals: "Your meals", pick: "Pick dishes",
   serveTime: "Serve time", preview: "Plan preview", cook: "Cook mode", done: "Done",
 };
 
@@ -50,6 +51,7 @@ export function App() {
   const [events, setEvents] = usePersistentState<LearnEvent[]>("tutti.events", []);
   const [meals, setMeals] = usePersistentState<SavedMeal[]>("tutti.meals", []);
   const [notes, setNotes] = usePersistentState<NotesMap>("tutti.recipeNotes", {});
+  const [detailRecipe, setDetailRecipe] = useState<RecipeGraph | null>(null);
   const paceAdjusted = Object.entries(pace).filter(([, m]) => Math.abs(m - 1) > 0.05);
   const focusAtRef = useRef<number | null>(null); // wall-clock boundary for honest actual-duration capture
   const allRecipes = [...thaliV1.recipes, ...candidates];
@@ -207,7 +209,20 @@ export function App() {
       ) : screen === "addRecipe" ? (
         <AddRecipe onAdd={addCandidate} onBack={() => setScreen("home")} />
       ) : screen === "browse" ? (
-        <BrowseScreen avoid={avoid} notes={notes} onPick={addCandidate} onBack={() => setScreen("home")} />
+        <BrowseScreen
+          avoid={avoid}
+          notes={notes}
+          onPick={addCandidate}
+          onDetails={(r) => { setDetailRecipe(r); setScreen("recipe"); }}
+          onBack={() => setScreen("home")}
+        />
+      ) : screen === "recipe" && detailRecipe ? (
+        <RecipeDetailScreen
+          recipe={detailRecipe}
+          note={notes[detailRecipe.recipeId]}
+          onAdd={() => addCandidate(detailRecipe)}
+          onBack={() => setScreen("browse")}
+        />
       ) : screen === "shopping" ? (
         <ShoppingScreen recipes={selectedRecipes.length ? selectedRecipes : allRecipes} onBack={() => setScreen("pick")} />
       ) : screen === "meals" ? (

@@ -14,11 +14,13 @@ export function BrowseScreen({
   avoid,
   notes = {},
   onPick,
+  onDetails,
   onBack,
 }: {
   avoid: string[];
   notes?: NotesMap;
   onPick: (r: RecipeGraph) => void;
+  onDetails?: (r: RecipeGraph) => void;
   onBack: () => void;
 }) {
   const [query, setQuery] = useState("");
@@ -63,17 +65,22 @@ export function BrowseScreen({
         {filtered.map((e) => {
           const note = notes[e.recipe.recipeId];
           return (
-          <button key={e.recipe.recipeId} className="pick-row browse-row" onClick={() => onPick(e.recipe)} aria-label={`Add ${e.recipe.name}`}>
-            <span className="pick-main" style={{ pointerEvents: "none" }}>
-              <span className="swatch" style={{ background: colorFor(e.recipe.recipeId) }} />
-              <span className="node-title">{e.recipe.name}</span>
-              {note?.rating ? <Stars value={note.rating} /> : null}
-              {note && note.cookCount > 0 ? <span className="cooked-n">cooked {note.cookCount}×</span> : null}
-              {e.allergens.map((a) => <span key={a} className="badge-allergen" title="contains">{a}</span>)}
-              <span className="dur">{e.totalMins}m</span>
-              <span className="browse-add">+ Add</span>
-            </span>
-          </button>
+          <div key={e.recipe.recipeId} className="browse-line">
+            <button className="pick-row browse-row" onClick={() => onPick(e.recipe)} aria-label={`Add ${e.recipe.name}`}>
+              <span className="pick-main" style={{ pointerEvents: "none" }}>
+                <span className="swatch" style={{ background: colorFor(e.recipe.recipeId) }} />
+                <span className="node-title">{e.recipe.name}</span>
+                {note?.rating ? <Stars value={note.rating} /> : null}
+                {note && note.cookCount > 0 ? <span className="cooked-n">cooked {note.cookCount}×</span> : null}
+                {e.allergens.map((a) => <span key={a} className="badge-allergen" title="contains">{a}</span>)}
+                <span className="dur">{e.totalMins}m</span>
+                <span className="browse-add">+ Add</span>
+              </span>
+            </button>
+            {onDetails && (
+              <button className="browse-info" aria-label={`View ${e.recipe.name}`} onClick={() => onDetails(e.recipe)}>ⓘ</button>
+            )}
+          </div>
           );
         })}
         </div>

@@ -1268,3 +1268,16 @@ button:focus-visible, a:focus-visible, input:focus-visible,
 .suggest-name { font-family: var(--display); font-size: 22px; font-weight: 600; margin: 4px 0 2px; }
 .suggest-card .hint { margin-bottom: 12px; }
 .suggest-card .btn { width: 100%; padding: 12px; }
+
+/* recipe detail + browse details affordance (Brief v19) */
+.browse-line { display: flex; align-items: stretch; gap: 8px; }
+.browse-line .browse-row { flex: 1; }
+.browse-info { flex: none; width: 44px; border-radius: 14px; border: 1px solid var(--card-edge);
+  background: var(--card); color: var(--muted); font-size: 18px; cursor: pointer; }
+.recipe-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.recipe-steps { margin: 4px 0 16px; padding-left: 22px; display: flex; flex-direction: column; gap: 10px; }
+.recipe-step { padding-left: 4px; }
+.recipe-step-title { display: block; font-weight: 500; }
+.recipe-step-meta { display: inline-flex; align-items: center; gap: 8px; margin-top: 3px; }
+.hands-free { font-size: 11px; color: var(--poriyal); border: 1px solid var(--card-edge); border-radius: 8px; padding: 1px 7px; }
+.recipe-note-text { color: var(--muted); font-style: italic; }

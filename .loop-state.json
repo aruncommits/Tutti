@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 62,
-  "lastTick": "2026-06-18T12:27:51.8485785+08:00",
-  "lastTickEpoch": 1781756872,
+  "iteration": 63,
+  "lastTick": "2026-06-18T12:31:36.7276601+08:00",
+  "lastTickEpoch": 1781757097,
   "phase": "brief-v19-recipe-detail",
-  "nextResearchTheme": "Brief v18 DONE (Home suggestion card; 196 tests). Brief v19 authored (recipe detail/read view). NEXT: Brief v19 item 1 - apps/web/src/recipeView.ts pure: orderedSteps(recipe):TaskNode[] (topo order respecting dependencies - check if engine exports topoSort from index; else small local Kahn), recipeIngredients(recipe):ShareItem[] (reuse buildShoppingList([recipe]) mapped to {name,amount,unit,toTaste}), recipeTotalMins(recipe). recipeView.test.ts: ordering respects deps (a node never before its dep), ingredients aggregate. Then item 2 RecipeDetailScreen (lazy) + 'recipe' screen, item 3 open from Browse (details affordance distinct from +Add) + App detailRecipe state, item 5 tests."
+  "nextResearchTheme": "Brief v19 item 1 done (recipeView orderedSteps/recipeIngredients/recipeTotalMins; 199 tests). NEXT: items 2-3+5 - RecipeDetailScreen.tsx (lazy in App): props recipe, note?, onAdd, onBack; header name + total mins + serves + allergen badges (allergensOf) + ★rating/cookCount/note if present; Ingredients section (recipeIngredients); numbered <ol> Steps (orderedSteps) each with title + phase chip + duration + 'hands-free' tag when attention passive; 'Add to meal' button -> onAdd. Add 'recipe' to Screen union + App detailRecipe state (RecipeGraph|null); route screen==='recipe' -> <RecipeDetailScreen recipe={detailRecipe} note={notes[id]} onAdd={()=>addCandidate(detailRecipe)} onBack={()=>setScreen('browse')}/>. BrowseScreen: add a 'details' affordance per row (e.g. an ⓘ button) distinct from the row's +Add, calling onDetails(recipe); App passes onDetails=(r)=>{setDetailRecipe(r); setScreen('recipe')}. Item 5: RecipeDetail render test (ingredients + N numbered steps for a library recipe; Add to meal calls onAdd). Verify in browser. Then Brief v19 done -> research + Brief v20."
 }

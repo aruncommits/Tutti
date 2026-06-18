@@ -8,6 +8,7 @@ export type Screen =
   | "home"
   | "addRecipe"
   | "browse"
+  | "recipe"
   | "shopping"
   | "stats"
   | "meals"
