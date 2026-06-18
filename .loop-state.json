@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 59,
-  "lastTick": "2026-06-18T12:08:09.1806530+08:00",
-  "lastTickEpoch": 1781755689,
-  "phase": "brief-v17-notes-ratings",
-  "nextResearchTheme": "Brief v17 item 1 done (recipeNotes model+helpers; 184 tests). NEXT: items 2-4 - App: usePersistentState<NotesMap>('tutti.recipeNotes',{}); in reset() finish hook recordCook each cooked dishId (Date.now). Pass notes + onRate(id,n)/onNote(id,s) into CookScreen; render a finale block listing just-cooked dishes (the meal's recipeIds) with a 1-5 star control + optional note input, one-tap skippable (Cook it again stays). BrowseScreen: accept notes prop, show ★rating + 'cooked N×' per row when present. Then item 5 tests (finale star click calls onRate; Browse shows stars)."
+  "iteration": 60,
+  "lastTick": "2026-06-18T12:16:43.0174764+08:00",
+  "lastTickEpoch": 1781756203,
+  "phase": "brief-v18-suggestion",
+  "nextResearchTheme": "Brief v17 DONE (notes/ratings/cook-count finale + Browse; 189 tests). Brief v18 authored (what-should-I-cook suggestion). NEXT: Brief v18 item 1 - apps/web/src/suggest.ts: pure suggestMeal(meals:SavedMeal[], notes:NotesMap, opts:{nowMs}):{meal,reason}|null. Score each meal = ratingTerm (avg of dishes' notes ratings, neutral default ~3 when unrated) + varietyTerm (daysSince(meal.savedAt or max lastCookedAt of its dishes, nowMs), capped, so just-cooked demoted). Pick max; reason from dominant factor. daysSince(ms,nowMs) helper. null if empty. suggest.test.ts: high-rated-old beats low-rated-recent; just-cooked demoted vs equally-rated-older; empty->null; reason matches factor. Then item 2 Home suggestion card -> restoreMeal, item 3 fallback (thali/top library), item 5 Home test."
 }
