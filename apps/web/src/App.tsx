@@ -11,6 +11,7 @@ import { formatPlan, shareOrCopy } from "./share";
 import { recordCook, setRating, setNote, type NotesMap } from "./recipeNotes";
 import { toggleStaple, type Pantry } from "./pantry";
 import { exportData, resetData } from "./appData";
+import { isStringArray, isPlainObject, isMealArray, isScreen, isClock } from "./validators";
 import { suggestMeal, type Suggestion } from "./suggest";
 
 // Secondary screens are lazy-loaded so the initial/cook bundle stays lean (Brief v10).
@@ -38,25 +39,25 @@ const SCREEN_NAMES: Record<Screen, string> = {
 };
 
 export function App() {
-  const [screen, setScreen] = usePersistentState<Screen>("tutti.screen", "home");
+  const [screen, setScreen] = usePersistentState<Screen>("tutti.screen", "home", isScreen);
   const [onboarded, setOnboarded] = usePersistentState<boolean>("tutti.onboarded", false);
-  const [kitchen, setKitchen] = usePersistentState<KitchenUi>("tutti.kitchen", DEFAULT_KITCHEN);
-  const [dishes, setDishes] = usePersistentState<string[]>("tutti.dishes", ALL_DISHES);
-  const [target, setTarget] = usePersistentState<string>("tutti.target", thaliV1.targetServeTime);
+  const [kitchen, setKitchen] = usePersistentState<KitchenUi>("tutti.kitchen", DEFAULT_KITCHEN, isPlainObject);
+  const [dishes, setDishes] = usePersistentState<string[]>("tutti.dishes", ALL_DISHES, isStringArray);
+  const [target, setTarget] = usePersistentState<string>("tutti.target", thaliV1.targetServeTime, isClock);
   const [pro, setPro] = usePersistentState<boolean>("tutti.pro", false);
-  const [candidates, setCandidates] = usePersistentState<RecipeGraph[]>("tutti.candidates", []);
-  const [avoid, setAvoid] = usePersistentState<string[]>("tutti.avoid", []);
-  const [servingsFactor, setServingsFactor] = usePersistentState<Record<string, number>>("tutti.servingsFactor", {});
+  const [candidates, setCandidates] = usePersistentState<RecipeGraph[]>("tutti.candidates", [], Array.isArray);
+  const [avoid, setAvoid] = usePersistentState<string[]>("tutti.avoid", [], isStringArray);
+  const [servingsFactor, setServingsFactor] = usePersistentState<Record<string, number>>("tutti.servingsFactor", {}, isPlainObject);
   // Adaptive pace model (Doc 2 §7): per-category multipliers learned from the user's own cooks.
   // Fed into compile() so elastic estimates adjust. Populated by telemetry in the learning loop
   // (Brief v6) — kept honest here: empty until real data exists, so it's identity by default.
-  const [pace, setPace] = usePersistentState<PaceModel>("tutti.pace", {});
+  const [pace, setPace] = usePersistentState<PaceModel>("tutti.pace", {}, isPlainObject);
   const [learnPace, setLearnPace] = usePersistentState<boolean>("tutti.learnPace", true);
-  const [events, setEvents] = usePersistentState<LearnEvent[]>("tutti.events", []);
-  const [meals, setMeals] = usePersistentState<SavedMeal[]>("tutti.meals", []);
-  const [notes, setNotes] = usePersistentState<NotesMap>("tutti.recipeNotes", {});
+  const [events, setEvents] = usePersistentState<LearnEvent[]>("tutti.events", [], Array.isArray);
+  const [meals, setMeals] = usePersistentState<SavedMeal[]>("tutti.meals", [], isMealArray);
+  const [notes, setNotes] = usePersistentState<NotesMap>("tutti.recipeNotes", {}, isPlainObject);
   const [detailRecipe, setDetailRecipe] = useState<RecipeGraph | null>(null);
-  const [pantry, setPantry] = usePersistentState<Pantry>("tutti.pantry", []);
+  const [pantry, setPantry] = usePersistentState<Pantry>("tutti.pantry", [], isStringArray);
   const paceAdjusted = Object.entries(pace).filter(([, m]) => Math.abs(m - 1) > 0.05);
   const focusAtRef = useRef<number | null>(null); // wall-clock boundary for honest actual-duration capture
   const allRecipes = [...thaliV1.recipes, ...candidates];

@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 70,
-  "lastTick": "2026-06-18T13:12:16.3862921+08:00",
-  "lastTickEpoch": 1781759536,
+  "iteration": 71,
+  "lastTick": "2026-06-18T05:15:56.689Z",
+  "lastTickEpoch": 1781759756,
   "phase": "brief-v23-resilient-persistence",
-  "nextResearchTheme": "Brief v22 DONE (settings + data export/reset; hardened suggestMeal; 219 tests). Brief v23 authored (resilient persistence). NEXT: Brief v23 item 1+2 - extract pure readPersisted(raw:string|null, initial, validate?) from usePersistentState (state.ts) [bad JSON->initial; valid-but-fails-validate->initial; passing->parsed] and add optional validate param to usePersistentState; apps/web/src/validators.ts pure guards isStringArray/isPlainObject/isMealArray/isScreen/isClock; tests for readPersisted + validators. Then item 3 apply validators to App's critical usePersistentState calls, item 5 App-level test that malformed tutti.meals + bogus tutti.screen still render (no throw)."
+  "nextResearchTheme": "Brief v23 items 1-2 done (readPersisted + validators; 229 tests). NEXT: items 3+5 - apply validators to App critical usePersistentState calls (screen->isScreen, dishes->isStringArray, candidates->Array.isArray, target->isClock, avoid->isStringArray, servingsFactor/pace/notes->isPlainObject, events->Array.isArray, meals->isMealArray, pantry->isStringArray; minimal, no typecheck break). Item 5: appResilience.test.tsx - seed malformed tutti.meals=[{id:x}] + bogus tutti.screen + non-array tutti.dishes, render <App/>, assert Home renders + no throw. Then Brief v23 DONE -> research + Brief v24."
 }
