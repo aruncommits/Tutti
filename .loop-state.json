@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 37,
-  "lastTick": "2026-06-18T03:38:48.7460892+08:00",
-  "lastTickEpoch": 1781725129,
+  "iteration": 38,
+  "lastTick": "2026-06-18T10:02:18.6822101+08:00",
+  "lastTickEpoch": 1781748139,
   "phase": "brief-v6-learning-loop",
-  "nextResearchTheme": "Brief v6 items 1-2 done (honest on-device pace learning feeding tutti.pace; 125 tests). NEXT: item 3 - capped tutti.events log (push {type:node_completed,recipeId,nodeId,category,plannedMins,actualMins,at}, keep last ~200) recorded alongside the pace update in complete(). Then item 4 - Stats/pace view (screen from Home): per-category multipliers + plain-language explanation + estimate-error MAE + 'forget my learning' (clears pace+events) + 'everything stays on this device' line. Then item 5 tests (outlier guard + opt-in gate)."
+  "nextResearchTheme": "Brief v6 items 1-4 done (on-device pace learning + event log + Stats view; 125 tests). NEXT: item 5 (FINAL v6) - extract a pure shouldLearn(node, actualMins, learnPace) helper (in a web util or App) encoding the guards (opt-in + elastic active + in-band), unit-test it (in-band learns, outlier/opt-off/non-elastic do not), and a StatsScreen render test (renders pace categories + Forget button). Then Brief v6 DONE -> research a continuous-enhancement theme (PWA offline / Lighthouse perf / a11y) -> author Research-Brief-v7."
 }

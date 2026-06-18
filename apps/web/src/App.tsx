@@ -9,6 +9,7 @@ import { PreviewScreen } from "./PreviewScreen";
 import { AddRecipe } from "./AddRecipe";
 import { ShoppingScreen } from "./ShoppingScreen";
 import { StatsScreen, type LearnEvent } from "./StatsScreen";
+import { shouldLearn } from "./learn";
 
 const ALL_DISHES = thaliV1.recipes.map((r) => r.recipeId);
 
@@ -61,9 +62,9 @@ export function App() {
     // fabricate: a missing/out-of-band interval teaches nothing.
     const node = plan.nodes.find((n) => n.nodeId === id);
     const now = Date.now();
-    if (learnPace && node && node.attention === "active" && node.duration.elastic && focusAtRef.current != null) {
+    if (node && focusAtRef.current != null) {
       const actualMins = (now - focusAtRef.current) / 60000;
-      if (actualMins >= 0.3 * node.duration.minMins && actualMins <= 3 * node.duration.maxMins) {
+      if (shouldLearn(node, actualMins, learnPace)) {
         const category = paceCategoryOf(node);
         setPace((p) => updatePace(p, { category, actualMins, estMins: node.duration.estMins }));
         const ev: LearnEvent = { type: "node_completed", recipeId: node.recipeId, nodeId: id, category, plannedMins: node.duration.estMins, actualMins: Math.round(actualMins * 10) / 10, at: now };
