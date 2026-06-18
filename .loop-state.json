@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 44,
-  "lastTick": "2026-06-18T10:31:05.5825090+08:00",
-  "lastTickEpoch": 1781749866,
-  "phase": "brief-v8-recipe-library",
-  "nextResearchTheme": "Brief v8 items 1-2 done (Golden Library + filterLibrary helpers; 143 tests). NEXT: item 3+4 - BrowseScreen.tsx over goldenLibrary using toLibraryEntries/filterLibrary: search box + filter chips (max-time presets e.g. <=20/<=40, veg-only default on, 'hide my allergens' using avoid-set); each row shows name + total time + allergen badges + dishColors dot; tap a row -> onAdd(recipe) which adds it to candidates+dishes (reuse addCandidate) and routes to pick. Add 'browse' to Screen union; reachable from Home ('Browse recipes'). Verify in browser. Then item 5 web test (BrowseScreen renders seeded dishes; a search term narrows)."
+  "iteration": 45,
+  "lastTick": "2026-06-18T10:38:06.2542509+08:00",
+  "lastTickEpoch": 1781750286,
+  "phase": "brief-v9-accessibility",
+  "nextResearchTheme": "Brief v8 DONE (browsable seeded library; 145 tests). Brief v9 authored (a11y deepening). NEXT: Brief v9 item 2 (the high-value one) - focus + announce on screen change in App: add an .sr-only class; a visually-hidden aria-live=polite status node that gets the screen's human name on change; a useEffect([screen]) that focuses the active screen region (give the wrap or section a ref + tabIndex -1) and sets the announcement; guard onboarding/typing. Then item 3 (:focus-visible ring), item 1 (ensure each screen has an h2 + tabIndex -1 region), item 4 (skip link), item 5 (axe audit via Chrome DevTools MCP + tests)."
 }

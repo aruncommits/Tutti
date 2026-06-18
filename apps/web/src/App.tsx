@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { applyEvent, compile, formatClock, parseClock, paceCategoryOf, scaleRecipe, thaliV1, updatePace, type MasterExecutionPlan, type PaceModel, type RecipeGraph } from "@tutti/engine";
 import { usePersistentState, type Screen } from "./state";
 import { CookScreen } from "./CookScreen";
@@ -13,6 +13,12 @@ import { BrowseScreen } from "./BrowseScreen";
 import { shouldLearn } from "./learn";
 
 const ALL_DISHES = thaliV1.recipes.map((r) => r.recipeId);
+
+const SCREEN_NAMES: Record<Screen, string> = {
+  onboarding: "Welcome", kitchen: "Your kitchen", home: "Home", addRecipe: "Add a dish",
+  browse: "Browse recipes", shopping: "Shopping list", stats: "Your pace", pick: "Pick dishes",
+  serveTime: "Serve time", preview: "Plan preview", cook: "Cook mode", done: "Done",
+};
 
 export function App() {
   const [screen, setScreen] = usePersistentState<Screen>("tutti.screen", "home");
@@ -97,6 +103,16 @@ export function App() {
     setScreen("home");
   };
 
+  // Screen-change a11y (Doc 7 §12): move focus to the new screen and announce it (SPA route fix).
+  const [announce, setAnnounce] = useState("");
+  const focusRef = useRef<HTMLDivElement>(null);
+  const firstMount = useRef(true);
+  useEffect(() => {
+    if (firstMount.current) { firstMount.current = false; return; }
+    setAnnounce(`${SCREEN_NAMES[screen]} screen`);
+    focusRef.current?.focus();
+  }, [screen]);
+
   if (!onboarded) {
     return (
       <div className="wrap">
@@ -107,12 +123,18 @@ export function App() {
 
   return (
     <div className="wrap">
+      <a className="skip-link" href="#screen-main" onClick={(e) => { e.preventDefault(); focusRef.current?.focus(); }}>
+        Skip to content
+      </a>
       <header>
         <button className="logo" onClick={() => setScreen("home")} aria-label="Home">
           <div className="mark">T</div>
           <div className="brand">Tutti<small>every dish, in concert</small></div>
         </button>
       </header>
+
+      <div role="status" aria-live="polite" className="sr-only">{announce}</div>
+      <div id="screen-main" ref={focusRef} tabIndex={-1} className="screen-focus">
 
       {screen === "cook" ? (
         <CookScreen plan={plan} pro={pro} onComplete={complete} onUndo={undo} onReset={reset} />
@@ -177,9 +199,10 @@ export function App() {
       ) : (
         <Stub screen={screen} onBack={() => setScreen("home")} onCook={startCooking} />
       )}
+      </div>
 
       <footer className="scaffold-note">
-        Phase 2 · single-recipe flow taking shape (screens being built brief by brief).
+        Tutti — every dish, in concert. Cooks fully offline; nothing leaves your device.
       </footer>
     </div>
   );
