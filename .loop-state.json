@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 91,
-  "lastTick": "2026-06-18T07:58:03.259Z",
-  "lastTickEpoch": 1781769483,
-  "phase": "brief-v35-error-boundary",
-  "nextResearchTheme": "Brief v34 DONE (entry trim 189->184KB; 274 tests). Brief v35 authored (error boundary). NEXT: Brief v35 item 1+2+4 - apps/web/src/ErrorBoundary.tsx class component (getDerivedStateFromError -> {error}; componentDidCatch -> console.error; render fallback .zone with h2 Something went wrong + line + 🏠 Back to home button calling onHome + this.setState({error:null}); else children). App: wrap routed Suspense/screen inside #screen-main with <ErrorBoundary key={screen} onHome={()=>setScreen(home)}> (header/Shell OUTSIDE). errorBoundary.test.tsx: throwing child -> fallback (suppress console.error spy); Back-to-home calls onHome + recovers; healthy child renders through. Then Brief v35 done -> research + Brief v36."
+  "iteration": 92,
+  "lastTick": "2026-06-18T08:09:06.426Z",
+  "lastTickEpoch": 1781770146,
+  "phase": "brief-v37-library-expansion",
+  "nextResearchTheme": "Brief v36 DONE (README; 276 tests). Brief v37 authored (expand Golden Library). NEXT: Brief v37 - add ~5 verified veg South Indian RecipeGraphs to packages/engine/fixtures/library.json (exact existing schema): rec_sambar, rec_cabbage (Cabbage Poriyal), rec_kootu, rec_pongal (Ven Pongal), rec_potato (Potato Fry). Each VALID: acyclic, deps resolve, active/passive correct (soak/cook-dal/pressure-cook/simmer = passive), sane durations, ingredients w/ units, verified:true, cuisine South Indian, unique recipeIds + nodeIds (prefix sb_/cb_/ko_/pg_/po_). Bump packages/engine/test/library.test.ts min count assertion 6 -> 11. Run gate (library.test validates each: validate().ok, verified, unique, compiles feasible). Fix any invalid graph. Then Brief v37 done -> research + Brief v38."
 }

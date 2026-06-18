@@ -42,17 +42,18 @@ describe("cook journey (Brief v30 item 1)", () => {
   it("plans a meal through Pick -> Preview -> Get ready -> Cook", async () => {
     render(<App />);
 
+    const LAZY = { timeout: 4000 }; // lazy screens (Pick/Preview/Mise) under parallel-load
     fireEvent.click(screen.getByRole("button", { name: /pick dishes/i }));
     // thali dishes are selected by default -> proceed
-    fireEvent.click(await screen.findByRole("button", { name: /set serve time/i }));
-    fireEvent.click(await screen.findByRole("button", { name: /build my plan/i }));
+    fireEvent.click(await screen.findByRole("button", { name: /set serve time/i }, LAZY));
+    fireEvent.click(await screen.findByRole("button", { name: /build my plan/i }, LAZY));
 
     // Preview is lazy-loaded (region label is stable across heading-text redesigns)
-    expect(await screen.findByRole("region", { name: /your plan/i })).toBeInTheDocument();
+    expect(await screen.findByRole("region", { name: /your plan/i }, LAZY)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /start cooking/i }));
 
     // "Get ready" mise screen (lazy)
-    expect(await screen.findByRole("heading", { name: /get ready/i })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: /get ready/i }, LAZY)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /start cooking/i }));
 
     // Cook Mode

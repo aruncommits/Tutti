@@ -116,6 +116,124 @@
           "duration": { "estMins": 1, "minMins": 1, "maxMins": 2, "elastic": false },
           "ingredients": [], "resources": [], "dependencies": ["up_4"] }
       ]
+    },
+    {
+      "recipeId": "rec_sambar", "name": "Sambar", "version": 1, "servings": 4, "verified": true, "cuisine": "South Indian",
+      "nodes": [
+        { "nodeId": "sb_1", "recipeId": "rec_sambar", "title": "Pressure-cook toor dal", "phase": "cook", "attention": "passive",
+          "duration": { "estMins": 18, "minMins": 16, "maxMins": 22, "elastic": false },
+          "ingredients": [ { "name": "toor dal", "amount": 0.75, "unit": "cup" }, { "name": "water", "amount": 2, "unit": "cup" }, { "name": "turmeric", "amount": 0.5, "unit": "tsp" } ],
+          "resources": [ { "category": "pressure_cooker", "count": 1, "heldFor": "duration" }, { "category": "burner", "count": 1, "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "sb_2", "recipeId": "rec_sambar", "title": "Chop drumstick, shallots & tomato", "phase": "prep", "attention": "active",
+          "duration": { "estMins": 7, "minMins": 5, "maxMins": 11, "elastic": true },
+          "ingredients": [ { "name": "drumstick", "amount": 1, "unit": "whole", "preparedState": "chopped" }, { "name": "shallots", "amount": 8, "unit": "whole" }, { "name": "tomato", "amount": 1, "unit": "whole", "preparedState": "chopped" } ],
+          "resources": [ { "category": "cutting_board", "count": 1, "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "sb_3", "recipeId": "rec_sambar", "title": "Simmer vegetables with tamarind & sambar powder", "phase": "cook", "attention": "passive",
+          "duration": { "estMins": 12, "minMins": 10, "maxMins": 16, "elastic": false },
+          "ingredients": [ { "name": "tamarind pulp", "amount": 0.5, "unit": "cup" }, { "name": "sambar powder", "amount": 2, "unit": "tbsp" }, { "name": "water", "amount": 2, "unit": "cup" }, { "name": "salt", "amount": 1, "unit": "tsp" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["large"], "heldFor": "duration" } ], "dependencies": ["sb_2"] },
+        { "nodeId": "sb_4", "recipeId": "rec_sambar", "title": "Mash the dal into the simmer", "phase": "cook", "attention": "active",
+          "duration": { "estMins": 3, "minMins": 2, "maxMins": 4, "elastic": false },
+          "ingredients": [], "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["large"], "heldFor": "duration" } ], "dependencies": ["sb_1", "sb_3"] },
+        { "nodeId": "sb_5", "recipeId": "rec_sambar", "title": "Temper mustard, fenugreek & curry leaves", "phase": "cook", "attention": "active",
+          "duration": { "estMins": 3, "minMins": 2, "maxMins": 4, "elastic": false },
+          "ingredients": [ { "name": "ghee", "amount": 1, "unit": "tbsp" }, { "name": "mustard seeds", "amount": 1, "unit": "tsp" }, { "name": "fenugreek seeds", "amount": 0.25, "unit": "tsp" }, { "name": "curry leaves", "amount": 1, "unit": "sprig" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["small"], "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "sb_6", "recipeId": "rec_sambar", "title": "Add the tempering & serve", "phase": "serve", "attention": "active",
+          "duration": { "estMins": 1, "minMins": 1, "maxMins": 2, "elastic": false },
+          "ingredients": [ { "name": "coriander", "amount": 2, "unit": "tbsp" } ], "resources": [], "dependencies": ["sb_4", "sb_5"] }
+      ]
+    },
+    {
+      "recipeId": "rec_cabbage", "name": "Cabbage Poriyal", "version": 1, "servings": 4, "verified": true, "cuisine": "South Indian",
+      "nodes": [
+        { "nodeId": "cb_1", "recipeId": "rec_cabbage", "title": "Shred the cabbage", "phase": "prep", "attention": "active",
+          "duration": { "estMins": 8, "minMins": 6, "maxMins": 12, "elastic": true },
+          "ingredients": [ { "name": "cabbage", "amount": 0.5, "unit": "whole", "preparedState": "shredded" } ],
+          "resources": [ { "category": "cutting_board", "count": 1, "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "cb_2", "recipeId": "rec_cabbage", "title": "Temper mustard, urad dal & dried chili", "phase": "cook", "attention": "active",
+          "duration": { "estMins": 3, "minMins": 2, "maxMins": 4, "elastic": false },
+          "ingredients": [ { "name": "coconut oil", "amount": 1, "unit": "tbsp" }, { "name": "mustard seeds", "amount": 1, "unit": "tsp" }, { "name": "urad dal", "amount": 1, "unit": "tsp" }, { "name": "dried red chili", "amount": 1, "unit": "whole" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["large"], "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "cb_3", "recipeId": "rec_cabbage", "title": "Saute cabbage till tender", "phase": "cook", "attention": "active",
+          "duration": { "estMins": 10, "minMins": 8, "maxMins": 14, "elastic": false },
+          "ingredients": [ { "name": "salt", "amount": 0.5, "unit": "tsp" }, { "name": "turmeric", "amount": 0.25, "unit": "tsp" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["large"], "heldFor": "duration" } ], "dependencies": ["cb_1", "cb_2"] },
+        { "nodeId": "cb_4", "recipeId": "rec_cabbage", "title": "Finish with grated coconut & serve", "phase": "serve", "attention": "active",
+          "duration": { "estMins": 2, "minMins": 1, "maxMins": 3, "elastic": false },
+          "ingredients": [ { "name": "grated coconut", "amount": 3, "unit": "tbsp" } ], "resources": [], "dependencies": ["cb_3"] }
+      ]
+    },
+    {
+      "recipeId": "rec_kootu", "name": "Mixed-Veg Kootu", "version": 1, "servings": 4, "verified": true, "cuisine": "South Indian",
+      "nodes": [
+        { "nodeId": "ko_1", "recipeId": "rec_kootu", "title": "Cook moong dal soft", "phase": "cook", "attention": "passive",
+          "duration": { "estMins": 15, "minMins": 12, "maxMins": 18, "elastic": false },
+          "ingredients": [ { "name": "moong dal", "amount": 0.5, "unit": "cup" }, { "name": "water", "amount": 1.5, "unit": "cup" } ],
+          "resources": [ { "category": "pressure_cooker", "count": 1, "heldFor": "duration" }, { "category": "burner", "count": 1, "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "ko_2", "recipeId": "rec_kootu", "title": "Chop mixed vegetables", "phase": "prep", "attention": "active",
+          "duration": { "estMins": 7, "minMins": 5, "maxMins": 11, "elastic": true },
+          "ingredients": [ { "name": "bottle gourd", "amount": 1, "unit": "cup", "preparedState": "chopped" }, { "name": "carrot", "amount": 1, "unit": "whole", "preparedState": "chopped" } ],
+          "resources": [ { "category": "cutting_board", "count": 1, "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "ko_3", "recipeId": "rec_kootu", "title": "Simmer vegetables till soft", "phase": "cook", "attention": "passive",
+          "duration": { "estMins": 10, "minMins": 8, "maxMins": 14, "elastic": false },
+          "ingredients": [ { "name": "water", "amount": 1, "unit": "cup" }, { "name": "turmeric", "amount": 0.25, "unit": "tsp" }, { "name": "salt", "amount": 1, "unit": "tsp" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["large"], "heldFor": "duration" } ], "dependencies": ["ko_2"] },
+        { "nodeId": "ko_4", "recipeId": "rec_kootu", "title": "Grind coconut, cumin & green chili", "phase": "prep", "attention": "active",
+          "duration": { "estMins": 4, "minMins": 3, "maxMins": 6, "elastic": false },
+          "ingredients": [ { "name": "grated coconut", "amount": 0.25, "unit": "cup" }, { "name": "cumin seeds", "amount": 1, "unit": "tsp" }, { "name": "green chili", "amount": 1, "unit": "whole" } ],
+          "resources": [ { "category": "blender", "count": 1, "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "ko_5", "recipeId": "rec_kootu", "title": "Add dal & coconut paste, simmer", "phase": "cook", "attention": "active",
+          "duration": { "estMins": 4, "minMins": 3, "maxMins": 6, "elastic": false },
+          "ingredients": [], "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["large"], "heldFor": "duration" } ], "dependencies": ["ko_1", "ko_3", "ko_4"] },
+        { "nodeId": "ko_6", "recipeId": "rec_kootu", "title": "Temper & serve", "phase": "serve", "attention": "active",
+          "duration": { "estMins": 3, "minMins": 2, "maxMins": 4, "elastic": false },
+          "ingredients": [ { "name": "coconut oil", "amount": 1, "unit": "tbsp" }, { "name": "mustard seeds", "amount": 1, "unit": "tsp" }, { "name": "curry leaves", "amount": 1, "unit": "sprig" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["small"], "heldFor": "duration" } ], "dependencies": ["ko_5"] }
+      ]
+    },
+    {
+      "recipeId": "rec_pongal", "name": "Ven Pongal", "version": 1, "servings": 4, "verified": true, "cuisine": "South Indian",
+      "nodes": [
+        { "nodeId": "pg_1", "recipeId": "rec_pongal", "title": "Dry-roast rice & moong dal", "phase": "cook", "attention": "active",
+          "duration": { "estMins": 4, "minMins": 3, "maxMins": 6, "elastic": false },
+          "ingredients": [ { "name": "rice", "amount": 1, "unit": "cup" }, { "name": "moong dal", "amount": 0.5, "unit": "cup" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["large"], "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "pg_2", "recipeId": "rec_pongal", "title": "Pressure-cook with water till soft", "phase": "cook", "attention": "passive",
+          "duration": { "estMins": 16, "minMins": 14, "maxMins": 20, "elastic": false },
+          "ingredients": [ { "name": "water", "amount": 4, "unit": "cup" }, { "name": "salt", "amount": 1, "unit": "tsp" } ],
+          "resources": [ { "category": "pressure_cooker", "count": 1, "heldFor": "duration" }, { "category": "burner", "count": 1, "heldFor": "duration" } ], "dependencies": ["pg_1"] },
+        { "nodeId": "pg_3", "recipeId": "rec_pongal", "title": "Temper pepper, cumin, cashew & ginger in ghee", "phase": "cook", "attention": "active",
+          "duration": { "estMins": 4, "minMins": 3, "maxMins": 6, "elastic": false },
+          "ingredients": [ { "name": "ghee", "amount": 2, "unit": "tbsp" }, { "name": "black pepper", "amount": 1, "unit": "tsp" }, { "name": "cumin seeds", "amount": 1, "unit": "tsp" }, { "name": "cashews", "amount": 10, "unit": "whole" }, { "name": "ginger", "amount": 1, "unit": "inch" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["small"], "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "pg_4", "recipeId": "rec_pongal", "title": "Fold the tempering in & serve", "phase": "serve", "attention": "active",
+          "duration": { "estMins": 2, "minMins": 1, "maxMins": 3, "elastic": false },
+          "ingredients": [], "resources": [], "dependencies": ["pg_2", "pg_3"] }
+      ]
+    },
+    {
+      "recipeId": "rec_potato", "name": "Potato Fry", "version": 1, "servings": 4, "verified": true, "cuisine": "South Indian",
+      "nodes": [
+        { "nodeId": "po_1", "recipeId": "rec_potato", "title": "Par-boil the potatoes", "phase": "cook", "attention": "passive",
+          "duration": { "estMins": 12, "minMins": 10, "maxMins": 16, "elastic": false },
+          "ingredients": [ { "name": "potato", "amount": 4, "unit": "whole" }, { "name": "water", "amount": 3, "unit": "cup" } ],
+          "resources": [ { "category": "pressure_cooker", "count": 1, "heldFor": "duration" }, { "category": "burner", "count": 1, "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "po_2", "recipeId": "rec_potato", "title": "Peel & cube the boiled potatoes", "phase": "prep", "attention": "active",
+          "duration": { "estMins": 5, "minMins": 4, "maxMins": 8, "elastic": true },
+          "ingredients": [], "resources": [ { "category": "cutting_board", "count": 1, "heldFor": "duration" } ], "dependencies": ["po_1"] },
+        { "nodeId": "po_3", "recipeId": "rec_potato", "title": "Temper mustard & curry leaves", "phase": "cook", "attention": "active",
+          "duration": { "estMins": 3, "minMins": 2, "maxMins": 4, "elastic": false },
+          "ingredients": [ { "name": "oil", "amount": 2, "unit": "tbsp" }, { "name": "mustard seeds", "amount": 1, "unit": "tsp" }, { "name": "curry leaves", "amount": 1, "unit": "sprig" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["large"], "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "po_4", "recipeId": "rec_potato", "title": "Saute potato with turmeric & chili till crisp", "phase": "cook", "attention": "active",
+          "duration": { "estMins": 12, "minMins": 10, "maxMins": 16, "elastic": false },
+          "ingredients": [ { "name": "turmeric", "amount": 0.5, "unit": "tsp" }, { "name": "red chili powder", "amount": 1, "unit": "tsp" }, { "name": "salt", "amount": 0.75, "unit": "tsp" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["large"], "heldFor": "duration" } ], "dependencies": ["po_2", "po_3"] },
+        { "nodeId": "po_5", "recipeId": "rec_potato", "title": "Serve hot", "phase": "serve", "attention": "active",
+          "duration": { "estMins": 1, "minMins": 1, "maxMins": 2, "elastic": false },
+          "ingredients": [], "resources": [], "dependencies": ["po_4"] }
+      ]
     }
   ]
 }
