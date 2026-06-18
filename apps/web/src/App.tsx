@@ -105,7 +105,7 @@ export function App() {
 
   // Screen-change a11y (Doc 7 §12): move focus to the new screen and announce it (SPA route fix).
   const [announce, setAnnounce] = useState("");
-  const focusRef = useRef<HTMLDivElement>(null);
+  const focusRef = useRef<HTMLElement>(null);
   const firstMount = useRef(true);
   useEffect(() => {
     if (firstMount.current) { firstMount.current = false; return; }
@@ -116,7 +116,9 @@ export function App() {
   if (!onboarded) {
     return (
       <div className="wrap">
-        <OnboardingScreen onDone={() => { setOnboarded(true); setScreen("kitchen"); }} />
+        <main>
+          <OnboardingScreen onDone={() => { setOnboarded(true); setScreen("kitchen"); }} />
+        </main>
       </div>
     );
   }
@@ -134,7 +136,7 @@ export function App() {
       </header>
 
       <div role="status" aria-live="polite" className="sr-only">{announce}</div>
-      <div id="screen-main" ref={focusRef} tabIndex={-1} className="screen-focus">
+      <main id="screen-main" ref={focusRef} tabIndex={-1} className="screen-focus">
 
       {screen === "cook" ? (
         <CookScreen plan={plan} pro={pro} onComplete={complete} onUndo={undo} onReset={reset} />
@@ -199,7 +201,7 @@ export function App() {
       ) : (
         <Stub screen={screen} onBack={() => setScreen("home")} onCook={startCooking} />
       )}
-      </div>
+      </main>
 
       <footer className="scaffold-note">
         Tutti — every dish, in concert. Cooks fully offline; nothing leaves your device.
@@ -229,6 +231,7 @@ function Home({
 }) {
   return (
     <section className="zone" aria-label="Home">
+      <h2 className="zone-h"><span>Tonight</span></h2>
       <p className="value">A South Indian thali — three dishes, all hot together in about 45 minutes.</p>
       {paceNote && <p className="hint">{paceNote}</p>}
       <button className="btn big-btn" onClick={onStart}>Start cooking</button>
