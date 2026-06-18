@@ -55,7 +55,8 @@ export function BrowseScreen({
       {filtered.length === 0 ? (
         <div className="idle">No recipes match — loosen a filter.</div>
       ) : (
-        filtered.map((e) => (
+        <div className="card-grid">
+        {filtered.map((e) => (
           <button key={e.recipe.recipeId} className="pick-row browse-row" onClick={() => onPick(e.recipe)} aria-label={`Add ${e.recipe.name}`}>
             <span className="pick-main" style={{ pointerEvents: "none" }}>
               <span className="swatch" style={{ background: colorFor(e.recipe.recipeId) }} />
@@ -65,7 +66,8 @@ export function BrowseScreen({
               <span className="browse-add">+ Add</span>
             </span>
           </button>
-        ))
+        ))}
+        </div>
       )}
 
       <div className="home-links"><button className="link" onClick={onBack}>Back</button></div>

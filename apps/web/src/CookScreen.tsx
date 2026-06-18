@@ -51,6 +51,8 @@ export function CookScreen({
 }) {
   const view = deriveViewState(plan);
   const allDone = view.active.length === 0 && view.queue.length === 0;
+  // How many cooks this plan was scheduled for — drives "who does what" lane chips (Brief v14).
+  const cooks = Math.max(1, ...plan.nodes.map((n) => (plan.schedule[n.nodeId]?.hand ?? 0) + 1));
 
   // Guided-not-gated (Doc 7 §9): a gentle nudge — never a wall — when cook steps are ready while
   // prep tasks remain. Pro mode silences it and lets prep/cook interleave without commentary.
@@ -162,15 +164,20 @@ export function CookScreen({
             <button className="btn" onClick={onReset}>Cook it again</button>
           </div>
         ) : view.active.length ? (
-          view.active.map((n) => {
+          <div className="card-grid now-grid">
+          {view.active.map((n) => {
             const ticking = remaining[n.nodeId];
             const isPassive = n.attention === "passive";
+            const hand = plan.schedule[n.nodeId]?.hand ?? 0;
             return (
               <div className={isPassive ? "now-card passive" : "now-card"} key={n.nodeId} style={{ borderLeft: `4px solid ${colorFor(n.recipeId)}` }}>
                 <div className="now-head">
                   <span className="tag">
                     <span className="swatch" style={{ background: colorFor(n.recipeId) }} />
                     {dishName(n.recipeId)}
+                    {cooks > 1 && !isPassive && (
+                      <span className={`lane lane-${hand % 4}`}>{hand === 0 ? "You" : `Cook ${hand + 1}`}</span>
+                    )}
                   </span>
                   <span className="phase">{n.phase}{isPassive ? " · hands-free" : ""}</span>
                 </div>
@@ -195,7 +202,8 @@ export function CookScreen({
                 </div>
               </div>
             );
-          })
+          })}
+          </div>
         ) : (
           <div className="idle"><b>Hands free.</b> Something's cooking — relax a moment.</div>
         )}
@@ -203,6 +211,7 @@ export function CookScreen({
 
       <section className="zone" aria-label="NEXT">
         <h2 className="zone-h"><span>NEXT</span><span className="count">{view.queue.length}</span></h2>
+        <div className="card-grid">
         {view.queue.map((n) => (
           <div className="q-item" key={n.nodeId}>
             <span className="swatch" style={{ background: colorFor(n.recipeId) }} />
@@ -210,6 +219,7 @@ export function CookScreen({
             <span className="dur">~{n.duration.estMins}m</span>
           </div>
         ))}
+        </div>
       </section>
 
       <section className="zone" aria-label="DONE">

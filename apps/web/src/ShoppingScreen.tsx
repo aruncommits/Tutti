@@ -25,7 +25,7 @@ export function ShoppingScreen({ recipes, onBack }: { recipes: RecipeGraph[]; on
       </div>
 
       {mode === "combined" ? (
-        <div className="ing-sec">
+        <div className="ing-sec card-grid ing-grid">
           {combined.map((item) => {
             const key = `c|${item.name}|${item.unit ?? ""}`;
             return (
@@ -54,6 +54,7 @@ export function ShoppingScreen({ recipes, onBack }: { recipes: RecipeGraph[]; on
           return (
             <div className="ing-sec" key={r.recipeId}>
               <div className="ing-title"><span className="sw" style={{ background: colorFor(r.recipeId) }} /> {r.name}</div>
+              <div className="card-grid ing-grid">
               {names.map((item, i) => {
                 const key = `s|${r.recipeId}|${item.raw}|${item.unit ?? ""}`;
                 return (
@@ -64,6 +65,7 @@ export function ShoppingScreen({ recipes, onBack }: { recipes: RecipeGraph[]; on
                   </button>
                 );
               })}
+              </div>
             </div>
           );
         })

@@ -35,6 +35,7 @@ export function PickScreen({
   return (
     <section className="zone" aria-label="Pick your dishes">
       <h2 className="zone-h"><span>Pick your dishes</span><span className="count">{selected.length}</span></h2>
+      <div className="card-grid">
       {recipes.map((r) => {
         const on = selected.includes(r.recipeId);
         const hits = avoid.length ? allergensOf(r).filter((a) => avoid.includes(a)) : [];
@@ -62,6 +63,7 @@ export function PickScreen({
           </div>
         );
       })}
+      </div>
       <button className="add-dish" onClick={onAdd}>+ Add a dish (paste · find online · AI)</button>
       {selected.length > 0 && (
         <div className="delta">
