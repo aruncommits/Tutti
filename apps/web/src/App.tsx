@@ -9,6 +9,7 @@ import { shouldLearn } from "./learn";
 import { addSaved, addRecent, removeMeal, type SavedMeal } from "./meals";
 import { formatPlan, shareOrCopy } from "./share";
 import { recordCook, setRating, setNote, type NotesMap } from "./recipeNotes";
+import { suggestMeal, type Suggestion } from "./suggest";
 
 // Secondary screens are lazy-loaded so the initial/cook bundle stays lean (Brief v10).
 // AddRecipe pulls @tutti/ingest, so splitting it keeps the parser out of the entry chunk.
@@ -144,6 +145,12 @@ export function App() {
     setTarget(meal.target);
     setScreen("pick");
   };
+  // "What should I cook tonight?" (Brief v18) — rank the user's own meals, or a starter for new users.
+  const suggestion: Suggestion =
+    suggestMeal(meals, notes, { nowMs: Date.now() }) ?? {
+      meal: { id: "starter", name: "South Indian thali", dishIds: ALL_DISHES, servings: {}, target, savedAt: 0, kind: "saved" },
+      reason: "A great first meal to try",
+    };
 
   // Screen-change a11y (Doc 7 §12): move focus to the new screen and announce it (SPA route fix).
   const [announce, setAnnounce] = useState("");
@@ -264,6 +271,8 @@ export function App() {
           onStats={() => setScreen("stats")}
           onBrowse={() => setScreen("browse")}
           onMeals={() => setScreen("meals")}
+          suggestion={suggestion}
+          onCookSuggested={() => restoreMeal(suggestion.meal)}
           paceNote={
             paceAdjusted.length
               ? "Calibrated to your pace: " +
@@ -293,6 +302,8 @@ function Home({
   onStats,
   onBrowse,
   onMeals,
+  suggestion,
+  onCookSuggested,
   paceNote,
 }: {
   onStart: () => void;
@@ -303,11 +314,21 @@ function Home({
   onStats: () => void;
   onBrowse: () => void;
   onMeals: () => void;
+  suggestion: Suggestion;
+  onCookSuggested: () => void;
   paceNote: string | null;
 }) {
   return (
     <section className="zone" aria-label="Home">
       <h2 className="zone-h"><span>Tonight</span></h2>
+
+      <div className="suggest-card">
+        <div className="suggest-h">Tonight?</div>
+        <div className="suggest-name">{suggestion.meal.name}</div>
+        <div className="hint">{suggestion.reason}</div>
+        <button className="btn" onClick={onCookSuggested}>Cook this</button>
+      </div>
+
       <p className="value">A South Indian thali — three dishes, all hot together in about 45 minutes.</p>
       {paceNote && <p className="hint">{paceNote}</p>}
       <button className="btn big-btn" onClick={onStart}>Start cooking</button>

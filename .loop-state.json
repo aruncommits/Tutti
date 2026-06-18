@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 60,
-  "lastTick": "2026-06-18T12:16:43.0174764+08:00",
-  "lastTickEpoch": 1781756203,
+  "iteration": 61,
+  "lastTick": "2026-06-18T12:21:09.8336925+08:00",
+  "lastTickEpoch": 1781756470,
   "phase": "brief-v18-suggestion",
-  "nextResearchTheme": "Brief v17 DONE (notes/ratings/cook-count finale + Browse; 189 tests). Brief v18 authored (what-should-I-cook suggestion). NEXT: Brief v18 item 1 - apps/web/src/suggest.ts: pure suggestMeal(meals:SavedMeal[], notes:NotesMap, opts:{nowMs}):{meal,reason}|null. Score each meal = ratingTerm (avg of dishes' notes ratings, neutral default ~3 when unrated) + varietyTerm (daysSince(meal.savedAt or max lastCookedAt of its dishes, nowMs), capped, so just-cooked demoted). Pick max; reason from dominant factor. daysSince(ms,nowMs) helper. null if empty. suggest.test.ts: high-rated-old beats low-rated-recent; just-cooked demoted vs equally-rated-older; empty->null; reason matches factor. Then item 2 Home suggestion card -> restoreMeal, item 3 fallback (thali/top library), item 5 Home test."
+  "nextResearchTheme": "Brief v18 item 1 done (suggestMeal ranking; 194 tests). NEXT: items 2-3+5 - Home suggestion card. In App compute const suggestion = suggestMeal(meals, notes, {nowMs: Date.now()}); pass to Home with onCookSuggested = (meal)=>restoreMeal(meal). Home renders a 'Tonight?' card when suggestion: meal.name + reason + 'Cook this' button -> onCookSuggested(suggestion.meal). Fallback (item 3): when meals empty, App passes a synthetic suggestion {meal:{id:'thali',name:'South Indian thali',dishIds:ALL_DISHES,servings:{},target,savedAt:0,kind:'saved'}, reason:'A great first meal to try'} so new users still get a suggestion. Item 5: Home/App test that the suggestion card renders + 'Cook this' restores (lands in pick or sets dishes). Verify in browser. Then Brief v18 done -> research + author Brief v19."
 }
