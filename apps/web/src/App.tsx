@@ -12,6 +12,7 @@ import { recordCook, setRating, setNote, type NotesMap } from "./recipeNotes";
 import { toggleStaple, type Pantry } from "./pantry";
 import { exportData, resetData } from "./appData";
 import { isStringArray, isPlainObject, isMealArray, isScreen, isClock } from "./validators";
+import { factorForPeople } from "./servings";
 import { suggestMeal, type Suggestion } from "./suggest";
 
 // Secondary screens are lazy-loaded so the initial/cook bundle stays lean (Brief v10).
@@ -58,12 +59,23 @@ export function App() {
   const [notes, setNotes] = usePersistentState<NotesMap>("tutti.recipeNotes", {}, isPlainObject);
   const [detailRecipe, setDetailRecipe] = useState<RecipeGraph | null>(null);
   const [pantry, setPantry] = usePersistentState<Pantry>("tutti.pantry", [], isStringArray);
+  const [people, setPeople] = usePersistentState<number>("tutti.people", 4, (v) => typeof v === "number");
   const paceAdjusted = Object.entries(pace).filter(([, m]) => Math.abs(m - 1) > 0.05);
   const focusAtRef = useRef<number | null>(null); // wall-clock boundary for honest actual-duration capture
   const allRecipes = [...thaliV1.recipes, ...candidates];
   const toggleAvoid = (a: string) => setAvoid((p) => (p.includes(a) ? p.filter((x) => x !== a) : [...p, a]));
   const factorOf = (id: string) => servingsFactor[id] ?? 1;
   const setFactor = (id: string, f: number) => setServingsFactor((p) => ({ ...p, [id]: f }));
+  // Meal-level "cooking for N people?" — scale every selected dish at once (Brief v26).
+  const setPeopleScaled = (n: number) => {
+    const c = Math.max(1, Math.min(40, n));
+    setPeople(c);
+    setServingsFactor((p) => {
+      const next = { ...p };
+      for (const r of allRecipes) if (dishes.includes(r.recipeId)) next[r.recipeId] = factorForPeople(r.servings, c);
+      return next;
+    });
+  };
   const scaled = (r: RecipeGraph) => (factorOf(r.recipeId) === 1 ? r : scaleRecipe(r, factorOf(r.recipeId)));
   const [plan, setPlan] = usePersistentState<MasterExecutionPlan>(
     "tutti.plan",
@@ -280,6 +292,8 @@ export function App() {
           avoid={avoid}
           factorOf={factorOf}
           onSetFactor={setFactor}
+          peopleTarget={people}
+          onPeople={setPeopleScaled}
           onNext={() => setScreen("serveTime")}
         />
       ) : screen === "serveTime" ? (

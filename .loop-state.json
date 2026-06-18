@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 77,
-  "lastTick": "2026-06-18T06:11:47.464Z",
-  "lastTickEpoch": 1781763107,
+  "iteration": 78,
+  "lastTick": "2026-06-18T06:15:28.970Z",
+  "lastTickEpoch": 1781763328,
   "phase": "brief-v26-meal-servings",
-  "nextResearchTheme": "Brief v25 DONE (substitution hints; 240 tests). RESUMED after 3rd ~8h stall. Brief v26 authored (meal-level cooking-for-N scaling). NEXT: Brief v26 item 1 - apps/web/src/servings.ts pure: factorForPeople(baseServings,people)=max(1,min(6,round(people/max(1,baseServings)))); peopleFromFactor(baseServings,factor)=baseServings*factor. servings.test.ts (base4: people8->2, people4->1, people12->3, clamp[1,6], people<base->1). Then item 2 PickScreen meal-level Cooking-for-N stepper -> App sets servingsFactor[id]=factorForPeople(recipe.servings,N) for each selected dish; item 3 per-dish chips still override; item 5 Pick test stepper drives factor."
+  "nextResearchTheme": "Brief v26 item 1 done (factorForPeople; 245 tests). NEXT: items 2-3+5 - App: const [people,setPeople]=usePersistentState(\"tutti.people\",4,(v)=>typeof v===\"number\"); pass peopleTarget=people + onPeople=(n)=>{const c=Math.max(1,Math.min(40,n)); setPeople(c); selectedRecipes.forEach(r=>setFactor(r.recipeId, factorForPeople(r.servings,c)));} to PickScreen. import factorForPeople. PickScreen: add a meal-level Cooking-for-N stepper (props peopleTarget,onPeople) near top with -/+ (aria Fewer/More people, >=40px) showing the count. Per-dish 1x/2x/3x chips unchanged (still override). item 5: PickScreen test - More people button calls onPeople. Verify browser (Cooking for 8 -> dishes 2x). Then Brief v26 done -> research + Brief v27."
 }

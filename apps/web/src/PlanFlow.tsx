@@ -17,6 +17,8 @@ export function PickScreen({
   avoid,
   factorOf,
   onSetFactor,
+  peopleTarget,
+  onPeople,
   onNext,
 }: {
   recipes: RecipeGraph[];
@@ -29,12 +31,26 @@ export function PickScreen({
   avoid: string[];
   factorOf: (id: string) => number;
   onSetFactor: (id: string, f: number) => void;
+  peopleTarget: number;
+  onPeople: (n: number) => void;
   onNext: () => void;
 }) {
   const FACTORS = [1, 2, 3];
   return (
     <section className="zone" aria-label="Pick your dishes">
       <h2 className="zone-h"><span>Pick your dishes</span><span className="count">{selected.length}</span></h2>
+
+      {selected.length > 0 && (
+        <div className="kp-row" style={{ marginBottom: 12 }}>
+          <span className="kp-label">Cooking for</span>
+          <div className="kp-stepper">
+            <button aria-label="Fewer people" onClick={() => onPeople(peopleTarget - 1)} disabled={peopleTarget <= 1}>−</button>
+            <span className="kp-val" aria-live="polite">{peopleTarget} {peopleTarget === 1 ? "person" : "people"}</span>
+            <button aria-label="More people" onClick={() => onPeople(peopleTarget + 1)} disabled={peopleTarget >= 40}>+</button>
+          </div>
+        </div>
+      )}
+
       <div className="card-grid">
       {recipes.map((r) => {
         const on = selected.includes(r.recipeId);

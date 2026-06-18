@@ -21,6 +21,7 @@ describe("PickScreen — allergen warning (Brief v4 item 7)", () => {
         avoid={["sesame"]}
         factorOf={() => 1}
         onSetFactor={noop}
+        peopleTarget={4} onPeople={noop}
         onNext={noop}
       />,
     );
@@ -30,7 +31,7 @@ describe("PickScreen — allergen warning (Brief v4 item 7)", () => {
   it("shows no warning when nothing is avoided", () => {
     render(
       <PickScreen recipes={[kuzhambu]} selected={[]} onToggle={noop} soloMins={0} interleavedMins={0}
-        onAdd={noop} onShopping={noop} avoid={[]} factorOf={() => 1} onSetFactor={noop} onNext={noop} />,
+        onAdd={noop} onShopping={noop} avoid={[]} factorOf={() => 1} onSetFactor={noop} peopleTarget={4} onPeople={noop} onNext={noop} />,
     );
     expect(screen.queryByText(/may contain|⚠/i)).toBeNull();
   });
