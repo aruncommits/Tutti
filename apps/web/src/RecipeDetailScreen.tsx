@@ -2,6 +2,7 @@ import { allergensOf, type RecipeGraph } from "@tutti/engine";
 import { orderedSteps, recipeIngredients, recipeTotalMins } from "./recipeView";
 import { Stars } from "./Stars";
 import { colorFor } from "./dishColors";
+import { substitutesFor } from "./substitutions";
 import type { RecipeNote } from "./recipeNotes";
 
 // Recipe detail / read view (Brief v19) — a control center, not a blog post: ingredients up top,
@@ -48,12 +49,22 @@ export function RecipeDetailScreen({
 
       <h3 className="meal-sec">Ingredients</h3>
       <div className="ing-sec">
-        {ingredients.map((i) => (
-          <div className="ing-row" key={`${i.name}|${i.unit ?? ""}`}>
-            <span className="nm">{i.name}</span>
-            <span className="amt">{amt(i)}</span>
-          </div>
-        ))}
+        {ingredients.map((i) => {
+          const subs = substitutesFor(i.name);
+          return (
+            <div key={`${i.name}|${i.unit ?? ""}`}>
+              <div className="ing-row">
+                <span className="nm">{i.name}</span>
+                <span className="amt">{amt(i)}</span>
+              </div>
+              {subs.length > 0 && (
+                <p className="sub-hint">
+                  Out of {i.name}? Try {subs.map((s) => s.swap + (s.note ? ` (${s.note})` : "")).join(" · or ")}
+                </p>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       <h3 className="meal-sec">Steps</h3>

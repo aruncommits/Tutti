@@ -21,6 +21,15 @@ describe("RecipeDetailScreen (Brief v19 items 2+5)", () => {
     expect(onAdd).toHaveBeenCalledTimes(1);
   });
 
+  it("shows an 'out of …' substitution hint for an ingredient with a curated swap", () => {
+    render(<RecipeDetailScreen recipe={rasam} onAdd={() => {}} onBack={() => {}} />); // rasam uses ghee
+    const hint = screen.getByText(/out of ghee\?/i);
+    expect(hint).toBeInTheDocument();
+    expect(hint.textContent).toMatch(/oil|butter/i);
+    // water has no curated swap -> no hint for it
+    expect(screen.queryByText(/out of water\?/i)).toBeNull();
+  });
+
   it("shows a saved rating and note when present", () => {
     render(<RecipeDetailScreen recipe={rasam} note={{ rating: 4, cookCount: 2, note: "more pepper" }} onAdd={() => {}} onBack={() => {}} />);
     expect(screen.getByLabelText(/4 of 5 stars/i)).toBeInTheDocument();

@@ -1,9 +1,9 @@
 {
   "focus": "Tutti phase-by-phase build, then research+enhance each phase",
   "mode": "until-stop",
-  "iteration": 75,
-  "lastTick": "2026-06-18T06:03:31.323Z",
-  "lastTickEpoch": 1781762611,
+  "iteration": 76,
+  "lastTick": "2026-06-18T06:07:00.532Z",
+  "lastTickEpoch": 1781762820,
   "phase": "brief-v25-substitutions",
-  "nextResearchTheme": "Brief v24 DONE (adjustable +1m/+5m timers; 235 tests). RESUMED after 2nd ~8.6h usage-limit stall. Brief v25 authored (ingredient substitutions). NEXT: Brief v25 item 1 - apps/web/src/substitutions.ts: interface Substitute{swap;note?}; frozen SUBSTITUTIONS keyed by normalizeIngredientName for ~12-15 South Indian items (tamarind->lemon+pinch sugar; ghee->neutral oil; curry leaves->omit; grated coconut->omit/yogurt; mustard seeds->omit; urad dal->omit; chana dal->roasted gram; green chili->red chili powder; jaggery->brown sugar; asafoetida->garlic powder pinch; sesame oil->any neutral oil; coconut oil->neutral oil; yogurt->buttermilk). substitutesFor(name):Substitute[] (normalize query). substitutions.test.ts (known/unknown/normalized). Then item 2 surface in RecipeDetailScreen (subtle hint per ingredient with swaps), item 5 RecipeDetail test."
+  "nextResearchTheme": "Brief v25 item 1 done (substitutions.ts + substitutesFor; 239 tests). NEXT: items 2+5 - RecipeDetailScreen: under each Ingredients row where substitutesFor(i.name).length, render a subtle hint line (e.g. a muted .sub-hint span or <details>): \"Out of {i.name}? Try {swaps.map(s=>s.swap + (s.note?` (${s.note})`:\"\")).join(\" or \")}\". import substitutesFor. Keep rows without swaps clean. Add CSS .sub-hint. Item 5: recipeDetail.test add a case - a recipe with ghee (rec_rasam has ghee) shows /out of/i + /oil|butter/i hint; an ingredient without swaps shows no hint. Then Brief v25 DONE -> research + Brief v26."
 }
