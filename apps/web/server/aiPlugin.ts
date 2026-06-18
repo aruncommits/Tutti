@@ -1,5 +1,6 @@
 import type { Plugin } from "vite";
 import { routeRecipe, configuredProviders, type Keys } from "./aiRouter";
+import { allowRequest } from "./accessPolicy";
 
 // Dev-time AI endpoint: a Vite middleware so we need no extra deps or separate process. The provider
 // keys live HERE (server-side, from a gitignored .env) — never in the client bundle. In production
@@ -13,6 +14,8 @@ import { routeRecipe, configuredProviders, type Keys } from "./aiRouter";
 interface Req {
   url?: string;
   method?: string;
+  socket?: { remoteAddress?: string };
+  headers?: Record<string, string | string[] | undefined>;
   on(event: string, cb: (chunk: string) => void): void;
   destroy(): void;
 }
@@ -31,7 +34,7 @@ function readJson(req: Req): Promise<Record<string, unknown>> {
   });
 }
 
-export function aiApi(keys: Keys, freeLimit: number): Plugin {
+export function aiApi(keys: Keys, freeLimit: number, opts: { allowLan?: boolean; expectedToken?: string } = {}): Plugin {
   let used = 0; // simple in-memory stub; resets on restart. Real metering = billing later.
   return {
     name: "tutti-ai-api",
@@ -41,6 +44,17 @@ export function aiApi(keys: Keys, freeLimit: number): Plugin {
         const url = (req.url || "").split("?")[0] ?? "";
         if (!url.startsWith("/api/")) return next();
         res.setHeader("content-type", "application/json");
+
+        // Secure-by-default (Brief v40): the paid AI endpoint is localhost-only unless the owner
+        // explicitly opts into LAN access (AI_ALLOW_LAN) — and then, if set, a shared dev token.
+        const hdr = req.headers?.["x-dev-token"];
+        const gate = allowRequest({
+          remoteAddr: req.socket?.remoteAddress,
+          allowLan: !!opts.allowLan,
+          token: Array.isArray(hdr) ? hdr[0] : hdr,
+          expectedToken: opts.expectedToken,
+        });
+        if (!gate.ok) { res.statusCode = gate.status ?? 403; res.end(JSON.stringify({ error: "forbidden" })); return; }
 
         if (url === "/api/usage") {
           res.end(JSON.stringify({ providers: configuredProviders(keys), used, free: freeLimit, remaining: Math.max(0, freeLimit - used) }));

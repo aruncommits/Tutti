@@ -18,10 +18,14 @@ export default defineConfig(({ mode }) => {
     google: env.GOOGLE_API_KEY || env.GEMINI_API_KEY || undefined,
   };
   const aiFreeLimit = Number(env.AI_FREE_LIMIT || "20");
+  // Secure-by-default (Brief v40): the paid AI endpoint is localhost-only unless AI_ALLOW_LAN is set
+  // (e.g. to test "Ask AI" on a phone over the LAN); AI_DEV_TOKEN then requires an x-dev-token header.
+  const aiAllowLan = /^(1|true|yes)$/i.test(env.AI_ALLOW_LAN || "");
+  const aiDevToken = env.AI_DEV_TOKEN || undefined;
   return {
   plugins: [
     react(),
-    aiApi(aiKeys, aiFreeLimit),
+    aiApi(aiKeys, aiFreeLimit, { allowLan: aiAllowLan, expectedToken: aiDevToken }),
     VitePWA({
       registerType: "autoUpdate",
       includeAssets: ["icon.svg"],
