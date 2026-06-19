@@ -1504,6 +1504,16 @@ header {
 .btn.mini { padding: 6px 12px; font-size: 13px; }
 @media (prefers-reduced-motion: reduce) { .timer-pill.ringing { animation: none; } }
 
+/* Shopping (manual add + actions) + Pantry inventory */
+.shop-add, .pantry-add-row { display: flex; gap: 8px; align-items: center; margin: 4px 0 14px; flex-wrap: wrap; }
+.pantry-add { margin-bottom: 10px; }
+.pantry-add-row { margin-top: 8px; }
+.shop-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.pantry-staple { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.pantry-staple input { width: 16px; height: 16px; }
+.ing-row.expiring { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 10px; }
+.ing-row.expiring .amt { color: var(--accent-deep); font-weight: 700; }
+
 /* Weekly meal calendar */
 .cal-weeknav { display: flex; align-items: center; justify-content: space-between; margin: 4px 0 14px; }
 .cal-weeklabel { font-weight: 700; }

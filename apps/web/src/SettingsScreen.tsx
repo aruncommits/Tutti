@@ -13,6 +13,7 @@ export function SettingsScreen({
   canInstall = false,
   onInstall,
   onKitchen,
+  onPantry,
   onPace,
   onExport,
   onReset,
@@ -27,6 +28,7 @@ export function SettingsScreen({
   canInstall?: boolean;
   onInstall?: () => void;
   onKitchen?: () => void;
+  onPantry?: () => void;
   onPace?: () => void;
   onExport: () => void;
   onReset: () => void;
@@ -51,6 +53,12 @@ export function SettingsScreen({
       {onKitchen && (
         <button className="kp-row settings-link" onClick={onKitchen}>
           <span className="kp-label">Your kitchen<small className="kp-desc">Cooks, burners, ovens & allergens to avoid</small></span>
+          <span className="settings-chevron" aria-hidden="true">›</span>
+        </button>
+      )}
+      {onPantry && (
+        <button className="kp-row settings-link" onClick={onPantry}>
+          <span className="kp-label">Your pantry<small className="kp-desc">What you keep on hand — hidden from shopping, expiry alerts</small></span>
           <span className="settings-chevron" aria-hidden="true">›</span>
         </button>
       )}

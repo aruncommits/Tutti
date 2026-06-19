@@ -46,7 +46,7 @@ function sectionOf(screen: Screen): IconName {
     case "browse": case "recipe": return "browse";
     case "studio": case "addRecipe": return "studio";
     case "meals": return "meals";
-    case "kitchen": return "kitchen";
+    case "kitchen": case "pantry": return "kitchen";
     case "stats": return "pace";
     case "settings": return "settings";
     // The planner + its build flow (preview / ready / cook / shopping) live under Home.

@@ -14,10 +14,11 @@ describe("ShoppingScreen pantry staples (Brief v21 items 2+5)", () => {
     expect(typeof onToggleStaple.mock.calls[0]![0]).toBe("string");
   });
 
-  it("separates staples into an 'In your pantry' group", () => {
+  it("separates on-hand items into an 'In your pantry' group", () => {
     // mark 'rice' (a thali ingredient) as a pantry staple
-    render(<ShoppingScreen recipes={thaliV1.recipes} pantry={["rice"]} onToggleStaple={() => {}} onBack={() => {}} />);
+    render(<ShoppingScreen recipes={thaliV1.recipes} pantry={[{ name: "rice", staple: true }]} onToggleStaple={() => {}} onBack={() => {}} />);
     expect(screen.getByRole("heading", { name: /in your pantry/i })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /^to buy/i })).toBeInTheDocument();
+    // rice appears once — in the pantry group, not also in a buy aisle
+    expect(screen.getAllByRole("checkbox", { name: /^rice/i })).toHaveLength(1);
   });
 });

@@ -5,7 +5,7 @@ import { assignMeal, plannedFromSaved, type Calendar } from "./calendar";
 import type { SavedMeal } from "./meals";
 
 const TODAY = "2026-06-18";
-const saved: SavedMeal = { id: "s1", name: "South Indian Thali", dishIds: ["rec_sambar", "rec_lemonrice"], servings: {}, target: null, savedAt: 0, kind: "saved" };
+const saved: SavedMeal = { id: "s1", name: "South Indian Thali", dishIds: ["rec_sambar", "rec_lemonrice"], servings: {}, target: "19:00:00", savedAt: 0, kind: "saved" };
 
 const baseProps = {
   meals: [saved],

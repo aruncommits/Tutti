@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useRef, useState } from "react";
+import { Suspense, lazy, useEffect, useMemo, useRef, useState } from "react";
 import { applyEvent, compile, dishIdOf, formatClock, parseClock, paceCategoryOf, scaleRecipe, thaliV1, goldenLibrary, tierOf, updatePace, variantsForDish, type ComplexityTier, type MasterExecutionPlan, type PaceModel, type RecipeGraph } from "@tutti/engine";
 import { usePersistentState, type Screen } from "./state";
 import { Shell } from "./Shell";
@@ -10,7 +10,7 @@ import { shouldLearn } from "./learn";
 import { addRecent, removeMeal, upsertSaved, type SavedMeal } from "./meals";
 import { formatPlan, shareOrCopy } from "./share";
 import { recordCook, setRating, setNote, type NotesMap } from "./recipeNotes";
-import { toggleStaple, type Pantry } from "./pantry";
+import { toggleStaple, migratePantry, addPantryItem, removePantryItem, type Pantry, type PantryItem } from "./pantry";
 import { exportData, resetData } from "./appData";
 import { isStringArray, isPlainObject, isMealArray, isScreen, isClock } from "./validators";
 import { factorForPeople } from "./servings";
@@ -35,6 +35,7 @@ const StatsScreen = lazy(() => import("./StatsScreen").then((m) => ({ default: m
 const BrowseScreen = lazy(() => import("./BrowseScreen").then((m) => ({ default: m.BrowseScreen })));
 const StudioScreen = lazy(() => import("./StudioScreen").then((m) => ({ default: m.StudioScreen })));
 const CalendarScreen = lazy(() => import("./CalendarScreen").then((m) => ({ default: m.CalendarScreen })));
+const PantryScreen = lazy(() => import("./PantryScreen").then((m) => ({ default: m.PantryScreen })));
 
 const Loading = () => <div className="idle" role="status">Loading…</div>;
 
@@ -48,7 +49,7 @@ const SAMPLE_RECIPES: RecipeGraph[] = (() => {
 
 const SCREEN_NAMES: Record<Screen, string> = {
   onboarding: "Welcome", kitchen: "Your kitchen", home: "Home", calendar: "Meal calendar", addRecipe: "Add a dish", studio: "Recipe Studio",
-  browse: "Browse recipes", recipe: "Recipe", shopping: "Shopping list", stats: "Your pace", meals: "Your meals", settings: "Settings", pick: "Pick dishes",
+  browse: "Browse recipes", recipe: "Recipe", shopping: "Shopping list", pantry: "Pantry", stats: "Your pace", meals: "Your meals", settings: "Settings", pick: "Pick dishes",
   serveTime: "Serve time", preview: "Plan preview", ready: "Get ready", cook: "Cook mode", done: "Done",
 };
 
@@ -76,7 +77,9 @@ export function App() {
   const [meals, setMeals] = usePersistentState<SavedMeal[]>("tutti.meals", [], isMealArray);
   const [notes, setNotes] = usePersistentState<NotesMap>("tutti.recipeNotes", {}, isPlainObject);
   const [detailRecipe, setDetailRecipe] = useState<RecipeGraph | null>(null);
-  const [pantry, setPantry] = usePersistentState<Pantry>("tutti.pantry", [], isStringArray);
+  // Pantry: stored loosely (back-compat with the old string[] of staples) then migrated on read.
+  const [pantryStored, setPantry] = usePersistentState<Pantry>("tutti.pantry", [], Array.isArray);
+  const pantry = useMemo(() => migratePantry(pantryStored), [pantryStored]);
   const [people, setPeople] = usePersistentState<number>("tutti.people", 4, (v) => typeof v === "number");
   const [metric, setMetric] = usePersistentState<boolean>("tutti.metric", false, (v) => typeof v === "boolean");
   const [photos, setPhotos] = usePersistentState<Photos>("tutti.photos", {}, isPlainObject);
@@ -359,9 +362,19 @@ export function App() {
         <ShoppingScreen
           recipes={weekShopRecipes ?? (selectedRecipes.length ? selectedRecipes : allRecipes)}
           onBack={() => { if (shopDays) { setShopDays(null); setScreen("calendar"); } else setScreen("home"); }}
+          onPantry={() => setScreen("pantry")}
           pantry={pantry}
           metric={metric}
-          onToggleStaple={(name) => setPantry((p) => toggleStaple(p, name))}
+          onToggleStaple={(name) => setPantry((p) => toggleStaple(migratePantry(p), name))}
+        />
+      ) : screen === "pantry" ? (
+        <PantryScreen
+          pantry={pantry}
+          today={todayISO}
+          onAdd={(item: PantryItem) => setPantry((p) => addPantryItem(migratePantry(p), item))}
+          onRemove={(name) => setPantry((p) => removePantryItem(migratePantry(p), name))}
+          onToggleStaple={(name) => setPantry((p) => toggleStaple(migratePantry(p), name))}
+          onBack={() => setScreen("home")}
         />
       ) : screen === "calendar" ? (
         <CalendarScreen
@@ -392,6 +405,7 @@ export function App() {
           canInstall={canInstall}
           onInstall={promptInstall}
           onKitchen={() => setScreen("kitchen")}
+          onPantry={() => setScreen("pantry")}
           onPace={() => setScreen("stats")}
           onExport={() => { void shareOrCopy("Tutti data", exportData(localStorage)); }}
           onReset={() => {
