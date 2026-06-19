@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { tierOf, type ComplexityTier, type RecipeGraph } from "@tutti/engine";
 import { colorFor } from "./dishColors";
 import { recipeTotalMins } from "./recipeView";
+import type { Collection } from "./collections";
 
 // Recipe Studio — the one home for authoring (Brief v42). "+ New" reaches the paste/URL/AI flow;
 // "My recipes" manages the recipes you've added or made (open / duplicate / delete). The Phase-2
@@ -11,19 +13,26 @@ const TIER_LABEL: Record<ComplexityTier, string> = { simple: "Simple", moderate:
 export function StudioScreen({
   candidates,
   photos = {},
+  collections = [],
   onNew,
   onOpen,
   onDuplicate,
   onRemove,
+  onAddCollection,
+  onRemoveCollection,
 }: {
   candidates: RecipeGraph[];
   photos?: Record<string, string>;
+  collections?: Collection[];
   onNew: () => void;
   onOpen: (r: RecipeGraph) => void;
   onDuplicate: (id: string) => void;
   onRemove: (id: string) => void;
+  onAddCollection?: (name: string) => void;
+  onRemoveCollection?: (id: string) => void;
 }) {
   const mine = [...candidates].reverse(); // newest first
+  const [newCol, setNewCol] = useState("");
 
   return (
     <section className="zone" aria-label="Recipe Studio">
@@ -56,6 +65,33 @@ export function StudioScreen({
             </div>
           ))}
         </div>
+      )}
+
+      {onAddCollection && (
+        <>
+          <h3 className="meal-sec">Collections</h3>
+          <div className="shop-add">
+            <input className="url-input" type="text" value={newCol} placeholder="New collection (e.g. Weeknight)…" aria-label="New collection name" onChange={(e) => setNewCol(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && newCol.trim()) { onAddCollection(newCol); setNewCol(""); } }} />
+            <button className="btn mini" onClick={() => { if (newCol.trim()) { onAddCollection(newCol); setNewCol(""); } }}>Add</button>
+          </div>
+          {collections.length === 0 ? (
+            <p className="hint">Group recipes into cookbooks — open a recipe to add it to a collection.</p>
+          ) : (
+            <div className="card-grid">
+              {collections.map((c) => (
+                <div className="browse-line" key={c.id}>
+                  <span className="pick-row browse-row" style={{ pointerEvents: "none" }}>
+                    <span className="pick-main">
+                      <span className="node-title">{c.name}</span>
+                      <span className="dur">{c.recipeIds.length} recipes</span>
+                    </span>
+                  </span>
+                  {onRemoveCollection && <button className="row-x" aria-label={`Delete collection ${c.name}`} onClick={() => onRemoveCollection(c.id)}>×</button>}
+                </div>
+              ))}
+            </div>
+          )}
+        </>
       )}
     </section>
   );

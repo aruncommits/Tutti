@@ -72,6 +72,19 @@ describe("sortLibrary (Brief v38 item 1)", () => {
 
 import { filterLibrary as _filterCuisine, cuisinesOf } from "./libraryView";
 
+describe("filterLibrary diets (Brief v47)", () => {
+  it("keeps only recipes satisfying all required diets", () => {
+    const vegan = filterLibrary(entries, { diets: ["vegan"] }).map((e) => e.recipe.recipeId);
+    expect(vegan).toContain("rec_chutney"); // all-plant
+    expect(vegan).not.toContain("rec_curdrice"); // has yogurt
+  });
+  it("annotates entries with diets and kcal", () => {
+    const curd = entries.find((e) => e.recipe.recipeId === "rec_curdrice")!;
+    expect(curd.diets).toContain("vegetarian");
+    expect(curd.kcal).toBeGreaterThan(0);
+  });
+});
+
 describe("filterLibrary cuisine (Brief v39)", () => {
   it("narrows to a single cuisine and ignores it when unset", () => {
     const cuisines = cuisinesOf(entries);

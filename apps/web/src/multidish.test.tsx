@@ -32,6 +32,7 @@ const builderProps = {
   onDetails: noop,
   onSetTier: noop,
   onShopping: noop,
+  diets: [],
   cookLive: false,
   fit: { makespanMins: 0, feasible: true, verdict: "fits", hint: "" } as MealFit,
 };

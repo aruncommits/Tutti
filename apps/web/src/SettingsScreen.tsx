@@ -12,6 +12,8 @@ export function SettingsScreen({
   onToggleMetric,
   canInstall = false,
   onInstall,
+  diet = [],
+  onToggleDiet,
   onKitchen,
   onPantry,
   onPace,
@@ -27,6 +29,8 @@ export function SettingsScreen({
   onToggleMetric: () => void;
   canInstall?: boolean;
   onInstall?: () => void;
+  diet?: string[];
+  onToggleDiet?: (d: string) => void;
   onKitchen?: () => void;
   onPantry?: () => void;
   onPace?: () => void;
@@ -73,6 +77,18 @@ export function SettingsScreen({
       <Toggle on={pro} onToggle={onTogglePro} label="Pro mode" desc="Let prep and cook interleave without nudges" />
       <Toggle on={learnPace} onToggle={onToggleLearn} label="Learn my pace" desc="Tune timings to how you actually cook" />
       <Toggle on={metric} onToggle={onToggleMetric} label="Metric units" desc="Show amounts in millilitres" />
+
+      {onToggleDiet && (
+        <>
+          <h3 className="meal-sec">Diet</h3>
+          <p className="hint">Recipes that don't fit are filtered out of discovery by default.</p>
+          <div className="browse-filters" role="group" aria-label="Dietary preferences">
+            {["vegetarian", "vegan", "pescatarian", "gluten-free", "dairy-free", "egg-free", "nut-free"].map((d) => (
+              <button key={d} className={`chip-toggle${diet.includes(d) ? " on" : ""}`} aria-pressed={diet.includes(d)} onClick={() => onToggleDiet(d)}>{d}</button>
+            ))}
+          </div>
+        </>
+      )}
 
       <h3 className="meal-sec">Appearance</h3>
       <p className="hint">Tutti follows your device's light or dark setting automatically.</p>

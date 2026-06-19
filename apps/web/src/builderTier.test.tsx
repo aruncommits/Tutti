@@ -32,6 +32,7 @@ const baseProps = {
   onDetails: vi.fn(),
   onSetTier: vi.fn(),
   onShopping: vi.fn(),
+  diets: [],
   cookLive: false,
   fit: { makespanMins: 45, feasible: true, verdict: "fits", hint: "" } as MealFit,
 };

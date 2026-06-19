@@ -18,6 +18,7 @@ import { useInstallPrompt } from "./useInstallPrompt";
 import { addPhoto, resizeToThumb, type Photos } from "./photos";
 import { mealFit } from "./mealFit";
 import { assignMeal, clearSlot, mealsInDays, toISO, type Calendar, type PlannedMeal } from "./calendar";
+import { addCollection, removeCollection, toggleInCollection, isValidCollections, type Collection } from "./collections";
 
 // Secondary screens are lazy-loaded so the initial/cook bundle stays lean (Brief v10).
 // AddRecipe pulls @tutti/ingest, so splitting it keeps the parser out of the entry chunk.
@@ -65,6 +66,9 @@ export function App() {
   const [cookStartedAt, setCookStartedAt] = usePersistentState<number | null>("tutti.cookStartedAt", null, (v) => v === null || typeof v === "number");
   const [calendar, setCalendar] = usePersistentState<Calendar>("tutti.calendar", {}, isPlainObject);
   const [shopDays, setShopDays] = useState<string[] | null>(null);
+  const [diet, setDiet] = usePersistentState<string[]>("tutti.diet", [], isStringArray);
+  const [collections, setCollections] = usePersistentState<Collection[]>("tutti.collections", [], isValidCollections);
+  const toggleDiet = (d: string) => setDiet((p) => (p.includes(d) ? p.filter((x) => x !== d) : [...p, d]));
   const [candidates, setCandidates] = usePersistentState<RecipeGraph[]>("tutti.candidates", [], Array.isArray);
   const [avoid, setAvoid] = usePersistentState<string[]>("tutti.avoid", [], isStringArray);
   const [servingsFactor, setServingsFactor] = usePersistentState<Record<string, number>>("tutti.servingsFactor", {}, isPlainObject);
@@ -339,6 +343,7 @@ export function App() {
       ) : screen === "browse" ? (
         <BrowseScreen
           avoid={avoid}
+          diets={diet}
           candidates={candidates}
           notes={notes}
           photos={photos}
@@ -355,6 +360,8 @@ export function App() {
           photo={photos[detailRecipe.recipeId]}
           siblings={variantsForDish(allRecipes, dishIdOf(detailRecipe))}
           onPickVariant={setDetailRecipe}
+          collections={collections}
+          onToggleCollection={(cid, rid) => setCollections((c) => toggleInCollection(c, cid, rid))}
           onAdd={() => addCandidate(detailRecipe)}
           onBack={() => setScreen("browse")}
         />
@@ -404,6 +411,8 @@ export function App() {
           onToggleMetric={() => setMetric(!metric)}
           canInstall={canInstall}
           onInstall={promptInstall}
+          diet={diet}
+          onToggleDiet={toggleDiet}
           onKitchen={() => setScreen("kitchen")}
           onPantry={() => setScreen("pantry")}
           onPace={() => setScreen("stats")}
@@ -412,6 +421,7 @@ export function App() {
             resetData(localStorage);
             setPace({}); setEvents([]); setMeals([]); setNotes({}); setPantry([]);
             setDishes([]); setServeAt(null); setLearnPace(true); setPro(false);
+            setDiet([]); setCollections([]); setCalendar({});
             setScreen("home");
           }}
           onBack={() => setScreen("home")}
@@ -429,10 +439,13 @@ export function App() {
         <StudioScreen
           candidates={candidates}
           photos={photos}
+          collections={collections}
           onNew={() => setScreen("addRecipe")}
           onOpen={(r) => { setDetailRecipe(r); setScreen("recipe"); }}
           onDuplicate={duplicateCandidate}
           onRemove={removeCandidate}
+          onAddCollection={(name) => setCollections((c) => addCollection(c, name, `col${Date.now().toString(36)}`))}
+          onRemoveCollection={(id) => setCollections((c) => removeCollection(c, id))}
         />
       ) : screen === "preview" ? (
         <PreviewScreen
@@ -473,6 +486,7 @@ export function App() {
           notes={notes}
           photos={photos}
           avoid={avoid}
+          diets={diet}
           selectedIds={dishes}
           onPick={addCandidate}
           onDetails={(r) => { setDetailRecipe(r); setScreen("recipe"); }}

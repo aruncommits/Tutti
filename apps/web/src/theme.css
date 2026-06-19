@@ -1504,6 +1504,19 @@ header {
 .btn.mini { padding: 6px 12px; font-size: 13px; }
 @media (prefers-reduced-motion: reduce) { .timer-pill.ringing { animation: none; } }
 
+/* Nutrition strip + diet badges + kcal chip */
+.nutri-strip { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; margin: 8px 0 12px; padding: 10px 12px; border-radius: 12px; background: var(--bg-tint); font-size: 13px; }
+.nutri-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+.nutri-kcal { font-weight: 800; color: var(--ink); }
+.nutri-macro { color: var(--muted); }
+.nutri-macro b { color: var(--ink); }
+.nutri-est { font-size: 11px; color: var(--faint); margin-left: auto; }
+.diet-badges { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0 8px; }
+.diet-badge { font-size: 11px; font-weight: 700; color: #2f6b3a; background: #e4f1e6; padding: 2px 8px; border-radius: 999px; }
+.diet-badge.sm { font-size: 10px; padding: 1px 6px; margin-left: 6px; }
+.kcal-chip { font-size: 11px; color: var(--muted); margin-left: 6px; }
+@media (prefers-color-scheme: dark) { .diet-badge { color: #bfe5c6; background: #20351f; } }
+
 /* Shopping (manual add + actions) + Pantry inventory */
 .shop-add, .pantry-add-row { display: flex; gap: 8px; align-items: center; margin: 4px 0 14px; flex-wrap: wrap; }
 .pantry-add { margin-bottom: 10px; }

@@ -42,8 +42,10 @@ function Row({ e, ctx }: { e: LibraryEntry; ctx: RowCtx }) {
             : <span className="swatch" style={{ background: colorFor(e.recipe.recipeId) }} />}
           <span className="node-title">{e.recipe.name}</span>
           {ways > 1 ? <span className="ways">{ways} ways</span> : null}
+          {e.diets.includes("vegan") ? <span className="diet-badge sm">vegan</span> : e.diets.includes("vegetarian") ? <span className="diet-badge sm">veg</span> : null}
           {note?.rating ? <Stars value={note.rating} /> : null}
           {note && note.cookCount > 0 ? <span className="cooked-n">cooked {note.cookCount}×</span> : null}
+          {e.kcal > 0 ? <span className="kcal-chip">{e.kcal} kcal</span> : null}
           <span className="dur">{e.totalMins}m</span>
           <span className="browse-add">{selected ? "✓ Added" : "+ Add"}</span>
         </span>
@@ -84,6 +86,7 @@ export function RecipePicker({
   notes = {},
   photos = {},
   avoid = [],
+  diets = [],
   selectedIds = [],
   onPick,
   onDetails,
@@ -93,6 +96,7 @@ export function RecipePicker({
   notes?: NotesMap;
   photos?: Record<string, string>;
   avoid?: string[];
+  diets?: string[];
   selectedIds?: string[];
   onPick: (r: RecipeGraph) => void;
   onDetails?: (r: RecipeGraph) => void;
@@ -101,7 +105,9 @@ export function RecipePicker({
   const [maxMins, setMaxMins] = useState<number | null>(null);
   const [vegOnly, setVegOnly] = useState(false);
   const [hideAllergens, setHideAllergens] = useState(avoid.length > 0);
+  const [dietFilter, setDietFilter] = useState<string[]>(diets);
   const [sort, setSort] = useState<SortKey>("default");
+  const toggleDiet = (d: string) => setDietFilter((f) => (f.includes(d) ? f.filter((x) => x !== d) : [...f, d]));
 
   // The pool the user can add from: library + their own recipes (deduped, candidates win), then
   // COLLAPSED to one card per dish (its verified default variant) — tiers are chosen on the plan row.
@@ -127,8 +133,8 @@ export function RecipePicker({
   const ctx: RowCtx = { notes, photos, selectedDishes, variantCount, onPick, onDetails };
 
   const filtered = useMemo(
-    () => filterLibrary(pool, { query, maxMins: maxMins ?? undefined, vegOnly, avoidAllergens: hideAllergens ? avoid : [] }),
-    [pool, query, maxMins, vegOnly, hideAllergens, avoid],
+    () => filterLibrary(pool, { query, maxMins: maxMins ?? undefined, vegOnly, avoidAllergens: hideAllergens ? avoid : [], diets: dietFilter }),
+    [pool, query, maxMins, vegOnly, hideAllergens, avoid, dietFilter],
   );
 
   const candidateEntries = useMemo(() => toLibraryEntries(candidates).reverse(), [candidates]); // newest-first
@@ -155,6 +161,12 @@ export function RecipePicker({
         {avoid.length > 0 && (
           <button className={`chip-toggle${hideAllergens ? " on" : ""}`} role="switch" aria-checked={hideAllergens} onClick={() => setHideAllergens((h) => !h)}>hide my allergens</button>
         )}
+      </div>
+
+      <div className="browse-filters" role="group" aria-label="Diet">
+        {["vegan", "vegetarian", "gluten-free", "dairy-free"].map((d) => (
+          <button key={d} className={`chip-toggle${dietFilter.includes(d) ? " on" : ""}`} aria-pressed={dietFilter.includes(d)} onClick={() => toggleDiet(d)}>{d}</button>
+        ))}
       </div>
 
       {searching ? (

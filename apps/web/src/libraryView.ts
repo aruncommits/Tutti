@@ -1,4 +1,4 @@
-import { allergensOf, type RecipeGraph } from "@tutti/engine";
+import { allergensOf, dietsOf, nutritionOf, satisfiesDiets, type RecipeGraph } from "@tutti/engine";
 import type { NotesMap } from "./recipeNotes";
 
 // Pure browse/search helpers for the recipe library (Brief v8 item 2). Derives display metadata
@@ -9,6 +9,8 @@ export interface LibraryEntry {
   totalMins: number;
   allergens: string[];
   veg: boolean;
+  diets: string[];
+  kcal: number;
 }
 
 const NON_VEG = /\b(meat|chicken|mutton|beef|pork|lamb|fish|prawn|shrimp|crab|lobster|egg|anchov|bacon|ham)\b/i;
@@ -24,6 +26,8 @@ export function toLibraryEntries(recipes: RecipeGraph[]): LibraryEntry[] {
     totalMins: recipe.nodes.reduce((s, n) => s + n.duration.estMins, 0),
     allergens: allergensOf(recipe),
     veg: isVeg(recipe),
+    diets: dietsOf(recipe),
+    kcal: nutritionOf(recipe).kcal,
   }));
 }
 
@@ -33,17 +37,22 @@ export interface LibraryFilter {
   avoidAllergens?: string[];
   vegOnly?: boolean;
   cuisine?: string; // exact match on recipe.cuisine; undefined/"" = all cuisines
+  diets?: string[]; // recipe must satisfy ALL of these
+  course?: string;  // exact match on recipe.course
 }
 
 /** Stackable filter: every provided criterion must pass. Query matches name OR an ingredient name. */
 export function filterLibrary(entries: LibraryEntry[], opts: LibraryFilter = {}): LibraryEntry[] {
   const q = opts.query?.trim().toLowerCase();
   const avoid = new Set(opts.avoidAllergens ?? []);
+  const diets = opts.diets ?? [];
   return entries.filter((e) => {
     if (opts.vegOnly && !e.veg) return false;
     if (opts.cuisine && e.recipe.cuisine !== opts.cuisine) return false;
+    if (opts.course && e.recipe.course !== opts.course) return false;
     if (opts.maxMins !== undefined && e.totalMins > opts.maxMins) return false;
     if (avoid.size && e.allergens.some((a) => avoid.has(a))) return false;
+    if (diets.length && !satisfiesDiets(e.recipe, diets)) return false;
     if (q) {
       const inName = e.recipe.name.toLowerCase().includes(q);
       const inIng = e.recipe.nodes.some((n) => n.ingredients.some((i) => i.name.toLowerCase().includes(q)));

@@ -1,10 +1,12 @@
-import { allergensOf, tierOf, type ComplexityTier, type RecipeGraph } from "@tutti/engine";
+import { allergensOf, dietsOf, nutritionOf, tierOf, type ComplexityTier, type RecipeGraph } from "@tutti/engine";
 import { orderedSteps, recipeIngredients, recipeTotalMins } from "./recipeView";
 import { Stars } from "./Stars";
 import { colorFor } from "./dishColors";
 import { substitutesFor } from "./substitutions";
 import { displayAmount } from "./units";
+import { NutritionStrip } from "./NutritionStrip";
 import type { RecipeNote } from "./recipeNotes";
+import type { Collection } from "./collections";
 
 // Recipe detail / read view (Brief v19) — a control center, not a blog post: ingredients up top,
 // scannable numbered steps with phase + time + hands-free tags. Pure render of the RecipeGraph.
@@ -18,6 +20,8 @@ export function RecipeDetailScreen({
   photo,
   siblings = [],
   onPickVariant,
+  collections = [],
+  onToggleCollection,
   onAdd,
   onBack,
 }: {
@@ -27,12 +31,16 @@ export function RecipeDetailScreen({
   photo?: string;
   siblings?: RecipeGraph[];
   onPickVariant?: (r: RecipeGraph) => void;
+  collections?: Collection[];
+  onToggleCollection?: (collectionId: string, recipeId: string) => void;
   onAdd: () => void;
   onBack: () => void;
 }) {
   const allergens = allergensOf(recipe);
   const steps = orderedSteps(recipe);
   const ingredients = recipeIngredients(recipe);
+  const nutrition = nutritionOf(recipe);
+  const diets = dietsOf(recipe);
 
   return (
     <section className="zone" aria-label="Recipe">
@@ -46,9 +54,32 @@ export function RecipeDetailScreen({
       <p className="value recipe-meta">
         {recipeTotalMins(recipe)} min · serves {recipe.servings}
         <span className="tier-badge">{TIER_LABEL[tierOf(recipe)]}</span>
+        {recipe.course && <span className="tier-badge">{recipe.course}</span>}
         {allergens.map((a) => <span key={a} className="badge-allergen" title="contains"> {a}</span>)}
         {!recipe.verified && <span className="badge-unverified"> unverified</span>}
       </p>
+
+      {diets.length > 0 && (
+        <p className="diet-badges" aria-label="Diets">
+          {diets.map((d) => <span key={d} className="diet-badge">{d}</span>)}
+        </p>
+      )}
+
+      <NutritionStrip nutrition={nutrition} />
+
+      {collections.length > 0 && onToggleCollection && (
+        <div className="browse-filters" role="group" aria-label="Add to a collection">
+          <span className="kp-label" style={{ alignSelf: "center" }}>Collections</span>
+          {collections.map((c) => {
+            const inIt = c.recipeIds.includes(recipe.recipeId);
+            return (
+              <button key={c.id} className={`chip-toggle${inIt ? " on" : ""}`} aria-pressed={inIt} onClick={() => onToggleCollection(c.id, recipe.recipeId)}>
+                {inIt ? "✓ " : "+ "}{c.name}
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {siblings.length > 1 && onPickVariant && (
         <div className="tier-toggle detail-tiers" role="group" aria-label="Other versions of this dish">

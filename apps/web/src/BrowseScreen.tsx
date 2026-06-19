@@ -7,6 +7,7 @@ import type { NotesMap } from "./recipeNotes";
 
 export function BrowseScreen({
   avoid,
+  diets = [],
   candidates = [],
   notes = {},
   photos = {},
@@ -16,6 +17,7 @@ export function BrowseScreen({
   onBack,
 }: {
   avoid: string[];
+  diets?: string[];
   candidates?: RecipeGraph[];
   notes?: NotesMap;
   photos?: Record<string, string>;
@@ -34,6 +36,7 @@ export function BrowseScreen({
         notes={notes}
         photos={photos}
         avoid={avoid}
+        diets={diets}
         selectedIds={selectedIds}
         onPick={onPick}
         onDetails={onDetails}

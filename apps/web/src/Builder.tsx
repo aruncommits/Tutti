@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
-import { allergensOf, dishIdOf, formatClock, parseClock, tierOf, variantsForDish, type ComplexityTier, type RecipeGraph } from "@tutti/engine";
+import { allergensOf, dishIdOf, formatClock, mealNutrition, parseClock, tierOf, variantsForDish, type ComplexityTier, type RecipeGraph } from "@tutti/engine";
 import { colorFor } from "./dishColors";
 import { RecipePicker } from "./RecipePicker";
+import { NutritionStrip } from "./NutritionStrip";
 import type { MealFit } from "./mealFit";
 import type { NotesMap } from "./recipeNotes";
 
@@ -67,6 +68,7 @@ export function Builder({
   notes,
   photos,
   avoid,
+  diets,
   selectedIds,
   onPick,
   onDetails,
@@ -95,6 +97,7 @@ export function Builder({
   notes: NotesMap;
   photos: Record<string, string>;
   avoid: string[];
+  diets: string[];
   selectedIds: string[];
   onPick: (r: RecipeGraph) => void;
   onDetails: (r: RecipeGraph) => void;
@@ -138,6 +141,7 @@ export function Builder({
           notes={notes}
           photos={photos}
           avoid={avoid}
+          diets={diets}
           selectedIds={selectedIds}
           onPick={onPick}
           onDetails={onDetails}
@@ -207,6 +211,8 @@ export function Builder({
             <span className="arrow">→</span>
             <b>~{interleavedMins} min with Tutti ⚡</b>
           </div>
+
+          <NutritionStrip nutrition={mealNutrition(selected)} label="Per person" />
 
           {fit.verdict !== "fits" && (
             <p className={`meal-fit ${fit.verdict}`} role="status">{fit.verdict === "over" ? "⛔ " : "⚠ "}{fit.hint}</p>
