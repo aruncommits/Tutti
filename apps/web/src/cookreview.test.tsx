@@ -36,7 +36,8 @@ describe("Cook Mode finale review (Brief v17 items 3+5)", () => {
 describe("Browse shows ratings & cook count (Brief v17 item 4)", () => {
   it("renders saved stars and cook count for a rated recipe", () => {
     render(<BrowseScreen avoid={[]} notes={{ rec_chutney: { rating: 4, cookCount: 3 } }} onPick={vi.fn()} onBack={vi.fn()} />);
-    expect(screen.getByText(/cooked 3×/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/4 of 5 stars/i)).toBeInTheDocument();
+    // A frequently-cooked dish shows in both "You cook these often" and its cuisine accordion.
+    expect(screen.getAllByText(/cooked 3×/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByLabelText(/4 of 5 stars/i).length).toBeGreaterThan(0);
   });
 });

@@ -17,7 +17,7 @@
       ]
     },
     {
-      "recipeId": "rec_rasam", "name": "Tomato Rasam", "version": 1, "servings": 4, "verified": true, "cuisine": "South Indian",
+      "recipeId": "rec_rasam", "name": "Tomato Rasam", "version": 1, "servings": 4, "verified": true, "cuisine": "South Indian", "dishId": "dish_rasam", "tier": "moderate", "variantLabel": "Everyday",
       "nodes": [
         { "nodeId": "ra_1", "recipeId": "rec_rasam", "title": "Chop tomatoes & crush garlic", "phase": "prep", "attention": "active",
           "duration": { "estMins": 5, "minMins": 4, "maxMins": 8, "elastic": true },
@@ -118,7 +118,7 @@
       ]
     },
     {
-      "recipeId": "rec_sambar", "name": "Sambar", "version": 1, "servings": 4, "verified": true, "cuisine": "South Indian",
+      "recipeId": "rec_sambar", "name": "Sambar", "version": 1, "servings": 4, "verified": true, "cuisine": "South Indian", "dishId": "dish_sambar", "tier": "moderate", "variantLabel": "Everyday",
       "nodes": [
         { "nodeId": "sb_1", "recipeId": "rec_sambar", "title": "Pressure-cook toor dal", "phase": "cook", "attention": "passive",
           "duration": { "estMins": 18, "minMins": 16, "maxMins": 22, "elastic": false },
@@ -142,6 +142,72 @@
         { "nodeId": "sb_6", "recipeId": "rec_sambar", "title": "Add the tempering & serve", "phase": "serve", "attention": "active",
           "duration": { "estMins": 1, "minMins": 1, "maxMins": 2, "elastic": false },
           "ingredients": [ { "name": "coriander", "amount": 2, "unit": "tbsp" } ], "resources": [], "dependencies": ["sb_4", "sb_5"] }
+      ]
+    },
+    {
+      "recipeId": "rec_sambar_simple", "name": "Quick Sambar", "version": 1, "servings": 4, "verified": true, "cuisine": "South Indian", "dishId": "dish_sambar", "tier": "simple", "variantLabel": "Quick one-pot",
+      "nodes": [
+        { "nodeId": "sbs_1", "recipeId": "rec_sambar_simple", "title": "Pressure-cook toor dal with veg & tomato", "phase": "cook", "attention": "passive",
+          "duration": { "estMins": 16, "minMins": 14, "maxMins": 20, "elastic": false },
+          "ingredients": [ { "name": "toor dal", "amount": 0.75, "unit": "cup" }, { "name": "mixed vegetables", "amount": 1.5, "unit": "cup", "preparedState": "chopped" }, { "name": "tomato", "amount": 1, "unit": "whole", "preparedState": "chopped" }, { "name": "turmeric", "amount": 0.5, "unit": "tsp" }, { "name": "water", "amount": 3, "unit": "cup" } ],
+          "resources": [ { "category": "pressure_cooker", "count": 1, "heldFor": "duration" }, { "category": "burner", "count": 1, "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "sbs_2", "recipeId": "rec_sambar_simple", "title": "Stir in tamarind, sambar powder & salt; simmer", "phase": "cook", "attention": "passive",
+          "duration": { "estMins": 6, "minMins": 5, "maxMins": 9, "elastic": false },
+          "ingredients": [ { "name": "tamarind pulp", "amount": 0.5, "unit": "cup" }, { "name": "sambar powder", "amount": 2, "unit": "tbsp" }, { "name": "salt", "amount": 1, "unit": "tsp" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["large"], "heldFor": "duration" } ], "dependencies": ["sbs_1"] },
+        { "nodeId": "sbs_3", "recipeId": "rec_sambar_simple", "title": "Quick temper & serve", "phase": "serve", "attention": "active",
+          "duration": { "estMins": 3, "minMins": 2, "maxMins": 4, "elastic": false },
+          "ingredients": [ { "name": "ghee", "amount": 1, "unit": "tbsp" }, { "name": "mustard seeds", "amount": 1, "unit": "tsp" }, { "name": "curry leaves", "amount": 1, "unit": "sprig" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["small"], "heldFor": "duration" } ], "dependencies": ["sbs_2"] }
+      ]
+    },
+    {
+      "recipeId": "rec_sambar_complex", "name": "Sambar from Scratch", "version": 1, "servings": 4, "verified": true, "cuisine": "South Indian", "dishId": "dish_sambar", "tier": "complex", "variantLabel": "From scratch",
+      "nodes": [
+        { "nodeId": "sbc_1", "recipeId": "rec_sambar_complex", "title": "Dry-roast & grind fresh sambar masala", "phase": "prep", "attention": "active",
+          "duration": { "estMins": 10, "minMins": 8, "maxMins": 14, "elastic": true },
+          "ingredients": [ { "name": "coriander seeds", "amount": 2, "unit": "tbsp" }, { "name": "chana dal", "amount": 1, "unit": "tbsp" }, { "name": "dried red chili", "amount": 4, "unit": "whole" }, { "name": "fenugreek seeds", "amount": 0.5, "unit": "tsp" }, { "name": "curry leaves", "amount": 1, "unit": "sprig" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["small"], "heldFor": "duration" }, { "category": "blender", "count": 1, "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "sbc_2", "recipeId": "rec_sambar_complex", "title": "Pressure-cook toor dal", "phase": "cook", "attention": "passive",
+          "duration": { "estMins": 18, "minMins": 16, "maxMins": 22, "elastic": false },
+          "ingredients": [ { "name": "toor dal", "amount": 0.75, "unit": "cup" }, { "name": "turmeric", "amount": 0.5, "unit": "tsp" }, { "name": "water", "amount": 2, "unit": "cup" } ],
+          "resources": [ { "category": "pressure_cooker", "count": 1, "heldFor": "duration" }, { "category": "burner", "count": 1, "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "sbc_3", "recipeId": "rec_sambar_complex", "title": "Soak & extract fresh tamarind", "phase": "prep", "attention": "active",
+          "duration": { "estMins": 5, "minMins": 4, "maxMins": 7, "elastic": false },
+          "ingredients": [ { "name": "tamarind", "amount": 1, "unit": "lime-size" }, { "name": "warm water", "amount": 1, "unit": "cup" } ],
+          "resources": [], "dependencies": [] },
+        { "nodeId": "sbc_4", "recipeId": "rec_sambar_complex", "title": "Chop drumstick, pumpkin, shallots & tomato", "phase": "prep", "attention": "active",
+          "duration": { "estMins": 12, "minMins": 9, "maxMins": 16, "elastic": true },
+          "ingredients": [ { "name": "drumstick", "amount": 1, "unit": "whole", "preparedState": "chopped" }, { "name": "pumpkin", "amount": 1, "unit": "cup", "preparedState": "cubed" }, { "name": "shallots", "amount": 10, "unit": "whole" }, { "name": "tomato", "amount": 1, "unit": "whole", "preparedState": "chopped" } ],
+          "resources": [ { "category": "cutting_board", "count": 1, "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "sbc_5", "recipeId": "rec_sambar_complex", "title": "Sauté shallots & vegetables till raw smell goes", "phase": "cook", "attention": "active",
+          "duration": { "estMins": 6, "minMins": 5, "maxMins": 9, "elastic": false },
+          "ingredients": [ { "name": "sesame oil", "amount": 1, "unit": "tbsp" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["large"], "heldFor": "duration" } ], "dependencies": ["sbc_4"] },
+        { "nodeId": "sbc_6", "recipeId": "rec_sambar_complex", "title": "Simmer vegetables with tamarind & ground masala", "phase": "cook", "attention": "passive",
+          "duration": { "estMins": 15, "minMins": 12, "maxMins": 20, "elastic": false },
+          "ingredients": [ { "name": "salt", "amount": 1, "unit": "tsp" }, { "name": "water", "amount": 1, "unit": "cup" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["large"], "heldFor": "duration" } ], "dependencies": ["sbc_1", "sbc_3", "sbc_5"] },
+        { "nodeId": "sbc_7", "recipeId": "rec_sambar_complex", "title": "Mash the dal in & boil together", "phase": "cook", "attention": "active",
+          "duration": { "estMins": 4, "minMins": 3, "maxMins": 6, "elastic": false },
+          "ingredients": [], "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["large"], "heldFor": "duration" } ], "dependencies": ["sbc_2", "sbc_6"] },
+        { "nodeId": "sbc_8", "recipeId": "rec_sambar_complex", "title": "Temper mustard, fenugreek & red chili; add coriander & serve", "phase": "serve", "attention": "active",
+          "duration": { "estMins": 4, "minMins": 3, "maxMins": 5, "elastic": false },
+          "ingredients": [ { "name": "ghee", "amount": 1, "unit": "tbsp" }, { "name": "mustard seeds", "amount": 1, "unit": "tsp" }, { "name": "dried red chili", "amount": 1, "unit": "whole" }, { "name": "coriander", "amount": 2, "unit": "tbsp" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["small"], "heldFor": "duration" } ], "dependencies": ["sbc_7"] }
+      ]
+    },
+    {
+      "recipeId": "rec_rasam_simple", "name": "2-Minute Rasam", "version": 1, "servings": 4, "verified": true, "cuisine": "South Indian", "dishId": "dish_rasam", "tier": "simple", "variantLabel": "Quick",
+      "nodes": [
+        { "nodeId": "ras_1", "recipeId": "rec_rasam_simple", "title": "Boil rasam powder, tamarind & tomato in water", "phase": "cook", "attention": "passive",
+          "duration": { "estMins": 8, "minMins": 6, "maxMins": 11, "elastic": false },
+          "ingredients": [ { "name": "rasam powder", "amount": 2, "unit": "tsp" }, { "name": "tamarind pulp", "amount": 0.5, "unit": "cup" }, { "name": "tomato", "amount": 1, "unit": "whole", "preparedState": "chopped" }, { "name": "water", "amount": 3, "unit": "cup" }, { "name": "salt", "amount": 1, "unit": "tsp" } ],
+          "resources": [ { "category": "burner", "count": 1, "heldFor": "duration" }, { "category": "pan", "count": 1, "capabilities": ["large"], "heldFor": "duration" } ], "dependencies": [] },
+        { "nodeId": "ras_2", "recipeId": "rec_rasam_simple", "title": "Add a jar tempering & coriander, serve", "phase": "serve", "attention": "active",
+          "duration": { "estMins": 2, "minMins": 1, "maxMins": 3, "elastic": false },
+          "ingredients": [ { "name": "ready tempering", "amount": 1, "unit": "tbsp" }, { "name": "coriander", "amount": 2, "unit": "tbsp" } ],
+          "resources": [], "dependencies": ["ras_1"] }
       ]
     },
     {

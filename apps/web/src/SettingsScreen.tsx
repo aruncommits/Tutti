@@ -12,6 +12,7 @@ export function SettingsScreen({
   onToggleMetric,
   canInstall = false,
   onInstall,
+  onKitchen,
   onPace,
   onExport,
   onReset,
@@ -25,6 +26,7 @@ export function SettingsScreen({
   onToggleMetric: () => void;
   canInstall?: boolean;
   onInstall?: () => void;
+  onKitchen?: () => void;
   onPace?: () => void;
   onExport: () => void;
   onReset: () => void;
@@ -45,16 +47,24 @@ export function SettingsScreen({
     <section className="zone" aria-label="Settings">
       <h2 className="zone-h"><span>Settings</span></h2>
 
-      <h3 className="meal-sec">Preferences</h3>
-      <Toggle on={pro} onToggle={onTogglePro} label="Pro mode" desc="Let prep and cook interleave without nudges" />
-      <Toggle on={learnPace} onToggle={onToggleLearn} label="Learn my pace" desc="Tune timings to how you actually cook" />
-      <Toggle on={metric} onToggle={onToggleMetric} label="Metric units" desc="Show amounts in millilitres" />
+      <h3 className="meal-sec">Setup</h3>
+      {onKitchen && (
+        <button className="kp-row settings-link" onClick={onKitchen}>
+          <span className="kp-label">Your kitchen<small className="kp-desc">Cooks, burners, ovens & allergens to avoid</small></span>
+          <span className="settings-chevron" aria-hidden="true">›</span>
+        </button>
+      )}
       {onPace && (
         <button className="kp-row settings-link" onClick={onPace}>
           <span className="kp-label">Your pace<small className="kp-desc">See what Tutti has learned about your timings</small></span>
           <span className="settings-chevron" aria-hidden="true">›</span>
         </button>
       )}
+
+      <h3 className="meal-sec">Preferences</h3>
+      <Toggle on={pro} onToggle={onTogglePro} label="Pro mode" desc="Let prep and cook interleave without nudges" />
+      <Toggle on={learnPace} onToggle={onToggleLearn} label="Learn my pace" desc="Tune timings to how you actually cook" />
+      <Toggle on={metric} onToggle={onToggleMetric} label="Metric units" desc="Show amounts in millilitres" />
 
       <h3 className="meal-sec">Appearance</h3>
       <p className="hint">Tutti follows your device's light or dark setting automatically.</p>

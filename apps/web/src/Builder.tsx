@@ -1,5 +1,9 @@
-import { formatClock, parseClock, type RecipeGraph } from "@tutti/engine";
+import { useMemo, useState } from "react";
+import { allergensOf, dishIdOf, formatClock, parseClock, tierOf, variantsForDish, type ComplexityTier, type RecipeGraph } from "@tutti/engine";
 import { colorFor } from "./dishColors";
+import { RecipePicker } from "./RecipePicker";
+import type { MealFit } from "./mealFit";
+import type { NotesMap } from "./recipeNotes";
 
 // The meal-plan builder — Tutti's opening screen. Add any recipes (search / paste / ask AI),
 // see your plan, then Build. Serve time is optional (ASAP by default). No forced steps.
@@ -7,6 +11,7 @@ import { colorFor } from "./dishColors";
 const hhmm = (clock: string) => formatClock(parseClock(clock)).slice(0, 5);
 const soloMinutes = (r: RecipeGraph) => r.nodes.reduce((s, n) => s + n.duration.estMins, 0);
 const FACTORS = [1, 2, 3];
+const TIER_LABEL: Record<ComplexityTier, string> = { simple: "Simple", moderate: "Standard", complex: "Elaborate" };
 
 function ServeTimeOption({
   serveAt,
@@ -55,9 +60,20 @@ export function Builder({
   feasible,
   earliestServe,
   onBuild,
-  onSearch,
   onPaste,
   onAskAI,
+  library,
+  candidates,
+  notes,
+  photos,
+  avoid,
+  selectedIds,
+  onPick,
+  onDetails,
+  onSetTier,
+  onShopping,
+  cookLive,
+  fit,
 }: {
   selected: RecipeGraph[];
   factorOf: (id: string) => number;
@@ -72,19 +88,61 @@ export function Builder({
   feasible: boolean;
   earliestServe: string;
   onBuild: () => void;
-  onSearch: () => void;
   onPaste: () => void;
   onAskAI: () => void;
+  library: RecipeGraph[];
+  candidates: RecipeGraph[];
+  notes: NotesMap;
+  photos: Record<string, string>;
+  avoid: string[];
+  selectedIds: string[];
+  onPick: (r: RecipeGraph) => void;
+  onDetails: (r: RecipeGraph) => void;
+  onSetTier: (dishId: string, tier: ComplexityTier) => void;
+  onShopping: () => void;
+  cookLive: boolean;
+  fit: MealFit;
 }) {
+  // The recipe picker (search / recents / cuisine→dish) lives inline so you discover and add
+  // without leaving the plan. Open by default when the plan is empty — that's the first job.
+  const [picking, setPicking] = useState(selected.length === 0);
+  // Rebuilding while a cook is live would discard its progress — require a deliberate second tap.
+  const [armedBuild, setArmedBuild] = useState(false);
+  const handleBuild = () => {
+    if (cookLive && !armedBuild) { setArmedBuild(true); return; }
+    setArmedBuild(false);
+    onBuild();
+  };
+
+  // All recipes (every tier) so each plan row can offer its dish's simple/standard/elaborate switch.
+  const pool = useMemo(() => {
+    const m = new Map<string, RecipeGraph>();
+    for (const r of [...library, ...candidates]) m.set(r.recipeId, r);
+    return [...m.values()];
+  }, [library, candidates]);
+
   return (
     <section className="zone" aria-label="Plan a meal">
       <h2 className="zone-h"><span>Plan a meal</span>{selected.length > 0 && <span className="count">{selected.length}</span>}</h2>
 
       <div className="add-row">
-        <button className="add-action" onClick={onSearch}><span className="add-ico" aria-hidden="true">🔍</span>Search recipes</button>
+        <button className={`add-action${picking ? " on" : ""}`} aria-pressed={picking} aria-expanded={picking} onClick={() => setPicking((p) => !p)}><span className="add-ico" aria-hidden="true">🔍</span>Find recipes</button>
         <button className="add-action" onClick={onPaste}><span className="add-ico" aria-hidden="true">📋</span>Paste a recipe</button>
         <button className="add-action" onClick={onAskAI}><span className="add-ico" aria-hidden="true">✨</span>Ask AI</button>
       </div>
+
+      {picking && (
+        <RecipePicker
+          library={library}
+          candidates={candidates}
+          notes={notes}
+          photos={photos}
+          avoid={avoid}
+          selectedIds={selectedIds}
+          onPick={onPick}
+          onDetails={onDetails}
+        />
+      )}
 
       {selected.length === 0 ? (
         <div className="idle"><b>Your meal plan is empty.</b> Search the library, paste a recipe, or ask AI to add your first dish — then build a plan that has everything ready together.</div>
@@ -105,14 +163,32 @@ export function Builder({
           <div className="card-grid">
             {selected.map((r) => {
               const factor = factorOf(r.recipeId);
+              const dishId = dishIdOf(r);
+              const variants = variantsForDish(pool, dishId);
+              const current = tierOf(r);
               return (
                 <div key={r.recipeId} className="pick-row on">
                   <div className="pick-main plan-main">
                     <span className="swatch" style={{ background: colorFor(r.recipeId) }} />
                     <span className="node-title">{r.name}</span>
+                    {(() => {
+                      const hits = avoid.length ? allergensOf(r).filter((a) => avoid.includes(a)) : [];
+                      return hits.length > 0 ? <span className="badge-allergen" title="may contain">⚠ {hits.join(", ")}</span> : null;
+                    })()}
                     <span className="dur">{soloMinutes(r)}m</span>
                     <button className="row-x" aria-label={`Remove ${r.name}`} onClick={() => onRemove(r.recipeId)}>×</button>
                   </div>
+                  {variants.length > 1 && (
+                    <div className="tier-toggle" role="group" aria-label={`How involved — ${r.name}`}>
+                      {variants.map((v) => {
+                        const t = tierOf(v);
+                        const on = v.recipeId === r.recipeId;
+                        return (
+                          <button key={t} className={`tier-btn${on ? " on" : ""}`} aria-pressed={on} title={v.variantLabel ?? TIER_LABEL[t]} onClick={() => onSetTier(dishId, t)}>{TIER_LABEL[t]}</button>
+                        );
+                      })}
+                    </div>
+                  )}
                   <div className="serve-scale" aria-label={`Servings for ${r.name}`}>
                     <span className="serve-label">serves {Math.round(r.servings * factor)}{factor !== 1 ? " · seasoning adjusted" : ""}</span>
                     <span className="scale-btns">
@@ -132,11 +208,19 @@ export function Builder({
             <b>~{interleavedMins} min with Tutti ⚡</b>
           </div>
 
+          {fit.verdict !== "fits" && (
+            <p className={`meal-fit ${fit.verdict}`} role="status">{fit.verdict === "over" ? "⛔ " : "⚠ "}{fit.hint}</p>
+          )}
+
           <ServeTimeOption serveAt={serveAt} onServeAt={onServeAt} earliestServe={earliestServe} feasible={feasible} />
 
-          <button className="btn big-btn" onClick={onBuild}>
-            Build plan{serveAt ? ` · serve ${hhmm(serveAt)}` : " · ready ASAP"}
+          {cookLive && armedBuild && (
+            <p className="meal-fit over" role="status">⚠ You're still cooking — building a new plan discards that progress. Tap Build again to confirm, or use the Resume bar to go back.</p>
+          )}
+          <button className={`btn big-btn${cookLive && armedBuild ? " danger" : ""}`} onClick={handleBuild}>
+            {cookLive && armedBuild ? "Discard cook & build" : `Build plan${serveAt ? ` · serve ${hhmm(serveAt)}` : " · ready ASAP"}`}
           </button>
+          <div className="home-links"><button className="link" onClick={onShopping}>🛒 Shopping list</button></div>
         </>
       )}
     </section>

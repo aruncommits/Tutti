@@ -1,16 +1,16 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import type { Screen } from "./state";
 
 // App shell: a persistent sidebar on desktop, a bottom tab bar on phones, and a settings gear.
 // One nav model drives both surfaces; the routed screen content is passed as children.
 
-type IconName = "home" | "browse" | "plan" | "meals" | "kitchen" | "pace" | "settings";
+type IconName = "home" | "browse" | "studio" | "meals" | "kitchen" | "pace" | "settings";
 
 function Icon({ name }: { name: IconName }) {
   const p: Record<IconName, ReactNode> = {
     home: <path d="M3 11.5 12 4l9 7.5M5.5 10v10h13V10" />,
     browse: <><circle cx="11" cy="11" r="6.5" /><path d="m21 21-4.5-4.5" /></>,
-    plan: <><path d="M8 4h8a1 1 0 0 1 1 1v15l-5-2.5L7 20V5a1 1 0 0 1 1-1Z" /><path d="M9.5 9h5M9.5 12.5h5" /></>,
+    studio: <><path d="M12 3l1.9 4.6L18.5 9l-3.6 3.1.9 4.9L12 14.8 8.2 17l.9-4.9L5.5 9l4.6-1.4Z" /><path d="M18.5 16.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7Z" /></>,
     meals: <path d="M6 3h12a1 1 0 0 1 1 1v16l-7-4-7 4V4a1 1 0 0 1 1-1Z" />,
     kitchen: <><path d="M5 8h14M5 8a2 2 0 1 1 4 0M15 8a2 2 0 1 1 4 0M6 8v11a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8" /></>,
     pace: <path d="M4 14l4-5 3 3 4-6 5 8" />,
@@ -25,37 +25,68 @@ function Icon({ name }: { name: IconName }) {
 
 type NavItem = { key: IconName; label: string; screen: Screen };
 
-// Primary destinations. `bottom` marks the 5 shown in the mobile tab bar.
+// Primary destinations. `BOTTOM` marks the 4 shown in the mobile tab bar; Kitchen + Pace are
+// sidebar/overflow-only. The meal planner is Home (the Builder); the old Plan(pick) flow is retired.
 const NAV: NavItem[] = [
   { key: "home", label: "Home", screen: "home" },
   { key: "browse", label: "Browse", screen: "browse" },
-  { key: "plan", label: "Plan", screen: "pick" },
+  { key: "studio", label: "Studio", screen: "studio" },
   { key: "meals", label: "Meals", screen: "meals" },
   { key: "kitchen", label: "Kitchen", screen: "kitchen" },
   { key: "pace", label: "Pace", screen: "stats" },
 ];
-const BOTTOM: IconName[] = ["home", "browse", "plan", "meals", "kitchen"];
+const BOTTOM: IconName[] = ["home", "browse", "studio", "meals"];
 
 // Which nav section a given screen belongs to (flow screens fold into their section).
 function sectionOf(screen: Screen): IconName {
   switch (screen) {
-    case "browse": case "recipe": case "addRecipe": return "browse";
-    case "pick": case "serveTime": case "preview": case "ready": case "cook": case "shopping": return "plan";
+    case "browse": case "recipe": return "browse";
+    case "studio": case "addRecipe": return "studio";
     case "meals": return "meals";
     case "kitchen": return "kitchen";
     case "stats": return "pace";
     case "settings": return "settings";
+    // The planner + its build flow (preview / ready / cook / shopping) live under Home.
     default: return "home";
   }
+}
+
+export interface CookBar {
+  done: number;
+  total: number;
+  onResume: () => void;
+  onEnd: () => void;
+}
+
+// Always-on "Resume cooking" bar. Ending a cook is a two-tap confirm so progress is never lost
+// by an accidental tap (the whole point of this feature).
+function CookBarView({ bar }: { bar: CookBar }) {
+  const [armed, setArmed] = useState(false);
+  return (
+    <div className="cook-bar">
+      <button className="cook-bar-resume" onClick={bar.onResume} aria-label={`Resume cooking, ${bar.done} of ${bar.total} steps done`}>
+        <span className="cook-bar-ico" aria-hidden="true">🍳</span>
+        <span className="cook-bar-text">Cooking · {bar.done}/{bar.total} steps</span>
+        <span className="cook-bar-cta">Resume →</span>
+      </button>
+      {armed ? (
+        <button className="cook-bar-end armed" aria-label="Tap again to end this cook" onClick={bar.onEnd}>End?</button>
+      ) : (
+        <button className="cook-bar-end" aria-label="End this cook" title="End this cook" onClick={() => setArmed(true)}>×</button>
+      )}
+    </div>
+  );
 }
 
 export function Shell({
   screen,
   onNavigate,
+  cookBar = null,
   children,
 }: {
   screen: Screen;
   onNavigate: (s: Screen) => void;
+  cookBar?: CookBar | null;
   children: ReactNode;
 }) {
   const active = sectionOf(screen);
@@ -106,6 +137,7 @@ export function Shell({
           {Logo}
           {gear}
         </header>
+        {cookBar && <CookBarView bar={cookBar} />}
         {children}
       </div>
 

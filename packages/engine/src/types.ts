@@ -3,6 +3,8 @@
 export type Phase = "prep" | "cook" | "serve";
 export type Attention = "active" | "passive";
 export type NodeStatus = "locked" | "active" | "completed";
+/** How involved a recipe is to cook — drives the meal-feasibility dial (variants of one dish). */
+export type ComplexityTier = "simple" | "moderate" | "complex";
 
 export interface Duration {
   estMins: number;
@@ -58,6 +60,12 @@ export interface RecipeGraph {
   source?: string;
   /** explicit allergen tags (14 EU vocabulary); when absent, detectAllergens() infers them. */
   allergens?: string[];
+  /** Recipes that are variants of the SAME dish share a dishId. Absent ⇒ recipe is its own dish. */
+  dishId?: string;
+  /** Authored complexity tier. Absent ⇒ derive with complexityOf(). */
+  tier?: ComplexityTier;
+  /** Short alternate label, e.g. "Quick weeknight", "Restaurant-style". */
+  variantLabel?: string;
   nodes: TaskNode[];
 }
 

@@ -21,6 +21,15 @@ describe("SettingsScreen (Brief v22 items 2+5)", () => {
     expect(p.onExport).toHaveBeenCalledTimes(1);
   });
 
+  it("links to Kitchen and Pace so they're reachable on mobile (no sidebar)", () => {
+    const p = { ...props(), onKitchen: vi.fn(), onPace: vi.fn() };
+    render(<SettingsScreen {...p} />);
+    fireEvent.click(screen.getByRole("button", { name: /your kitchen/i }));
+    expect(p.onKitchen).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByRole("button", { name: /your pace/i }));
+    expect(p.onPace).toHaveBeenCalledTimes(1);
+  });
+
   it("requires a second tap to actually reset", () => {
     const p = props();
     render(<SettingsScreen {...p} />);

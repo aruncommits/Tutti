@@ -25,6 +25,16 @@ export function addSaved(list: SavedMeal[], meal: SavedMeal, cap = 50): SavedMea
   return [meal, ...rest].slice(0, cap);
 }
 
+/** Auto-save a built plan: update the saved meal covering the same dish-set in place (keeping its
+ *  id), else add it. Newest first, capped — so rebuilding the same meal refreshes one entry rather
+ *  than cluttering the list. */
+export function upsertSaved(list: SavedMeal[], meal: SavedMeal, cap = 50): SavedMeal[] {
+  const match = list.find((m) => m.kind === "saved" && sameDishSet(m.dishIds, meal.dishIds));
+  const id = match ? match.id : meal.id;
+  const rest = list.filter((m) => m.id !== id);
+  return [{ ...meal, id }, ...rest].slice(0, cap);
+}
+
 /** Record a just-cooked meal at the front of recents, collapsing an earlier cook of the same
  *  dish-set so re-cooking moves it up instead of duplicating. Saved meals are left untouched. */
 export function addRecent(list: SavedMeal[], meal: SavedMeal, cap = 10): SavedMeal[] {

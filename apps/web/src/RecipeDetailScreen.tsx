@@ -1,4 +1,4 @@
-import { allergensOf, type RecipeGraph } from "@tutti/engine";
+import { allergensOf, tierOf, type ComplexityTier, type RecipeGraph } from "@tutti/engine";
 import { orderedSteps, recipeIngredients, recipeTotalMins } from "./recipeView";
 import { Stars } from "./Stars";
 import { colorFor } from "./dishColors";
@@ -9,11 +9,15 @@ import type { RecipeNote } from "./recipeNotes";
 // Recipe detail / read view (Brief v19) — a control center, not a blog post: ingredients up top,
 // scannable numbered steps with phase + time + hands-free tags. Pure render of the RecipeGraph.
 
+const TIER_LABEL: Record<ComplexityTier, string> = { simple: "Simple", moderate: "Standard", complex: "Elaborate" };
+
 export function RecipeDetailScreen({
   recipe,
   note,
   metric = false,
   photo,
+  siblings = [],
+  onPickVariant,
   onAdd,
   onBack,
 }: {
@@ -21,6 +25,8 @@ export function RecipeDetailScreen({
   note?: RecipeNote;
   metric?: boolean;
   photo?: string;
+  siblings?: RecipeGraph[];
+  onPickVariant?: (r: RecipeGraph) => void;
   onAdd: () => void;
   onBack: () => void;
 }) {
@@ -39,9 +45,23 @@ export function RecipeDetailScreen({
 
       <p className="value recipe-meta">
         {recipeTotalMins(recipe)} min · serves {recipe.servings}
+        <span className="tier-badge">{TIER_LABEL[tierOf(recipe)]}</span>
         {allergens.map((a) => <span key={a} className="badge-allergen" title="contains"> {a}</span>)}
         {!recipe.verified && <span className="badge-unverified"> unverified</span>}
       </p>
+
+      {siblings.length > 1 && onPickVariant && (
+        <div className="tier-toggle detail-tiers" role="group" aria-label="Other versions of this dish">
+          {siblings.map((v) => {
+            const on = v.recipeId === recipe.recipeId;
+            return (
+              <button key={v.recipeId} className={`tier-btn${on ? " on" : ""}`} aria-pressed={on} onClick={() => onPickVariant(v)}>
+                {TIER_LABEL[tierOf(v)]}{v.variantLabel ? ` · ${v.variantLabel}` : ""}
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {note && (note.rating || note.note || note.cookCount > 0) && (
         <p className="value">

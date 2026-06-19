@@ -46,6 +46,7 @@ export function CookScreen({
   onComplete,
   onUndo,
   onReset,
+  onLeave,
   notes = {},
   dishesForReview = [],
   onRate,
@@ -58,6 +59,7 @@ export function CookScreen({
   onComplete: (id: string) => void;
   onUndo: (id: string) => void;
   onReset: () => void;
+  onLeave?: () => void;
   notes?: NotesMap;
   dishesForReview?: string[];
   onRate?: (id: string, n: number) => void;
@@ -177,6 +179,12 @@ export function CookScreen({
           )}
         </div>
       </div>
+      {onLeave && !allDone && (
+        <div className="home-links" style={{ marginTop: 0 }}>
+          <button className="link" onClick={onLeave}>‹ Leave cooking — resume anytime</button>
+        </div>
+      )}
+
       {speech.supported && speech.listening && (
         <p className="listening" aria-live="polite">
           Listening… say “done”, “what's next”, or “how long”{speech.transcript ? ` · heard: ${speech.transcript}` : ""}

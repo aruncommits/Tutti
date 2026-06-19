@@ -24,6 +24,8 @@ export { applyEvent } from "./events";
 export { reschedule } from "./reschedule";
 export { updatePace, applyPace, paceCategoryOf, type PaceSample } from "./pace";
 export { scaleRecipe } from "./scale";
+export { complexityOf, type Complexity } from "./complexity";
+export { dishIdOf, tierOf, groupVariants, variantsForDish, type DishGroup } from "./variants";
 export { buildShoppingList, normalizeIngredientName, type ShoppingItem } from "./shopping";
 export { ALLERGENS, detectAllergens, allergensOf, type Allergen } from "./allergens";
 export { HANDS, normalizeKitchen, nodeRequirements, capacityOf } from "./resources";

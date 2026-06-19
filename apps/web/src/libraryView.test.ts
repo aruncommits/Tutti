@@ -83,3 +83,63 @@ describe("filterLibrary cuisine (Brief v39)", () => {
     expect(_filterCuisine(entries, {}).length).toBe(entries.length); // unset = all
   });
 });
+
+import { courseOf, groupByCuisine, pickHistory } from "./libraryView";
+
+describe("courseOf — dish-type inference (Brief v41)", () => {
+  const byId = (id: string) => entries.find((e) => e.recipe.recipeId === id)!.recipe;
+  it("classifies rice, gravy, and chutney from the recipe name", () => {
+    expect(courseOf(byId("rec_lemonrice"))).toBe("Rice");
+    expect(courseOf(byId("rec_rasam"))).toBe("Gravies & curries"); // Tomato Rasam
+    expect(courseOf(byId("rec_chutney"))).toBe("Chutneys & sauces");
+  });
+  it("falls back to 'Other dishes' for an unmatched name", () => {
+    const fake = { ...byId("rec_lemonrice"), name: "Mystery Platter" };
+    expect(courseOf(fake)).toBe("Other dishes");
+  });
+});
+
+describe("groupByCuisine — cuisine → dish (Brief v41)", () => {
+  it("groups by cuisine, largest first, and sub-groups a varied cuisine by course", () => {
+    const groups = groupByCuisine(entries);
+    expect(groups.length).toBe(cuisinesOf(entries).length);
+    // largest cuisine first
+    for (let i = 1; i < groups.length; i++) {
+      expect(groups[i - 1]!.entries.length).toBeGreaterThanOrEqual(groups[i]!.entries.length);
+    }
+    // the biggest cuisine (South Indian, 11 dishes) sub-groups by course
+    const biggest = groups[0]!;
+    expect(biggest.courses.length).toBeGreaterThanOrEqual(2);
+    const inCourses = biggest.courses.reduce((n, c) => n + c.entries.length, 0);
+    expect(inCourses).toBe(biggest.entries.length); // every dish lands in exactly one course
+  });
+  it("leaves a small cuisine flat (no course sub-groups)", () => {
+    const groups = groupByCuisine(entries);
+    const small = groups.find((g) => g.entries.length < 4);
+    if (small) expect(small.courses).toHaveLength(0);
+  });
+});
+
+describe("pickHistory — recents & frequent (Brief v41)", () => {
+  it("orders recents by lastCookedAt and frequent by cookCount, history-only", () => {
+    const a = entries[0]!.recipe.recipeId;
+    const b = entries[1]!.recipe.recipeId;
+    const c = entries[2]!.recipe.recipeId;
+    const notes = {
+      [a]: { cookCount: 2, lastCookedAt: 100 },
+      [b]: { cookCount: 9, lastCookedAt: 300 },
+      [c]: { cookCount: 5, lastCookedAt: 200 },
+    };
+    const { recents, frequent } = pickHistory(entries, notes);
+    expect(recents.map((e) => e.recipe.recipeId)).toEqual([b, c, a]); // newest cooked first
+    expect(frequent.map((e) => e.recipe.recipeId)).toEqual([b, c, a]); // most cooked first
+    // dishes with no history are excluded from both
+    expect(recents.length).toBe(3);
+    expect(frequent.length).toBe(3);
+  });
+  it("returns empty lists when there is no cook history", () => {
+    const { recents, frequent } = pickHistory(entries, {});
+    expect(recents).toHaveLength(0);
+    expect(frequent).toHaveLength(0);
+  });
+});

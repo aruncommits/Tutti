@@ -1,5 +1,5 @@
 import { Suspense, lazy, useEffect, useRef, useState } from "react";
-import { applyEvent, compile, formatClock, parseClock, paceCategoryOf, scaleRecipe, thaliV1, goldenLibrary, updatePace, type MasterExecutionPlan, type PaceModel, type RecipeGraph } from "@tutti/engine";
+import { applyEvent, compile, dishIdOf, formatClock, parseClock, paceCategoryOf, scaleRecipe, thaliV1, goldenLibrary, tierOf, updatePace, variantsForDish, type ComplexityTier, type MasterExecutionPlan, type PaceModel, type RecipeGraph } from "@tutti/engine";
 import { usePersistentState, type Screen } from "./state";
 import { Shell } from "./Shell";
 import { ErrorBoundary } from "./ErrorBoundary";
@@ -7,7 +7,7 @@ import { CookScreen } from "./CookScreen"; // eager — the critical cook path m
 import { DEFAULT_KITCHEN, toKitchenProfile, type KitchenUi } from "./kitchenModel";
 import type { LearnEvent } from "./StatsScreen";
 import { shouldLearn } from "./learn";
-import { addSaved, addRecent, removeMeal, type SavedMeal } from "./meals";
+import { addRecent, removeMeal, upsertSaved, type SavedMeal } from "./meals";
 import { formatPlan, shareOrCopy } from "./share";
 import { recordCook, setRating, setNote, type NotesMap } from "./recipeNotes";
 import { toggleStaple, type Pantry } from "./pantry";
@@ -16,6 +16,7 @@ import { isStringArray, isPlainObject, isMealArray, isScreen, isClock } from "./
 import { factorForPeople } from "./servings";
 import { useInstallPrompt } from "./useInstallPrompt";
 import { addPhoto, resizeToThumb, type Photos } from "./photos";
+import { mealFit } from "./mealFit";
 
 // Secondary screens are lazy-loaded so the initial/cook bundle stays lean (Brief v10).
 // AddRecipe pulls @tutti/ingest, so splitting it keeps the parser out of the entry chunk.
@@ -31,9 +32,7 @@ const AddRecipe = lazy(() => import("./AddRecipe").then((m) => ({ default: m.Add
 const ShoppingScreen = lazy(() => import("./ShoppingScreen").then((m) => ({ default: m.ShoppingScreen })));
 const StatsScreen = lazy(() => import("./StatsScreen").then((m) => ({ default: m.StatsScreen })));
 const BrowseScreen = lazy(() => import("./BrowseScreen").then((m) => ({ default: m.BrowseScreen })));
-// PlanFlow (Pick + Serve-time) is a secondary route, not the instant-cook path — lazy (Brief v34).
-const PickScreen = lazy(() => import("./PlanFlow").then((m) => ({ default: m.PickScreen })));
-const ServeTimeScreen = lazy(() => import("./PlanFlow").then((m) => ({ default: m.ServeTimeScreen })));
+const StudioScreen = lazy(() => import("./StudioScreen").then((m) => ({ default: m.StudioScreen })));
 
 const Loading = () => <div className="idle" role="status">Loading…</div>;
 
@@ -46,7 +45,7 @@ const SAMPLE_RECIPES: RecipeGraph[] = (() => {
 })();
 
 const SCREEN_NAMES: Record<Screen, string> = {
-  onboarding: "Welcome", kitchen: "Your kitchen", home: "Home", addRecipe: "Add a dish",
+  onboarding: "Welcome", kitchen: "Your kitchen", home: "Home", addRecipe: "Add a dish", studio: "Recipe Studio",
   browse: "Browse recipes", recipe: "Recipe", shopping: "Shopping list", stats: "Your pace", meals: "Your meals", settings: "Settings", pick: "Pick dishes",
   serveTime: "Serve time", preview: "Plan preview", ready: "Get ready", cook: "Cook mode", done: "Done",
 };
@@ -59,6 +58,8 @@ export function App() {
   // Optional serve time: null = cook ASAP (start now). Set only when the user opts into a time.
   const [serveAt, setServeAt] = usePersistentState<string | null>("tutti.serveAt", null, (v) => v === null || isClock(v));
   const [pro, setPro] = usePersistentState<boolean>("tutti.pro", false);
+  // Marks a cook as in-progress so it's always resumable (set on start, cleared on finish/abandon).
+  const [cookStartedAt, setCookStartedAt] = usePersistentState<number | null>("tutti.cookStartedAt", null, (v) => v === null || typeof v === "number");
   const [candidates, setCandidates] = usePersistentState<RecipeGraph[]>("tutti.candidates", [], Array.isArray);
   const [avoid, setAvoid] = usePersistentState<string[]>("tutti.avoid", [], isStringArray);
   const [servingsFactor, setServingsFactor] = usePersistentState<Record<string, number>>("tutti.servingsFactor", {}, isPlainObject);
@@ -125,17 +126,11 @@ export function App() {
     : null;
   const soloMins = selectedRecipes.reduce((a, r) => a + r.nodes.reduce((s, n) => s + n.duration.estMins, 0), 0);
   const makespan = previewPlan ? parseClock(previewPlan.projectedServeTime) - parseClock(previewPlan.startTime) : 0;
-  // How much the extra hands save vs cooking solo (same target serve time => shorter hands-on span).
-  const soloPlan = kitchen.cooks > 1 && selectedRecipes.length
-    ? compile(selectedRecipes, toKitchenProfile({ ...kitchen, cooks: 1 }), target, pace)
-    : null;
-  const soonerMins = soloPlan
-    ? Math.max(0, (parseClock(soloPlan.projectedServeTime) - parseClock(soloPlan.startTime)) - makespan)
-    : null;
-  const setCooks = (n: number) => setKitchen((k) => ({ ...k, cooks: Math.max(1, Math.min(4, n)) }));
   const startMins = parseClock(target) - makespan;
   const feasible = serveAt ? startMins >= nowMins : true; // cooking ASAP is always feasible
   const earliestServe = asapServe;
+  // Whole-meal feasibility dial: tier choices change `makespan` upstream; this reads it back.
+  const fit = mealFit(makespan, kitchen.cooks, serveAt, feasible);
 
   const complete = (id: string) => {
     // Honest pace learning (Doc 10 Loop A): measure real elapsed time between completions and feed
@@ -158,19 +153,69 @@ export function App() {
   const undo = (id: string) => setPlan((prev) => applyEvent(prev, { type: "undo", nodeId: id, at: "" }));
   const toggleDish = (id: string) =>
     setDishes((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  // Resolve any recipeId to its dish group (so a meal holds at most one variant per dish).
+  const dishIdByRecipe = new Map(allRecipes.map((r) => [r.recipeId, dishIdOf(r)]));
+  const dishOf = (id: string) => dishIdByRecipe.get(id) ?? id;
   const addCandidate = (g: RecipeGraph) => {
     setCandidates((prev) => [...prev.filter((c) => c.recipeId !== g.recipeId), g]);
-    setDishes((prev) => (prev.includes(g.recipeId) ? prev : [...prev, g.recipeId]));
+    const gDish = dishIdOf(g);
+    setDishes((prev) => {
+      // Drop any other variant of the same dish, then add g (one variant per dish).
+      const others = prev.filter((id) => (dishOf(id) !== gDish));
+      return others.includes(g.recipeId) ? others : [...others, g.recipeId];
+    });
     setScreen("home"); // adding a recipe returns to the builder
+  };
+  // Studio: remove one of my recipes (and drop it from the plan if selected).
+  const removeCandidate = (id: string) => {
+    setCandidates((prev) => prev.filter((c) => c.recipeId !== id));
+    setDishes((prev) => prev.filter((d) => d !== id));
+  };
+  // Studio: duplicate a recipe as a new editable copy (same dish, unverified, own id).
+  const duplicateCandidate = (id: string) => {
+    const src = allRecipes.find((r) => r.recipeId === id);
+    if (!src) return;
+    const copy: RecipeGraph = {
+      ...src,
+      recipeId: `${src.recipeId}_copy${Date.now().toString(36)}`,
+      name: `${src.name} (copy)`,
+      dishId: dishIdOf(src),
+      verified: false,
+    };
+    setCandidates((prev) => [...prev, copy]);
+  };
+  // Switch a dish to a different complexity tier: swap its recipeId in the plan, carrying servings.
+  const setTier = (dishId: string, tier: ComplexityTier) => {
+    const variant = variantsForDish(allRecipes, dishId).find((r) => tierOf(r) === tier);
+    if (!variant) return;
+    setDishes((prev) => {
+      const prior = prev.find((id) => dishOf(id) === dishId);
+      if (prior === variant.recipeId) return prev;
+      if (prior) setServingsFactor((p) => (p[prior] ? { ...p, [variant.recipeId]: p[prior]! } : p));
+      return prev.map((id) => (dishOf(id) === dishId ? variant.recipeId : id));
+    });
+  };
+  // A recognisable name from the dishes themselves, falling back to the date.
+  const mealName = () => {
+    const names = selectedRecipes.map((r) => r.name);
+    if (names.length === 0) return `Meal of ${new Date().toLocaleDateString()}`;
+    const head = names.slice(0, 3).join(", ");
+    return names.length > 3 ? `${head} +${names.length - 3} more` : head;
   };
   const buildPlan = () => {
     if (!previewPlan) return; // need at least one recipe — no thali fallback
+    setCookStartedAt(null); // building a new plan ends any prior in-progress cook (confirmed in the Builder)
     setPlan(previewPlan);
+    // Auto-save the built meal (Brief v43) — no manual Save step; dedupe by dish-set so rebuilding
+    // the same meal refreshes one entry instead of cluttering Meals.
+    const meal: SavedMeal = { id: `m${Date.now()}`, name: mealName(), dishIds: dishes, servings: servingsFactor, target, savedAt: Date.now(), kind: "saved" };
+    setMeals((m) => upsertSaved(m, meal));
     setScreen("preview");
   };
   const startCooking = () => {
     if (!previewPlan) return;
     setPlan(previewPlan);
+    setCookStartedAt(Date.now()); // the cook is now live & resumable
     focusAtRef.current = Date.now(); // first completion measures from cook start
     setScreen("cook");
   };
@@ -183,14 +228,12 @@ export function App() {
       setMeals((m) => addRecent(m, rec));
       setNotes((nm) => dishes.reduce((acc, id) => recordCook(acc, id, at), nm));
     }
+    setCookStartedAt(null); // cook finished
     setPlan(previewPlan ?? plan);
     setScreen("home");
   };
-  // Save the current plan as a named meal (Brief v12).
-  const saveMeal = () => {
-    const meal: SavedMeal = { id: `m${Date.now()}`, name: `Meal of ${new Date().toLocaleDateString()}`, dishIds: dishes, servings: servingsFactor, target, savedAt: Date.now(), kind: "saved" };
-    setMeals((m) => addSaved(m, meal));
-  };
+  // Intentionally abandon an in-progress cook (from the resume bar) without finishing it.
+  const endCook = () => { setCookStartedAt(null); setScreen("home"); };
   // Restore a saved/recent meal: load its dishes, servings, serve time, then drop into Pick to tweak.
   const restoreMeal = (meal: SavedMeal) => {
     const known = new Set(allRecipes.map((r) => r.recipeId));
@@ -209,6 +252,23 @@ export function App() {
     focusRef.current?.focus();
   }, [screen]);
 
+  // Auto-resume (Brief v43): if a cook was in progress when the app was last closed, drop straight
+  // back into it on reopen — even if the user had wandered off to another tab first.
+  const resumedRef = useRef(false);
+  useEffect(() => {
+    if (resumedRef.current) return;
+    resumedRef.current = true;
+    if (cookStartedAt != null && plan.nodes.length > 0 && screen !== "cook") setScreen("cook");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Whole-app "Resume cooking" bar: shown on every screen except the cook screen while a cook is live.
+  const cookDone = plan.nodes.filter((n) => n.status === "completed").length;
+  const cookLive = cookStartedAt != null && plan.nodes.length > 0;
+  const cookBar = cookLive && screen !== "cook"
+    ? { done: cookDone, total: plan.nodes.length, onResume: () => setScreen("cook"), onEnd: endCook }
+    : null;
+
   if (!onboarded) {
     return (
       <div className="wrap">
@@ -222,7 +282,7 @@ export function App() {
   }
 
   return (
-    <Shell screen={screen} onNavigate={setScreen}>
+    <Shell screen={screen} onNavigate={setScreen} cookBar={cookBar}>
       <div role="status" aria-live="polite" className="sr-only">{announce}</div>
       <main id="screen-main" ref={focusRef} tabIndex={-1} className="screen-focus">
       <ErrorBoundary key={screen} onHome={() => setScreen("home")}>
@@ -235,6 +295,7 @@ export function App() {
           onComplete={complete}
           onUndo={undo}
           onReset={reset}
+          onLeave={() => setScreen("home")}
           notes={notes}
           dishesForReview={[...new Set(plan.nodes.map((n) => n.recipeId))]}
           onRate={(id, n) => setNotes((m) => setRating(m, id, n))}
@@ -249,8 +310,10 @@ export function App() {
       ) : screen === "browse" ? (
         <BrowseScreen
           avoid={avoid}
+          candidates={candidates}
           notes={notes}
           photos={photos}
+          selectedIds={dishes}
           onPick={addCandidate}
           onDetails={(r) => { setDetailRecipe(r); setScreen("recipe"); }}
           onBack={() => setScreen("home")}
@@ -261,13 +324,15 @@ export function App() {
           note={notes[detailRecipe.recipeId]}
           metric={metric}
           photo={photos[detailRecipe.recipeId]}
+          siblings={variantsForDish(allRecipes, dishIdOf(detailRecipe))}
+          onPickVariant={setDetailRecipe}
           onAdd={() => addCandidate(detailRecipe)}
           onBack={() => setScreen("browse")}
         />
       ) : screen === "shopping" ? (
         <ShoppingScreen
           recipes={selectedRecipes.length ? selectedRecipes : allRecipes}
-          onBack={() => setScreen("pick")}
+          onBack={() => setScreen("home")}
           pantry={pantry}
           metric={metric}
           onToggleStaple={(name) => setPantry((p) => toggleStaple(p, name))}
@@ -290,6 +355,7 @@ export function App() {
           onToggleMetric={() => setMetric(!metric)}
           canInstall={canInstall}
           onInstall={promptInstall}
+          onKitchen={() => setScreen("kitchen")}
           onPace={() => setScreen("stats")}
           onExport={() => { void shareOrCopy("Tutti data", exportData(localStorage)); }}
           onReset={() => {
@@ -309,40 +375,20 @@ export function App() {
           onForget={() => { setPace({}); setEvents([]); }}
           onBack={() => setScreen("home")}
         />
-      ) : screen === "pick" ? (
-        <PickScreen
-          recipes={allRecipes}
-          selected={dishes}
-          onToggle={toggleDish}
-          soloMins={soloMins}
-          interleavedMins={makespan}
-          onAdd={() => setScreen("addRecipe")}
-          onShopping={() => setScreen("shopping")}
-          avoid={avoid}
-          factorOf={factorOf}
-          onSetFactor={setFactor}
-          peopleTarget={people}
-          onPeople={setPeopleScaled}
-          onNext={() => setScreen("serveTime")}
-        />
-      ) : screen === "serveTime" ? (
-        <ServeTimeScreen
-          target={target}
-          onChange={(c) => setServeAt(c)}
-          startTime={previewPlan?.startTime ?? target}
-          feasible={feasible}
-          earliestServe={earliestServe}
-          onBuild={buildPlan}
-          cooks={kitchen.cooks}
-          onCooks={setCooks}
-          soonerMins={soonerMins}
+      ) : screen === "studio" ? (
+        <StudioScreen
+          candidates={candidates}
+          photos={photos}
+          onNew={() => setScreen("addRecipe")}
+          onOpen={(r) => { setDetailRecipe(r); setScreen("recipe"); }}
+          onDuplicate={duplicateCandidate}
+          onRemove={removeCandidate}
         />
       ) : screen === "preview" ? (
         <PreviewScreen
           plan={plan}
           onStart={() => setScreen("ready")}
-          onEdit={() => setScreen("pick")}
-          onSave={saveMeal}
+          onEdit={() => setScreen("home")}
           onShare={() => { void shareOrCopy("Tutti plan", formatPlan(plan, selectedRecipes.map((r) => r.name))); }}
         />
       ) : screen === "ready" ? (
@@ -370,9 +416,20 @@ export function App() {
           feasible={feasible}
           earliestServe={earliestServe}
           onBuild={buildPlan}
-          onSearch={() => setScreen("browse")}
           onPaste={() => setScreen("addRecipe")}
           onAskAI={() => setScreen("addRecipe")}
+          library={goldenLibrary}
+          candidates={candidates}
+          notes={notes}
+          photos={photos}
+          avoid={avoid}
+          selectedIds={dishes}
+          onPick={addCandidate}
+          onDetails={(r) => { setDetailRecipe(r); setScreen("recipe"); }}
+          onSetTier={setTier}
+          onShopping={() => setScreen("shopping")}
+          cookLive={cookLive}
+          fit={fit}
         />
       ) : (
         <Stub screen={screen} onBack={() => setScreen("home")} onCook={startCooking} />

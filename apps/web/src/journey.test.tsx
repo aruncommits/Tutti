@@ -47,11 +47,10 @@ describe("cook journey (Brief v30 item 1)", () => {
     expect(await screen.findByText(/dinner is served/i)).toBeInTheDocument();
   });
 
-  it("adds a recipe via Search and builds a plan", async () => {
+  it("adds a recipe via the inline picker and builds a plan", async () => {
     render(<App />);
 
-    // Empty builder (lazy) → search the library → add the first recipe → it lands in the plan.
-    fireEvent.click(await screen.findByRole("button", { name: /search recipes/i }, LAZY));
+    // Empty builder (lazy) opens with the recipe picker already expanded → add the first recipe.
     const adds = await screen.findAllByRole("button", { name: /^add /i }, LAZY);
     fireEvent.click(adds[0]!);
 

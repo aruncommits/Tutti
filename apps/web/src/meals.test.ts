@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { addSaved, addRecent, removeMeal, sameDishSet, type SavedMeal } from "./meals";
+import { addSaved, addRecent, removeMeal, sameDishSet, upsertSaved, type SavedMeal } from "./meals";
 
 const meal = (id: string, dishIds: string[], kind: SavedMeal["kind"] = "recent", savedAt = 0): SavedMeal => ({
   id, name: id, dishIds, servings: {}, target: "19:30:00", savedAt, kind,
@@ -56,5 +56,27 @@ describe("addSaved / removeMeal", () => {
   it("removes by id", () => {
     const list: SavedMeal[] = [meal("a", ["x"]), meal("b", ["y"])];
     expect(removeMeal(list, "a").map((m) => m.id)).toEqual(["b"]);
+  });
+});
+
+describe("upsertSaved — auto-save on build (Brief v43)", () => {
+  it("updates the saved meal with the same dish-set in place (no duplicate)", () => {
+    let list: SavedMeal[] = [meal("s1", ["a", "b"], "saved", 1)];
+    list = upsertSaved(list, meal("m-new", ["b", "a"], "saved", 2)); // same set, different order
+    expect(list).toHaveLength(1);
+    expect(list[0]!.id).toBe("s1"); // kept the existing entry's id
+    expect(list[0]!.savedAt).toBe(2); // refreshed
+  });
+
+  it("adds a new entry for a different dish-set", () => {
+    let list: SavedMeal[] = [meal("s1", ["a"], "saved", 1)];
+    list = upsertSaved(list, meal("s2", ["b", "c"], "saved", 2));
+    expect(list.map((m) => m.id)).toEqual(["s2", "s1"]); // new one at front
+  });
+
+  it("does not collapse onto a recent (only saved) meal", () => {
+    let list: SavedMeal[] = [meal("r1", ["a"], "recent", 1)];
+    list = upsertSaved(list, meal("s1", ["a"], "saved", 2));
+    expect(list.map((m) => m.id).sort()).toEqual(["r1", "s1"]); // recent untouched
   });
 });

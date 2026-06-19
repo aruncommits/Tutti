@@ -1,25 +1,27 @@
-import { render, screen, fireEvent, within } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { goldenLibrary } from "@tutti/engine";
 import { BrowseScreen } from "./BrowseScreen";
-import { toLibraryEntries, filterLibrary, cuisinesOf } from "./libraryView";
+import { toLibraryEntries, groupByCuisine } from "./libraryView";
 
-const addButtons = () => screen.getAllByRole("button", { name: /^add /i });
-
-describe("Browse cuisine filter (Brief v39 items 3+5)", () => {
-  it("narrows the list to a chosen cuisine and All restores it", () => {
+// Browse now discovers by cuisine accordion (Brief v41): the largest cuisine is open by default,
+// others expand on demand and sub-group by dish-type. (Replaces the old cuisine chip row.)
+describe("Browse cuisine accordions (Brief v41)", () => {
+  it("opens the largest cuisine by default and toggles others on demand", () => {
     render(<BrowseScreen avoid={[]} notes={{}} onPick={vi.fn()} onBack={vi.fn()} />);
-    const all = addButtons().length;
+    const groups = groupByCuisine(toLibraryEntries(goldenLibrary));
+    const [biggest, second] = groups;
 
-    const cuisine = cuisinesOf(toLibraryEntries(goldenLibrary))[0]!; // e.g. "East Asian"
-    const expected = filterLibrary(toLibraryEntries(goldenLibrary), { cuisine }).length;
-    expect(expected).toBeLessThan(all); // a single cuisine is a strict subset
+    const bigHead = screen.getByRole("button", { name: new RegExp(`^${biggest!.cuisine}`, "i") });
+    expect(bigHead).toHaveAttribute("aria-expanded", "true");
 
-    const group = within(screen.getByRole("group", { name: "Cuisine" }));
-    fireEvent.click(group.getByRole("button", { name: new RegExp(`^${cuisine}$`, "i") }));
-    expect(addButtons().length).toBe(expected);
-
-    fireEvent.click(group.getByRole("button", { name: /^all$/i }));
-    expect(addButtons().length).toBe(all);
+    if (second) {
+      const secondHead = screen.getByRole("button", { name: new RegExp(`^${second.cuisine}`, "i") });
+      expect(secondHead).toHaveAttribute("aria-expanded", "false");
+      fireEvent.click(secondHead);
+      expect(secondHead).toHaveAttribute("aria-expanded", "true");
+      // opening one cuisine closes the previously open one (single-open accordion)
+      expect(bigHead).toHaveAttribute("aria-expanded", "false");
+    }
   });
 });

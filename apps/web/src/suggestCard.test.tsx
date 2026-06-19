@@ -16,7 +16,7 @@ describe("Home meal-plan builder", () => {
     // Builder is lazy-loaded (Suspense) — await it.
     expect(await screen.findByRole("heading", { level: 2, name: /plan a meal/i }, { timeout: 3000 })).toBeInTheDocument();
     expect(screen.getByText(/your meal plan is empty/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /search recipes/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /find recipes/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /paste a recipe/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /ask ai/i })).toBeInTheDocument();
   });
