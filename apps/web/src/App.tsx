@@ -531,6 +531,7 @@ export function App() {
           selectedIds={dishes}
           onPick={addCandidate}
           onDetails={(r) => { setDetailRecipe(r); setScreen("recipe"); }}
+          onRemoveCandidate={removeCandidate}
           onSetTier={setTier}
           onShopping={() => setScreen("shopping")}
           cookLive={cookLive}

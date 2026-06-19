@@ -52,4 +52,22 @@ describe("RecipePicker", () => {
     const yours = screen.getByRole("heading", { name: /your recipes/i });
     expect(within(yours.closest(".pick-sec") as HTMLElement).getByRole("button", { name: /add my pasta bake/i })).toBeInTheDocument();
   });
+
+  it("offers a Remove on Your-recipes rows (and only there) when onRemove is provided", () => {
+    const onRemove = vi.fn();
+    const mine = { ...goldenLibrary[0]!, recipeId: "rec_mine", name: "My Pasta Bake" };
+    render(<RecipePicker library={LIB} candidates={[mine]} onPick={() => {}} onRemove={onRemove} />);
+    // The candidate row has a Remove button…
+    const remove = screen.getByRole("button", { name: /remove my pasta bake/i });
+    fireEvent.click(remove);
+    expect(onRemove).toHaveBeenCalledWith("rec_mine");
+    // …but library rows (e.g. the cuisine accordion) do not.
+    expect(screen.queryByRole("button", { name: /remove tomato rasam/i })).toBeNull();
+  });
+
+  it("shows no Remove when onRemove is omitted", () => {
+    const mine = { ...goldenLibrary[0]!, recipeId: "rec_mine", name: "My Pasta Bake" };
+    render(<RecipePicker library={LIB} candidates={[mine]} onPick={() => {}} />);
+    expect(screen.queryByRole("button", { name: /remove my pasta bake/i })).toBeNull();
+  });
 });

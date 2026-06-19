@@ -1,22 +1,25 @@
 // Curation CLI.
 //   npm run curate -w packages/curation                          # FREE dry run — counts only, no AI
 //   npm run curate -w packages/curation -- --limit=3             # dry run, first 3 dishes
-//   npm run curate -w packages/curation -- --commit              # PAID: generate to staging
+//   npm run curate -w packages/curation -- --commit              # generate to staging (Claude Code CLI)
 //   npm run curate -w packages/curation -- --commit --publish    # …and promote to live
+//   npm run curate -w packages/curation -- --commit --api        # use paid provider keys instead (prod)
 //
-// Dry run calls NO AI (it only reads existing keys from the DB, if reachable). Generation is PAID and
-// needs a provider key in apps/web/.env (loaded via --env-file in the npm script).
+// Generation runs through the local Claude Code CLI by default (no API keys). `--api` switches to the
+// provider-key generator (for production). Dry run calls NO AI either way.
 
 import { SEED_CATALOG } from "./catalog";
 import { planCuration } from "./plan";
 import { curateCatalog } from "./pipeline";
 import { createAiGenerator } from "./aiGenerator.mts";
+import { createClaudeGenerator } from "./claudeGenerator.mts";
 import { createDbStore, publishStaged } from "./dbStore.mts";
 import { closePool } from "../../../apps/web/server/db/client.mts";
 
 const args = process.argv.slice(2);
 const commit = args.includes("--commit");
 const publish = args.includes("--publish");
+const useApi = args.includes("--api"); // prod path: paid provider keys; default is the Claude Code CLI
 const limitArg = args.find((a) => a.startsWith("--limit="));
 const limit = limitArg ? Math.max(1, Number(limitArg.split("=")[1])) : SEED_CATALOG.length;
 const entries = SEED_CATALOG.slice(0, limit);
@@ -41,14 +44,20 @@ if (!commit) {
   process.exit(0);
 }
 
-// --commit path (PAID)
-if (!process.env.OPENAI_API_KEY && !process.env.ANTHROPIC_API_KEY && !process.env.GOOGLE_API_KEY) {
-  console.error("No AI provider key in apps/web/.env (OPENAI/ANTHROPIC/GOOGLE) — cannot generate. Aborting.");
-  process.exit(2);
+// --commit path
+let generator;
+if (useApi) {
+  if (!process.env.OPENAI_API_KEY && !process.env.ANTHROPIC_API_KEY && !process.env.GOOGLE_API_KEY) {
+    console.error("--api set but no provider key in apps/web/.env (OPENAI/ANTHROPIC/GOOGLE). Aborting.");
+    process.exit(2);
+  }
+  generator = createAiGenerator();
+} else {
+  generator = createClaudeGenerator(); // local Claude Code CLI — no API keys
 }
-console.log(`COMMIT: generating ${entries.length} dishes × up to 3 tiers (PAID)…`);
+console.log(`COMMIT via ${useApi ? "provider API" : "Claude Code CLI"}: generating ${entries.length} dishes × up to 3 tiers…`);
 const report = await curateCatalog(entries, {
-  generator: createAiGenerator(),
+  generator,
   store: createDbStore(),
   dryRun: false,
   log: (m) => console.log("  " + m),

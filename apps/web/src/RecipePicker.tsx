@@ -26,6 +26,7 @@ interface RowCtx {
   variantCount: (dishId: string) => number;
   onPick: (r: RecipeGraph) => void;
   onDetails?: (r: RecipeGraph) => void;
+  onRemove?: (recipeId: string) => void; // present only for "Your recipes" rows — delete from the library
 }
 
 function Row({ e, ctx }: { e: LibraryEntry; ctx: RowCtx }) {
@@ -52,6 +53,9 @@ function Row({ e, ctx }: { e: LibraryEntry; ctx: RowCtx }) {
       </button>
       {ctx.onDetails && (
         <button className="browse-info" aria-label={`View ${e.recipe.name}`} onClick={() => ctx.onDetails!(e.recipe)}>ⓘ</button>
+      )}
+      {ctx.onRemove && (
+        <button className="browse-info" aria-label={`Remove ${e.recipe.name}`} title="Remove from your recipes" onClick={() => ctx.onRemove!(e.recipe.recipeId)}>🗑</button>
       )}
     </div>
   );
@@ -90,6 +94,7 @@ export function RecipePicker({
   selectedIds = [],
   onPick,
   onDetails,
+  onRemove,
 }: {
   library: RecipeGraph[];
   candidates?: RecipeGraph[];
@@ -100,6 +105,7 @@ export function RecipePicker({
   selectedIds?: string[];
   onPick: (r: RecipeGraph) => void;
   onDetails?: (r: RecipeGraph) => void;
+  onRemove?: (recipeId: string) => void; // delete one of "Your recipes" (candidates)
 }) {
   const [query, setQuery] = useState("");
   const [maxMins, setMaxMins] = useState<number | null>(null);
@@ -131,6 +137,8 @@ export function RecipePicker({
   // A dish is "added" when any of its variants is in the plan (compare by dish, not exact recipe).
   const selectedDishes = useMemo(() => new Set(selectedIds.map(dishOf)), [selectedIds, dishOf]);
   const ctx: RowCtx = { notes, photos, selectedDishes, variantCount, onPick, onDetails };
+  // "Your recipes" rows additionally get a delete affordance (the others must not).
+  const yourCtx: RowCtx = onRemove ? { ...ctx, onRemove } : ctx;
 
   const filtered = useMemo(
     () => filterLibrary(pool, { query, maxMins: maxMins ?? undefined, vegOnly, avoidAllergens: hideAllergens ? avoid : [], diets: dietFilter }),
@@ -185,7 +193,7 @@ export function RecipePicker({
         <>
           <Section title="Recently cooked" entries={recents} ctx={ctx} />
           <Section title="You cook these often" entries={frequent} ctx={ctx} />
-          {candidateEntries.length > 0 && <Section title="Your recipes" entries={candidateEntries} ctx={ctx} />}
+          {candidateEntries.length > 0 && <Section title="Your recipes" entries={candidateEntries} ctx={yourCtx} />}
 
           <h3 className="meal-sec">By cuisine</h3>
           {groups.map((g) => {

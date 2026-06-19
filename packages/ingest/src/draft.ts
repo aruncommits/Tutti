@@ -37,6 +37,7 @@ export function buildDraftGraph(
   name: string,
   ingredients: string[],
   instructions: string[],
+  servings = 2, // base yield of the recipe AS WRITTEN; the app scales per-person from this
 ): RecipeGraph {
   const nodes: TaskNode[] = instructions.map((text, i) => {
     const passive = PASSIVE.test(text);
@@ -60,5 +61,5 @@ export function buildDraftGraph(
       reviewerNote: "auto-parsed draft — verify dependencies, durations, and active/passive tags",
     };
   });
-  return { recipeId, name: name || "Untitled recipe", version: 1, servings: 2, verified: false, nodes };
+  return { recipeId, name: name || "Untitled recipe", version: 1, servings, verified: false, nodes };
 }

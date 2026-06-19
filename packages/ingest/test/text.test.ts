@@ -39,6 +39,18 @@ describe("draftFromText — pasted recipe (Brief v3 item 2)", () => {
     expect(g2.nodes.length).toBe(3);
     expect(validate(g2).ok).toBe(true);
   });
+
+  it("captures the base serving size from a 'Serves: N' line and keeps it out of ingredients/steps", () => {
+    const g3 = draftFromText("Veg Biryani\nServes: 6\n\nIngredients:\n- 2 cups rice\n- 1 cup peas\n\nMethod:\n1. Cook the rice\n2. Mix and serve");
+    expect(g3.servings).toBe(6);
+    expect(g3.name).toBe("Veg Biryani");
+    expect(g3.nodes).toHaveLength(2);
+    expect(g3.nodes[0]!.ingredients.some((i) => /serv/i.test(i.name))).toBe(false);
+  });
+
+  it("defaults servings when the recipe doesn't state a yield, and keeps 'serve' steps", () => {
+    expect(draftFromText("Boil water\nAdd pasta\nDrain and serve").servings).toBe(2);
+  });
 });
 
 describe("PasteParser — RecipeParser contract", () => {

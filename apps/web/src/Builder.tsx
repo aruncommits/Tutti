@@ -72,6 +72,7 @@ export function Builder({
   selectedIds,
   onPick,
   onDetails,
+  onRemoveCandidate,
   onSetTier,
   onShopping,
   cookLive,
@@ -101,6 +102,7 @@ export function Builder({
   selectedIds: string[];
   onPick: (r: RecipeGraph) => void;
   onDetails: (r: RecipeGraph) => void;
+  onRemoveCandidate?: (recipeId: string) => void;
   onSetTier: (dishId: string, tier: ComplexityTier) => void;
   onShopping: () => void;
   cookLive: boolean;
@@ -145,6 +147,7 @@ export function Builder({
           selectedIds={selectedIds}
           onPick={onPick}
           onDetails={onDetails}
+          onRemove={onRemoveCandidate}
         />
       )}
 
