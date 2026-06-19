@@ -40,4 +40,16 @@ describe("parseVoiceCommand (Brief v5 item 1, Doc 7 §11.1)", () => {
     expect(t("add more salt please")).toBe("unknown");
     expect(t("tell me a joke")).toBe("unknown");
   });
+
+  it("parses a set-timer command with minutes (digits or words)", () => {
+    expect(parseVoiceCommand("set a 12 minute timer")).toEqual({ type: "setTimer", minutes: 12 });
+    expect(parseVoiceCommand("start a timer for 5 minutes")).toEqual({ type: "setTimer", minutes: 5 });
+    expect(parseVoiceCommand("set a timer for ten minutes")).toEqual({ type: "setTimer", minutes: 10 });
+    expect(t("set a timer")).toBe("unknown"); // no duration → not actionable
+  });
+
+  it("maps read-step", () => {
+    expect(t("read the step")).toBe("readStep");
+    expect(t("read it")).toBe("readStep");
+  });
 });

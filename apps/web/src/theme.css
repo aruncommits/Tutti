@@ -1485,6 +1485,25 @@ header {
 }
 .cook-bar-end.armed { width: auto; padding: 0 14px; font-size: 14px; font-weight: 700; }
 
+/* Cook-mode timers + read-aloud toolbar */
+.cook-timers { margin: 8px 0 12px; }
+.cook-timers-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.wake-on { font-size: 12px; color: var(--muted); margin-left: auto; }
+.timer-add { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 8px; }
+.timer-label { flex: 1; min-width: 120px; font-size: 16px; padding: 6px 10px; border-radius: 9px; border: 1px solid var(--card-edge); background: var(--surface); color: var(--ink); }
+.timer-mins { width: 64px; font-size: 16px; padding: 6px 8px; border-radius: 9px; border: 1px solid var(--card-edge); background: var(--surface); color: var(--ink); }
+.timer-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.timer-pill {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 6px 6px 12px; border-radius: 999px;
+  background: var(--accent-soft); color: var(--accent-deep); font-weight: 700; font-size: 14px;
+}
+.timer-pill .timer-left { font-family: var(--mono); }
+.timer-pill.ringing { background: var(--accent); color: #fff; animation: timer-ring 1s steps(2) infinite; }
+@keyframes timer-ring { 50% { opacity: 0.55; } }
+.btn.mini { padding: 6px 12px; font-size: 13px; }
+@media (prefers-reduced-motion: reduce) { .timer-pill.ringing { animation: none; } }
+
 /* shared nav icon */
 .nav-ico { width: 22px; height: 22px; display: block; flex: none; }
 

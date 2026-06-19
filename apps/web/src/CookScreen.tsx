@@ -11,6 +11,9 @@ import { useSpeech } from "./useSpeech";
 import { parseVoiceCommand } from "./voice";
 import { requestNotifyPermission, notifyReady } from "./notify";
 import { extendRemaining } from "./timer";
+import { useWakeLock } from "./useWakeLock";
+import { usePersistentState } from "./state";
+import { createTimer, remainingSec, removeTimer, extendTimer, sortTimers, type Timer } from "./timers";
 import { Stars } from "./Stars";
 import type { NotesMap } from "./recipeNotes";
 
@@ -36,6 +39,64 @@ function Measures({ node }: { node: TaskNode }) {
           {ing.amount !== undefined && <b>{ing.amount}{ing.unit ? ` ${ing.unit}` : ""}</b>} {ing.name}
         </span>
       ))}
+    </div>
+  );
+}
+
+// Parallel cook timers + read-aloud toolbar. Presets cover the common cases; the active timers
+// count down live and can be extended or dismissed.
+function CookTimers({
+  timers,
+  now,
+  wake,
+  onAdd,
+  onReadStep,
+  onExtend,
+  onRemove,
+}: {
+  timers: Timer[];
+  now: number;
+  wake: boolean;
+  onAdd: (label: string, minutes: number) => void;
+  onReadStep: () => void;
+  onExtend: (id: string) => void;
+  onRemove: (id: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [mins, setMins] = useState(5);
+  const [label, setLabel] = useState("");
+  return (
+    <div className="cook-timers">
+      <div className="cook-timers-bar">
+        <button className="chip-toggle" onClick={onReadStep} aria-label="Read the current step aloud">🔊 Read step</button>
+        <button className="chip-toggle" aria-expanded={open} onClick={() => setOpen((o) => !o)}>⏲ Add timer</button>
+        {wake && <span className="wake-on" title="Screen will stay on while cooking">🔆 screen on</span>}
+      </div>
+      {open && (
+        <div className="timer-add" role="group" aria-label="Add a timer">
+          {[3, 5, 10, 15, 20].map((m) => (
+            <button key={m} className="chip-toggle" onClick={() => { onAdd(label || `${m} min`, m); setLabel(""); setOpen(false); }}>{m}m</button>
+          ))}
+          <input className="timer-label" type="text" value={label} placeholder="label (optional)" aria-label="Timer label" onChange={(e) => setLabel(e.target.value)} />
+          <input className="timer-mins" type="number" min={1} max={180} value={mins} aria-label="Minutes" onChange={(e) => setMins(Math.max(1, Math.min(180, Number(e.target.value) || 1)))} />
+          <button className="btn mini" onClick={() => { onAdd(label || `${mins} min`, mins); setLabel(""); setOpen(false); }}>Start</button>
+        </div>
+      )}
+      {timers.length > 0 && (
+        <div className="timer-list">
+          {timers.map((t) => {
+            const left = remainingSec(t, now);
+            return (
+              <div className={`timer-pill${left === 0 ? " ringing" : ""}`} key={t.id}>
+                <span className="timer-name">{t.label}</span>
+                <span className="timer-left">{left === 0 ? "⏰ done" : mmss(left)}</span>
+                <button className="btn ghost mini" aria-label={`Add 1 minute to ${t.label}`} onClick={() => onExtend(t.id)}>+1m</button>
+                <button className="row-x" aria-label={`Dismiss ${t.label} timer`} onClick={() => onRemove(t.id)}>×</button>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
@@ -77,6 +138,31 @@ export function CookScreen({
   const showNudge =
     !pro && view.active.some((n) => n.phase === "cook") && view.queue.concat(view.active).some((n) => n.phase === "prep");
 
+  // Keep the screen awake while cooking — re-acquires on tab focus (the lock dies when hidden).
+  const wake = useWakeLock(true);
+
+  // Named, parallel cook timers (persisted by end-time so they survive a reload/resume).
+  const [timers, setTimers] = usePersistentState<Timer[]>("tutti.timers", [], Array.isArray);
+  const [nowTick, setNowTick] = useState(() => Date.now());
+  const timerNotified = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    if (timers.length === 0) return;
+    const t = setInterval(() => setNowTick(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, [timers.length]);
+  useEffect(() => {
+    for (const tm of timers) {
+      if (remainingSec(tm, nowTick) === 0 && !timerNotified.current.has(tm.id)) {
+        timerNotified.current.add(tm.id);
+        notifyReady(`⏲ ${tm.label} — time's up`);
+      }
+    }
+  }, [timers, nowTick]);
+  const addNamedTimer = (label: string, minutes: number) => {
+    void requestNotifyPermission();
+    setTimers((list) => sortTimers([...list, createTimer(label, minutes, Date.now(), `t${Date.now()}_${list.length}`)]));
+  };
+
   // UI-only countdowns for passive tasks the cook has started (seconds remaining, floored at 0).
   const [remaining, setRemaining] = useState<Record<string, number>>({});
   const notifiedRef = useRef<Set<string>>(new Set());
@@ -117,8 +203,14 @@ export function CookScreen({
   const activeHands = view.active.filter((n) => n.attention === "active"); // the hands-on NOW tasks
   const stopRef = useRef<() => void>(() => {});
   const handleVoice = (transcript: string) => {
-    const { type } = parseVoiceCommand(transcript);
-    switch (type) {
+    const cmd = parseVoiceCommand(transcript);
+    switch (cmd.type) {
+      case "setTimer":
+        if (cmd.minutes) { addNamedTimer(`${cmd.minutes} min`, cmd.minutes); speak(`${cmd.minutes} minute timer set`); }
+        break;
+      case "readStep":
+        speak(view.active.map((n) => `${dishName(n.recipeId)}: ${n.title}`).join(". ") || "Nothing active right now.");
+        break;
       case "complete":
       case "next":
         if (activeHands.length === 1) {
@@ -150,13 +242,7 @@ export function CookScreen({
   const speech = useSpeech(handleVoice);
   stopRef.current = speech.stop;
 
-  // Keep the screen awake while cooking (Doc 7 §12). Guarded for unsupported browsers.
-  useEffect(() => {
-    let lock: { release: () => void } | null = null;
-    const nav = navigator as Navigator & { wakeLock?: { request: (t: string) => Promise<{ release: () => void }> } };
-    nav.wakeLock?.request("screen").then((l) => { lock = l; }).catch(() => { /* unsupported / denied */ });
-    return () => { try { lock?.release(); } catch { /* ignore */ } };
-  }, []);
+  // (Screen wake handled by useWakeLock above — re-acquires on visibilitychange, unlike a one-shot.)
 
   return (
     <>
@@ -190,6 +276,16 @@ export function CookScreen({
           Listening… say “done”, “what's next”, or “how long”{speech.transcript ? ` · heard: ${speech.transcript}` : ""}
         </p>
       )}
+
+      <CookTimers
+        timers={sortTimers(timers)}
+        now={nowTick}
+        wake={wake.active}
+        onAdd={addNamedTimer}
+        onReadStep={() => speak(view.active.map((n) => `${dishName(n.recipeId)}: ${n.title}`).join(". ") || "Nothing active right now.")}
+        onExtend={(id) => { setTimers((l) => extendTimer(l, id, 60, Date.now())); timerNotified.current.delete(id); }}
+        onRemove={(id) => { setTimers((l) => removeTimer(l, id)); timerNotified.current.delete(id); }}
+      />
 
       {view.nextStartAlert && <p className="alert">{view.nextStartAlert}</p>}
       {showNudge && (
