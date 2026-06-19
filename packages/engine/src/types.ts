@@ -19,7 +19,23 @@ export interface Ingredient {
   amount?: number;
   unit?: string;
   preparedState?: string;
+  /** explicit weight in grams for this line; when absent, gramsOf() derives it from amount+unit. */
+  grams?: number;
 }
+
+/** Per-serving nutrition. Authored on a recipe, or derived from its ingredients by nutritionOf(). */
+export interface Nutrition {
+  kcal: number;
+  protein: number; // grams
+  carbs: number;   // grams
+  fat: number;     // grams
+  fiber?: number;  // grams
+  sugar?: number;  // grams
+  sodium?: number; // milligrams
+}
+
+/** Where a dish sits in a day. Free-form but these are the canonical values. */
+export type Course = "breakfast" | "lunch" | "dinner" | "snack" | "side" | "dessert" | "drink";
 
 export type HeldFor = "duration";
 
@@ -66,6 +82,17 @@ export interface RecipeGraph {
   tier?: ComplexityTier;
   /** Short alternate label, e.g. "Quick weeknight", "Restaurant-style". */
   variantLabel?: string;
+  /** Per-serving nutrition. When absent, nutritionOf() estimates it from the ingredients. */
+  nutrition?: Nutrition;
+  /** Diet tags this dish satisfies (vegan, gluten-free, …). When absent, dietsOf() derives them. */
+  diets?: string[];
+  /** Where the dish sits in a day (breakfast/dinner/side/dessert…). */
+  course?: Course;
+  /** Free-form discovery tags (e.g. "weeknight", "festive", "one-pot"). */
+  tags?: string[];
+  /** Hands-on prep minutes (display only); cook minutes. Derived from nodes when absent. */
+  prepMins?: number;
+  cookMins?: number;
   nodes: TaskNode[];
 }
 
