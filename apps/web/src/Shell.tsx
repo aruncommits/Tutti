@@ -4,11 +4,12 @@ import type { Screen } from "./state";
 // App shell: a persistent sidebar on desktop, a bottom tab bar on phones, and a settings gear.
 // One nav model drives both surfaces; the routed screen content is passed as children.
 
-type IconName = "home" | "browse" | "studio" | "meals" | "kitchen" | "pace" | "settings";
+type IconName = "home" | "calendar" | "browse" | "studio" | "meals" | "kitchen" | "pace" | "settings";
 
 function Icon({ name }: { name: IconName }) {
   const p: Record<IconName, ReactNode> = {
     home: <path d="M3 11.5 12 4l9 7.5M5.5 10v10h13V10" />,
+    calendar: <><rect x="3.5" y="5" width="17" height="15" rx="2" /><path d="M3.5 9h17M8 3v4M16 3v4" /></>,
     browse: <><circle cx="11" cy="11" r="6.5" /><path d="m21 21-4.5-4.5" /></>,
     studio: <><path d="M12 3l1.9 4.6L18.5 9l-3.6 3.1.9 4.9L12 14.8 8.2 17l.9-4.9L5.5 9l4.6-1.4Z" /><path d="M18.5 16.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7Z" /></>,
     meals: <path d="M6 3h12a1 1 0 0 1 1 1v16l-7-4-7 4V4a1 1 0 0 1 1-1Z" />,
@@ -29,17 +30,19 @@ type NavItem = { key: IconName; label: string; screen: Screen };
 // sidebar/overflow-only. The meal planner is Home (the Builder); the old Plan(pick) flow is retired.
 const NAV: NavItem[] = [
   { key: "home", label: "Home", screen: "home" },
+  { key: "calendar", label: "Calendar", screen: "calendar" },
   { key: "browse", label: "Browse", screen: "browse" },
   { key: "studio", label: "Studio", screen: "studio" },
   { key: "meals", label: "Meals", screen: "meals" },
   { key: "kitchen", label: "Kitchen", screen: "kitchen" },
   { key: "pace", label: "Pace", screen: "stats" },
 ];
-const BOTTOM: IconName[] = ["home", "browse", "studio", "meals"];
+const BOTTOM: IconName[] = ["home", "calendar", "browse", "studio", "meals"];
 
 // Which nav section a given screen belongs to (flow screens fold into their section).
 function sectionOf(screen: Screen): IconName {
   switch (screen) {
+    case "calendar": return "calendar";
     case "browse": case "recipe": return "browse";
     case "studio": case "addRecipe": return "studio";
     case "meals": return "meals";

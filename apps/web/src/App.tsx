@@ -17,6 +17,7 @@ import { factorForPeople } from "./servings";
 import { useInstallPrompt } from "./useInstallPrompt";
 import { addPhoto, resizeToThumb, type Photos } from "./photos";
 import { mealFit } from "./mealFit";
+import { assignMeal, clearSlot, mealsInDays, toISO, type Calendar, type PlannedMeal } from "./calendar";
 
 // Secondary screens are lazy-loaded so the initial/cook bundle stays lean (Brief v10).
 // AddRecipe pulls @tutti/ingest, so splitting it keeps the parser out of the entry chunk.
@@ -33,6 +34,7 @@ const ShoppingScreen = lazy(() => import("./ShoppingScreen").then((m) => ({ defa
 const StatsScreen = lazy(() => import("./StatsScreen").then((m) => ({ default: m.StatsScreen })));
 const BrowseScreen = lazy(() => import("./BrowseScreen").then((m) => ({ default: m.BrowseScreen })));
 const StudioScreen = lazy(() => import("./StudioScreen").then((m) => ({ default: m.StudioScreen })));
+const CalendarScreen = lazy(() => import("./CalendarScreen").then((m) => ({ default: m.CalendarScreen })));
 
 const Loading = () => <div className="idle" role="status">Loading…</div>;
 
@@ -45,7 +47,7 @@ const SAMPLE_RECIPES: RecipeGraph[] = (() => {
 })();
 
 const SCREEN_NAMES: Record<Screen, string> = {
-  onboarding: "Welcome", kitchen: "Your kitchen", home: "Home", addRecipe: "Add a dish", studio: "Recipe Studio",
+  onboarding: "Welcome", kitchen: "Your kitchen", home: "Home", calendar: "Meal calendar", addRecipe: "Add a dish", studio: "Recipe Studio",
   browse: "Browse recipes", recipe: "Recipe", shopping: "Shopping list", stats: "Your pace", meals: "Your meals", settings: "Settings", pick: "Pick dishes",
   serveTime: "Serve time", preview: "Plan preview", ready: "Get ready", cook: "Cook mode", done: "Done",
 };
@@ -60,6 +62,8 @@ export function App() {
   const [pro, setPro] = usePersistentState<boolean>("tutti.pro", false);
   // Marks a cook as in-progress so it's always resumable (set on start, cleared on finish/abandon).
   const [cookStartedAt, setCookStartedAt] = usePersistentState<number | null>("tutti.cookStartedAt", null, (v) => v === null || typeof v === "number");
+  const [calendar, setCalendar] = usePersistentState<Calendar>("tutti.calendar", {}, isPlainObject);
+  const [shopDays, setShopDays] = useState<string[] | null>(null);
   const [candidates, setCandidates] = usePersistentState<RecipeGraph[]>("tutti.candidates", [], Array.isArray);
   const [avoid, setAvoid] = usePersistentState<string[]>("tutti.avoid", [], isStringArray);
   const [servingsFactor, setServingsFactor] = usePersistentState<Record<string, number>>("tutti.servingsFactor", {}, isPlainObject);
@@ -242,6 +246,28 @@ export function App() {
     setServeAt(meal.target ?? null);
     setScreen("home");
   };
+  // Calendar (Brief v45): plan saved meals onto days; cook a day loads it into the coordinated builder.
+  const todayISO = toISO(new Date());
+  const cookPlanned = (pm: PlannedMeal) => {
+    const known = new Set(allRecipes.map((r) => r.recipeId));
+    setDishes(pm.dishIds.filter((id) => known.has(id)));
+    setServingsFactor(pm.servings);
+    setServeAt(pm.target ?? null);
+    setScreen("home");
+  };
+  const shopForDays = (days: string[]) => { setShopDays(days); setScreen("shopping"); };
+  // Resolve the week's planned meals to (scaled) recipes so the shopping list sums across days.
+  const weekShopRecipes = (() => {
+    if (!shopDays) return null;
+    const out: RecipeGraph[] = [];
+    for (const pm of mealsInDays(calendar, shopDays)) {
+      for (const id of pm.dishIds) {
+        const r = allRecipes.find((x) => x.recipeId === id);
+        if (r) { const f = pm.servings[id] ?? 1; out.push(f === 1 ? r : scaleRecipe(r, f)); }
+      }
+    }
+    return out;
+  })();
   // Screen-change a11y (Doc 7 §12): move focus to the new screen and announce it (SPA route fix).
   const [announce, setAnnounce] = useState("");
   const focusRef = useRef<HTMLElement>(null);
@@ -331,11 +357,21 @@ export function App() {
         />
       ) : screen === "shopping" ? (
         <ShoppingScreen
-          recipes={selectedRecipes.length ? selectedRecipes : allRecipes}
-          onBack={() => setScreen("home")}
+          recipes={weekShopRecipes ?? (selectedRecipes.length ? selectedRecipes : allRecipes)}
+          onBack={() => { if (shopDays) { setShopDays(null); setScreen("calendar"); } else setScreen("home"); }}
           pantry={pantry}
           metric={metric}
           onToggleStaple={(name) => setPantry((p) => toggleStaple(p, name))}
+        />
+      ) : screen === "calendar" ? (
+        <CalendarScreen
+          calendar={calendar}
+          meals={meals}
+          today={todayISO}
+          onAssign={(d, s, m) => setCalendar((c) => assignMeal(c, d, s, m))}
+          onClear={(d, s) => setCalendar((c) => clearSlot(c, d, s))}
+          onCook={cookPlanned}
+          onShopWeek={shopForDays}
         />
       ) : screen === "meals" ? (
         <MealsScreen
