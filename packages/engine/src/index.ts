@@ -26,6 +26,16 @@ export { updatePace, applyPace, paceCategoryOf, type PaceSample } from "./pace";
 export { scaleRecipe } from "./scale";
 export { complexityOf, type Complexity } from "./complexity";
 export { dishIdOf, tierOf, groupVariants, variantsForDish, type DishGroup } from "./variants";
+export {
+  CATEGORIES,
+  categoryOf,
+  totalMinsOf,
+  toSummary,
+  toDishSummaries,
+  type Category,
+  type RecipeSummary,
+  type DishSummary,
+} from "./categories";
 export { lookupIngredient, gramsOf, ALL_INGREDIENTS, type IngredientInfo } from "./ingredients";
 export { nutritionOf, mealNutrition, type NutritionEstimate } from "./nutrition";
 export { DIETS, dietsOf, satisfiesDiets, type Diet } from "./diets";

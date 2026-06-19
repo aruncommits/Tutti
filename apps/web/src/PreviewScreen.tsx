@@ -31,7 +31,10 @@ export function PreviewScreen({
       <p className="value">Start at <b>{hhmm(plan.startTime)}</b> and every dish finishes together at <b>{hhmm(plan.projectedServeTime)}</b>.</p>
 
       <p className="tempo">
-        <span className="beat">About {plan.criticalPathMins} min · {voices} dishes</span>
+        {/* The headline duration is the actual makespan (start → serve), matching the times above
+            and the Home estimate — not criticalPathMins, which ignores the cook/burner contention
+            that sets the real schedule length. */}
+        <span className="beat">About {total} min · {voices} dishes</span>
       </p>
       <div className="gantt" role="img" aria-label="Cooking timeline showing dishes interleaved">
         {rows.map((n) => {

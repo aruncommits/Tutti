@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { goldenLibrary } from "@tutti/engine";
-import { BrowseScreen } from "./BrowseScreen";
+import { RecipePicker } from "./RecipePicker";
 import { toLibraryEntries, filterLibrary, sortLibrary } from "./libraryView";
 
 const addButtons = () => screen.getAllByRole("button", { name: /^add /i });
@@ -10,7 +10,7 @@ const addButtons = () => screen.getAllByRole("button", { name: /^add /i });
 // flat grid with the four sort chips; reordering never excludes a match.
 describe("Browse sort on search results (Brief v38 + v41)", () => {
   it("renders four sort chips while searching and reorders without changing the count", () => {
-    render(<BrowseScreen avoid={[]} notes={{}} onPick={vi.fn()} onBack={vi.fn()} />);
+    render(<RecipePicker avoid={[]} notes={{}} library={goldenLibrary} onPick={vi.fn()} />);
     fireEvent.change(screen.getByRole("searchbox", { name: /search recipes/i }), { target: { value: "rice" } });
 
     expect(screen.getByRole("button", { name: /^quickest$/i })).toBeInTheDocument();

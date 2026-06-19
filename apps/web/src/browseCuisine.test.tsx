@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { goldenLibrary } from "@tutti/engine";
-import { BrowseScreen } from "./BrowseScreen";
+import { RecipePicker } from "./RecipePicker";
 import { toLibraryEntries, groupByCuisine } from "./libraryView";
 
 // A fixed South-Indian-dominant subset so the assertions don't depend on the full library mix.
@@ -11,7 +11,7 @@ const LIB = goldenLibrary.filter((r) => ["rec_chutney", "rec_rasam", "rec_curdri
 // others expand on demand and sub-group by dish-type. (Replaces the old cuisine chip row.)
 describe("Browse cuisine accordions (Brief v41)", () => {
   it("opens the largest cuisine by default and toggles others on demand", () => {
-    render(<BrowseScreen avoid={[]} notes={{}} library={LIB} onPick={vi.fn()} onBack={vi.fn()} />);
+    render(<RecipePicker avoid={[]} notes={{}} library={LIB} onPick={vi.fn()} />);
     const groups = groupByCuisine(toLibraryEntries(LIB));
     const [biggest, second] = groups;
 

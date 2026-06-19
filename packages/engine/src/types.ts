@@ -73,6 +73,9 @@ export interface RecipeGraph {
   servings: number;
   verified: boolean;
   cuisine?: string;
+  /** Broad browse bucket the dish belongs to ("Biryani & Pulao", "Pasta & Noodles"…). Authored;
+   *  when absent, categoryOf() infers one from the name. The top level of Category → Dish → tier. */
+  category?: string;
   source?: string;
   /** explicit allergen tags (14 EU vocabulary); when absent, detectAllergens() infers them. */
   allergens?: string[];

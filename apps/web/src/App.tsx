@@ -19,6 +19,7 @@ import { addPhoto, resizeToThumb, type Photos } from "./photos";
 import { mealFit } from "./mealFit";
 import { assignMeal, clearSlot, mealsInDays, toISO, type Calendar, type PlannedMeal } from "./calendar";
 import { addCollection, removeCollection, toggleInCollection, isValidCollections, type Collection } from "./collections";
+import { recipeStore, library } from "./library";
 
 // Secondary screens are lazy-loaded so the initial/cook bundle stays lean (Brief v10).
 // AddRecipe pulls @tutti/ingest, so splitting it keeps the parser out of the entry chunk.
@@ -50,8 +51,8 @@ const SAMPLE_RECIPES: RecipeGraph[] = (() => {
 
 const SCREEN_NAMES: Record<Screen, string> = {
   onboarding: "Welcome", kitchen: "Your kitchen", home: "Home", calendar: "Meal calendar", addRecipe: "Add a dish", studio: "Recipe Studio",
-  browse: "Browse recipes", recipe: "Recipe", shopping: "Shopping list", pantry: "Pantry", stats: "Your pace", meals: "Your meals", settings: "Settings", pick: "Pick dishes",
-  serveTime: "Serve time", preview: "Plan preview", ready: "Get ready", cook: "Cook mode", done: "Done",
+  browse: "Browse recipes", recipe: "Recipe", shopping: "Shopping list", pantry: "Pantry", stats: "Your pace", meals: "Your meals", settings: "Settings",
+  preview: "Plan preview", ready: "Get ready", cook: "Cook mode",
 };
 
 export function App() {
@@ -92,10 +93,14 @@ export function App() {
   };
   const { canInstall, promptInstall } = useInstallPrompt();
   const focusAtRef = useRef<number | null>(null); // wall-clock boundary for honest actual-duration capture
-  // candidates (user-added / browsed) take precedence over the sample pool when ids collide.
+  // Full graphs cached on-device (IndexedDB) — recipes pulled from the server library. Loaded once on
+  // mount so a server-sourced dish in a saved meal still resolves (and cooks) offline.
+  const [cachedRecipes, setCachedRecipes] = useState<RecipeGraph[]>([]);
+  useEffect(() => { recipeStore.all().then(setCachedRecipes).catch(() => { /* no cache yet */ }); }, []);
+  // Resolution pool: bundled starter ∪ on-device cache ∪ the user's own recipes (candidates win on id).
   const allRecipes = (() => {
     const map = new Map<string, RecipeGraph>();
-    for (const r of [...SAMPLE_RECIPES, ...candidates]) map.set(r.recipeId, r);
+    for (const r of [...SAMPLE_RECIPES, ...cachedRecipes, ...candidates]) map.set(r.recipeId, r);
     return [...map.values()];
   })();
   const toggleAvoid = (a: string) => setAvoid((p) => (p.includes(a) ? p.filter((x) => x !== a) : [...p, a]));
@@ -170,6 +175,7 @@ export function App() {
   const dishOf = (id: string) => dishIdByRecipe.get(id) ?? id;
   const addCandidate = (g: RecipeGraph) => {
     setCandidates((prev) => [...prev.filter((c) => c.recipeId !== g.recipeId), g]);
+    void recipeStore.put(g); // cache the full graph so this dish cooks offline even if it came from the server
     const gDish = dishIdOf(g);
     setDishes((prev) => {
       // Drop any other variant of the same dish, then add g (one variant per dish).
@@ -177,6 +183,14 @@ export function App() {
       return others.includes(g.recipeId) ? others : [...others, g.recipeId];
     });
     setScreen("home"); // adding a recipe returns to the builder
+  };
+  // Browse-at-scale (Phase D): the catalog hands back a recipeId — resolve+cache the full graph
+  // (RemoteProvider stores it for offline cook), then select it / open its detail.
+  const pickLibraryRecipe = (recipeId: string) => {
+    void library.getRecipe(recipeId).then((g) => { if (g) addCandidate(g); });
+  };
+  const openLibraryRecipe = (recipeId: string) => {
+    void library.getRecipe(recipeId).then((g) => { if (g) { setDetailRecipe(g); setScreen("recipe"); } });
   };
   // Studio: remove one of my recipes (and drop it from the plan if selected).
   const removeCandidate = (id: string) => {
@@ -246,22 +260,47 @@ export function App() {
   };
   // Intentionally abandon an in-progress cook (from the resume bar) without finishing it.
   const endCook = () => { setCookStartedAt(null); setScreen("home"); };
-  // Restore a saved/recent meal: load its dishes, servings, serve time, then drop into Pick to tweak.
+  // Compile a plan straight from a saved/planned meal's snapshot (dishIds + servings + serve time),
+  // without waiting for the dishes/servings state we just set to flush. Mirrors the live previewPlan
+  // computation: ASAP (now + hands-on span) when no serve time was saved.
+  const compileMealPlan = (dishIds: string[], servings: Record<string, number>, serveTime: string | null): MasterExecutionPlan | null => {
+    const known = new Set(allRecipes.map((r) => r.recipeId));
+    const recipes = dishIds
+      .filter((id) => known.has(id))
+      .map((id) => {
+        const r = allRecipes.find((x) => x.recipeId === id)!;
+        const f = servings[id] ?? 1;
+        return f === 1 ? r : scaleRecipe(r, f);
+      });
+    if (!recipes.length) return null;
+    const kp = toKitchenProfile(kitchen);
+    const probe = compile(recipes, kp, serveTime ?? "20:00:00", pace);
+    const span = parseClock(probe.projectedServeTime) - parseClock(probe.startTime);
+    const tgt = serveTime ?? formatClock(nowMins + span);
+    return compile(recipes, kp, tgt, pace);
+  };
+  // Restore a saved/recent meal. It was already built when saved, so skip the redundant Build step
+  // and jump straight to its plan preview (where Start cooking / Edit live). A live cook is sacred:
+  // we never overwrite its plan here — fall back to the Builder, whose two-tap confirm guards it.
   const restoreMeal = (meal: SavedMeal) => {
     const known = new Set(allRecipes.map((r) => r.recipeId));
     setDishes(meal.dishIds.filter((id) => known.has(id)));
     setServingsFactor(meal.servings);
     setServeAt(meal.target ?? null);
-    setScreen("home");
+    const built = cookLive ? null : compileMealPlan(meal.dishIds, meal.servings, meal.target ?? null);
+    if (built) { setCookStartedAt(null); setPlan(built); setScreen("preview"); }
+    else { setScreen("home"); }
   };
-  // Calendar (Brief v45): plan saved meals onto days; cook a day loads it into the coordinated builder.
+  // Calendar (Brief v45): plan saved meals onto days; cooking a day jumps straight to its built plan.
   const todayISO = toISO(new Date());
   const cookPlanned = (pm: PlannedMeal) => {
     const known = new Set(allRecipes.map((r) => r.recipeId));
     setDishes(pm.dishIds.filter((id) => known.has(id)));
     setServingsFactor(pm.servings);
     setServeAt(pm.target ?? null);
-    setScreen("home");
+    const built = cookLive ? null : compileMealPlan(pm.dishIds, pm.servings, pm.target ?? null);
+    if (built) { setCookStartedAt(null); setPlan(built); setScreen("preview"); }
+    else { setScreen("home"); }
   };
   const shopForDays = (days: string[]) => { setShopDays(days); setScreen("shopping"); };
   // Resolve the week's planned meals to (scaled) recipes so the shopping list sums across days.
@@ -296,10 +335,15 @@ export function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Whole-app "Resume cooking" bar: shown on every screen except the cook screen while a cook is live.
+  // Whole-app "Resume cooking" bar: shown on every screen except the cook screen while a cook is
+  // still IN PROGRESS. A finished cook (every step done) has nothing left to resume, so the bar
+  // clears even when the user leaves the "Dinner is served" finale via nav instead of tapping
+  // "Cook it again". cookLive stays "a cook was started" (the finale keeps undo, which must remain
+  // resumable); only the bar gates on remaining work.
   const cookDone = plan.nodes.filter((n) => n.status === "completed").length;
   const cookLive = cookStartedAt != null && plan.nodes.length > 0;
-  const cookBar = cookLive && screen !== "cook"
+  const cookInProgress = cookLive && cookDone < plan.nodes.length;
+  const cookBar = cookInProgress && screen !== "cook"
     ? { done: cookDone, total: plan.nodes.length, onResume: () => setScreen("cook"), onEnd: endCook }
     : null;
 
@@ -343,14 +387,10 @@ export function App() {
         <AddRecipe onAdd={addCandidate} onBack={() => setScreen("home")} />
       ) : screen === "browse" ? (
         <BrowseScreen
-          avoid={avoid}
           diets={diet}
-          candidates={candidates}
-          notes={notes}
-          photos={photos}
-          selectedIds={dishes}
-          onPick={addCandidate}
-          onDetails={(r) => { setDetailRecipe(r); setScreen("recipe"); }}
+          selectedDishIds={dishes.map(dishOf)}
+          onAddRecipe={pickLibraryRecipe}
+          onDetails={openLibraryRecipe}
           onBack={() => setScreen("home")}
         />
       ) : screen === "recipe" && detailRecipe ? (
@@ -497,7 +537,10 @@ export function App() {
           fit={fit}
         />
       ) : (
-        <Stub screen={screen} onBack={() => setScreen("home")} onCook={startCooking} />
+        // Any screen we can't render here (e.g. a stale persisted route, or "recipe" after a
+        // reload dropped the in-memory detailRecipe) quietly bounces back to Home rather than
+        // showing a dead-end placeholder.
+        <Redirect onHome={() => setScreen("home")} />
       )}
       </Suspense>
       </ErrorBoundary>
@@ -510,15 +553,8 @@ export function App() {
   );
 }
 
-function Stub({ screen, onBack, onCook }: { screen: Screen; onBack: () => void; onCook: () => void }) {
-  return (
-    <section className="zone" aria-label={screen}>
-      <h2 className="zone-h"><span>{screen}</span></h2>
-      <div className="idle">This screen ("{screen}") is being built in an upcoming brief.</div>
-      <div className="home-links">
-        <button className="link" onClick={onCook}>Start cooking</button>
-        <button className="link" onClick={onBack}>Back home</button>
-      </div>
-    </section>
-  );
+// Fallback for an unrenderable screen: send the user Home on mount instead of stranding them.
+function Redirect({ onHome }: { onHome: () => void }) {
+  useEffect(() => { onHome(); }, [onHome]);
+  return <Loading />;
 }

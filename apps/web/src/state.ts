@@ -16,22 +16,17 @@ export type Screen =
   | "stats"
   | "meals"
   | "settings"
-  | "pick"
-  | "serveTime"
   | "preview"
   | "ready"
-  | "cook"
-  | "done";
+  | "cook";
 
 export const SCREEN_ORDER: Screen[] = [
   "onboarding",
   "kitchen",
   "home",
-  "pick",
-  "serveTime",
   "preview",
+  "ready",
   "cook",
-  "done",
 ];
 
 /**

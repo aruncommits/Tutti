@@ -22,6 +22,9 @@ export default defineConfig(({ mode }) => {
   // (e.g. to test "Ask AI" on a phone over the LAN); AI_DEV_TOKEN then requires an x-dev-token header.
   const aiAllowLan = /^(1|true|yes)$/i.test(env.AI_ALLOW_LAN || "");
   const aiDevToken = env.AI_DEV_TOKEN || undefined;
+  // The recipe-library API runs as its own Node process (it uses pg, kept out of this browser-only
+  // typecheck graph). Proxy just /api/library/* to it; /api/usage + /api/recipe stay on the AI plugin.
+  const libApiPort = Number(env.LIBRARY_API_PORT || "5181");
   return {
   plugins: [
     react(),
@@ -42,7 +45,12 @@ export default defineConfig(({ mode }) => {
       workbox: { globPatterns: ["**/*.{js,css,html,svg,woff2,png}"] },
     }),
   ],
-  server: { port: PORT, strictPort: true, host: true },
+  server: {
+    port: PORT,
+    strictPort: true,
+    host: true,
+    proxy: { "/api/library": { target: `http://localhost:${libApiPort}`, changeOrigin: true } },
+  },
   preview: { port: PORT, strictPort: true, host: true },
   };
 });

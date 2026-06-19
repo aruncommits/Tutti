@@ -1,0 +1,19 @@
+{
+  "name": "@tutti/curation",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "curate": "tsx --env-file=../../apps/web/.env src/run.mts"
+  },
+  "dependencies": {
+    "@tutti/engine": "*",
+    "@tutti/ingest": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.8"
+  }
+}

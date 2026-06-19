@@ -1,8 +1,8 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import { compile, applyEvent, thaliV1 } from "@tutti/engine";
+import { compile, applyEvent, thaliV1, goldenLibrary } from "@tutti/engine";
 import { CookScreen } from "./CookScreen";
-import { BrowseScreen } from "./BrowseScreen";
+import { RecipePicker } from "./RecipePicker";
 
 function donePlan() {
   let plan = compile(thaliV1.recipes, thaliV1.kitchenProfile, "19:30:00");
@@ -35,7 +35,7 @@ describe("Cook Mode finale review (Brief v17 items 3+5)", () => {
 
 describe("Browse shows ratings & cook count (Brief v17 item 4)", () => {
   it("renders saved stars and cook count for a rated recipe", () => {
-    render(<BrowseScreen avoid={[]} notes={{ rec_chutney: { rating: 4, cookCount: 3 } }} onPick={vi.fn()} onBack={vi.fn()} />);
+    render(<RecipePicker avoid={[]} library={goldenLibrary} notes={{ rec_chutney: { rating: 4, cookCount: 3 } }} onPick={vi.fn()} />);
     // A frequently-cooked dish shows in both "You cook these often" and its cuisine accordion.
     expect(screen.getAllByText(/cooked 3×/i).length).toBeGreaterThan(0);
     expect(screen.getAllByLabelText(/4 of 5 stars/i).length).toBeGreaterThan(0);

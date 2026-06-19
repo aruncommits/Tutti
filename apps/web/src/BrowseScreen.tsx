@@ -1,46 +1,33 @@
-import { goldenLibrary, type RecipeGraph } from "@tutti/engine";
-import { RecipePicker } from "./RecipePicker";
-import type { NotesMap } from "./recipeNotes";
+import { LibraryBrowser } from "./LibraryBrowser";
+import type { LibraryProvider } from "./library";
 
-// Full-screen browse: the same shared RecipePicker the Plan builder uses inline, so discovery
-// (search + recents/frequent + cuisine → dish) stays identical in both places (Brief v41).
+// Full-screen "browse at scale" (Phase D): category-first, server-backed, paginated discovery over
+// the whole catalog. (The Plan builder keeps the lighter inline RecipePicker for quick adds.)
 
 export function BrowseScreen({
-  avoid,
+  provider,
   diets = [],
-  library = goldenLibrary,
-  candidates = [],
-  notes = {},
-  photos = {},
-  selectedIds = [],
-  onPick,
+  selectedDishIds = [],
+  onAddRecipe,
   onDetails,
   onBack,
 }: {
-  avoid: string[];
+  provider?: LibraryProvider;
   diets?: string[];
-  library?: RecipeGraph[];
-  candidates?: RecipeGraph[];
-  notes?: NotesMap;
-  photos?: Record<string, string>;
-  selectedIds?: string[];
-  onPick: (r: RecipeGraph) => void;
-  onDetails?: (r: RecipeGraph) => void;
+  selectedDishIds?: string[];
+  onAddRecipe: (recipeId: string) => void;
+  onDetails?: (recipeId: string) => void;
   onBack: () => void;
 }) {
   return (
     <section className="zone" aria-label="Browse recipes">
       <h2 className="zone-h"><span>Browse recipes</span></h2>
 
-      <RecipePicker
-        library={library}
-        candidates={candidates}
-        notes={notes}
-        photos={photos}
-        avoid={avoid}
+      <LibraryBrowser
+        provider={provider}
         diets={diets}
-        selectedIds={selectedIds}
-        onPick={onPick}
+        selectedDishIds={selectedDishIds}
+        onAddRecipe={onAddRecipe}
         onDetails={onDetails}
       />
 

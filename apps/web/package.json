@@ -8,7 +8,10 @@
     "build": "vite build",
     "preview": "vite preview --host --port 5180 --strictPort",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "db:migrate": "tsx --env-file=.env server/db/migrate.mts",
+    "db:seed": "tsx --env-file=.env server/db/seed.mts",
+    "dev:api": "tsx --env-file=.env server/api/server.mts"
   },
   "dependencies": {
     "@fontsource/bodoni-moda": "^5.2.7",
