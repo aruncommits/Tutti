@@ -48,6 +48,7 @@ export function createClaudeGenerator(): RecipeGenerator {
         `Output ONLY the recipe text — no preamble, no markdown, no commentary.\n` +
         `Write ONE recipe for "${req.name}" (${req.category}${req.cuisine ? `, ${req.cuisine}` : ""}) — ${TIER_HINT[req.tier]}, ` +
         `for the dish's natural standard batch. Format strictly: a title line, then a line "Serves: N" (the batch this yields), ` +
+        `then a line "Best for: M" (the smallest batch that still turns out well), ` +
         `then a line "Ingredients:" with one ingredient per line (with quantity), then a line "Method:" with numbered steps.`;
       const raw = await claudeText(prompt);
       const result = await new PasteParser().parse({ source: "paste", text: stripToRecipe(raw) });

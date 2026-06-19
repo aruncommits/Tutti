@@ -30,6 +30,15 @@ describe("RecipeDetailScreen (Brief v19 items 2+5)", () => {
     expect(screen.queryByText(/out of water\?/i)).toBeNull();
   });
 
+  it("shows a 'best for N+' minimum-batch suggestion only when it's below the base servings", () => {
+    const base = { ...rasam, servings: 4 };
+    const { rerender } = render(<RecipeDetailScreen recipe={{ ...base, minServings: 2 }} onAdd={() => {}} onBack={() => {}} />);
+    expect(screen.getByText(/best for 2\+/i)).toBeInTheDocument();
+    // when the recommended minimum equals the base, no redundant hint
+    rerender(<RecipeDetailScreen recipe={{ ...base, minServings: 4 }} onAdd={() => {}} onBack={() => {}} />);
+    expect(screen.queryByText(/best for/i)).toBeNull();
+  });
+
   it("shows a saved rating and note when present", () => {
     render(<RecipeDetailScreen recipe={rasam} note={{ rating: 4, cookCount: 2, note: "more pepper" }} onAdd={() => {}} onBack={() => {}} />);
     expect(screen.getByLabelText(/4 of 5 stars/i)).toBeInTheDocument();

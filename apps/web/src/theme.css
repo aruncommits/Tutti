@@ -1742,3 +1742,27 @@ header {
 .dish-thumb { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; flex: none; }
 .dish-thumb-lg { width: 100%; max-width: 320px; height: auto; max-height: 220px; border-radius: 14px; margin: 4px 0 12px; }
 @media print { .dish-thumb, .dish-thumb-lg { display: none !important; } }
+
+/* Recipe preview modal — read a recipe before adding, without leaving the browse list. */
+.modal-backdrop {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 24px 16px; overflow-y: auto;
+}
+.modal-panel {
+  position: relative;
+  width: 100%; max-width: 640px;
+  background: var(--surface); color: var(--ink);
+  border: 1px solid var(--card-edge); border-radius: 16px;
+  padding: 6px 18px 18px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
+}
+.modal-close {
+  position: absolute; top: 10px; right: 10px;
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 1px solid var(--card-edge); background: var(--card-strong);
+  color: var(--ink); font-size: 20px; line-height: 1; cursor: pointer; z-index: 1;
+}
+.min-batch { color: var(--accent); }
+body.modal-open { overflow: hidden; }

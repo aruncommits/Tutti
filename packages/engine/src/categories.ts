@@ -73,6 +73,9 @@ export function categoryOf(recipe: RecipeGraph): Category {
 /** Total hands-on + cook minutes (sum of node estimates) — the headline "how long" for a card. */
 export const totalMinsOf = (r: RecipeGraph): number => r.nodes.reduce((s, n) => s + n.duration.estMins, 0);
 
+/** Recommended smallest batch for a good result — authored `minServings`, else the base `servings`. */
+export const minServingsOf = (r: RecipeGraph): number => Math.max(1, r.minServings ?? r.servings);
+
 /** A flat, list-friendly projection of one recipe — everything a card/filter needs, no task graph. */
 export interface RecipeSummary {
   recipeId: string;

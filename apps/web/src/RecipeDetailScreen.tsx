@@ -1,4 +1,4 @@
-import { allergensOf, dietsOf, nutritionOf, tierOf, type ComplexityTier, type RecipeGraph } from "@tutti/engine";
+import { allergensOf, dietsOf, minServingsOf, nutritionOf, tierOf, type ComplexityTier, type RecipeGraph } from "@tutti/engine";
 import { orderedSteps, recipeIngredients, recipeTotalMins } from "./recipeView";
 import { Stars } from "./Stars";
 import { colorFor } from "./dishColors";
@@ -53,6 +53,7 @@ export function RecipeDetailScreen({
 
       <p className="value recipe-meta">
         {recipeTotalMins(recipe)} min · serves {recipe.servings}
+        {minServingsOf(recipe) < recipe.servings && <span className="min-batch"> · best for {minServingsOf(recipe)}+</span>}
         <span className="tier-badge">{TIER_LABEL[tierOf(recipe)]}</span>
         {recipe.course && <span className="tier-badge">{recipe.course}</span>}
         {allergens.map((a) => <span key={a} className="badge-allergen" title="contains"> {a}</span>)}

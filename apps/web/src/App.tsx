@@ -20,6 +20,7 @@ import { mealFit } from "./mealFit";
 import { assignMeal, clearSlot, mealsInDays, toISO, type Calendar, type PlannedMeal } from "./calendar";
 import { addCollection, removeCollection, toggleInCollection, isValidCollections, type Collection } from "./collections";
 import { recipeStore, library } from "./library";
+import { Modal } from "./Modal";
 
 // Secondary screens are lazy-loaded so the initial/cook bundle stays lean (Brief v10).
 // AddRecipe pulls @tutti/ingest, so splitting it keeps the parser out of the entry chunk.
@@ -82,6 +83,9 @@ export function App() {
   const [meals, setMeals] = usePersistentState<SavedMeal[]>("tutti.meals", [], isMealArray);
   const [notes, setNotes] = usePersistentState<NotesMap>("tutti.recipeNotes", {}, isPlainObject);
   const [detailRecipe, setDetailRecipe] = useState<RecipeGraph | null>(null);
+  // Quick-preview modal: read a recipe over the browse list before adding (separate from the full
+  // "recipe" screen used by Studio). Holds the full graph (fetched for server recipes).
+  const [previewRecipe, setPreviewRecipe] = useState<RecipeGraph | null>(null);
   // Pantry: stored loosely (back-compat with the old string[] of staples) then migrated on read.
   const [pantryStored, setPantry] = usePersistentState<Pantry>("tutti.pantry", [], Array.isArray);
   const pantry = useMemo(() => migratePantry(pantryStored), [pantryStored]);
@@ -189,8 +193,9 @@ export function App() {
   const pickLibraryRecipe = (recipeId: string) => {
     void library.getRecipe(recipeId).then((g) => { if (g) addCandidate(g); });
   };
+  // Browse "View" → preview the recipe in a modal (fetch the full graph first for server recipes).
   const openLibraryRecipe = (recipeId: string) => {
-    void library.getRecipe(recipeId).then((g) => { if (g) { setDetailRecipe(g); setScreen("recipe"); } });
+    void library.getRecipe(recipeId).then((g) => { if (g) setPreviewRecipe(g); });
   };
   // Studio: remove one of my recipes (and drop it from the plan if selected).
   const removeCandidate = (id: string) => {
@@ -530,7 +535,7 @@ export function App() {
           diets={diet}
           selectedIds={dishes}
           onPick={addCandidate}
-          onDetails={(r) => { setDetailRecipe(r); setScreen("recipe"); }}
+          onDetails={(r) => setPreviewRecipe(r)}
           onRemoveCandidate={removeCandidate}
           onSetTier={setTier}
           onShopping={() => setScreen("shopping")}
@@ -550,6 +555,25 @@ export function App() {
       <footer className="scaffold-note">
         Tutti — the whole meal, ready at once. Cooks fully offline; nothing leaves your device.
       </footer>
+
+      {previewRecipe && (
+        <Modal onClose={() => setPreviewRecipe(null)} label={previewRecipe.name}>
+          <Suspense fallback={<Loading />}>
+            <RecipeDetailScreen
+              recipe={previewRecipe}
+              note={notes[previewRecipe.recipeId]}
+              metric={metric}
+              photo={photos[previewRecipe.recipeId]}
+              siblings={variantsForDish(allRecipes, dishIdOf(previewRecipe))}
+              onPickVariant={setPreviewRecipe}
+              collections={collections}
+              onToggleCollection={(cid, rid) => setCollections((c) => toggleInCollection(c, cid, rid))}
+              onAdd={() => { addCandidate(previewRecipe); setPreviewRecipe(null); }}
+              onBack={() => setPreviewRecipe(null)}
+            />
+          </Suspense>
+        </Modal>
+      )}
     </Shell>
   );
 }

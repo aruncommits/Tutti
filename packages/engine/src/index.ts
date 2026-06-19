@@ -30,6 +30,7 @@ export {
   CATEGORIES,
   categoryOf,
   totalMinsOf,
+  minServingsOf,
   toSummary,
   toDishSummaries,
   type Category,

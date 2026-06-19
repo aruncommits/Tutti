@@ -38,6 +38,7 @@ export function buildDraftGraph(
   ingredients: string[],
   instructions: string[],
   servings = 2, // base yield of the recipe AS WRITTEN; the app scales per-person from this
+  minServings?: number, // recommended smallest good batch (suggestion only)
 ): RecipeGraph {
   const nodes: TaskNode[] = instructions.map((text, i) => {
     const passive = PASSIVE.test(text);
@@ -61,5 +62,13 @@ export function buildDraftGraph(
       reviewerNote: "auto-parsed draft — verify dependencies, durations, and active/passive tags",
     };
   });
-  return { recipeId, name: name || "Untitled recipe", version: 1, servings, verified: false, nodes };
+  return {
+    recipeId,
+    name: name || "Untitled recipe",
+    version: 1,
+    servings,
+    ...(minServings && minServings >= 1 ? { minServings } : {}),
+    verified: false,
+    nodes,
+  };
 }

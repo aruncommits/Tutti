@@ -89,6 +89,9 @@ export interface RecipeGraph {
   nutrition?: Nutrition;
   /** Diet tags this dish satisfies (vegan, gluten-free, …). When absent, dietsOf() derives them. */
   diets?: string[];
+  /** Smallest batch that still turns out well — a suggestion, not a limit (the user can scale below).
+   *  Absent ⇒ treat the base `servings` as the recommended minimum. */
+  minServings?: number;
   /** Where the dish sits in a day (breakfast/dinner/side/dessert…). */
   course?: Course;
   /** Free-form discovery tags (e.g. "weeknight", "festive", "one-pot"). */
