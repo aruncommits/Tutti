@@ -3,6 +3,11 @@
 // anything. Data only — same RecipeGraph schema the runtime cooks from; no LLM (Doc 1 §4).
 
 import library from "../fixtures/library.json";
+import extra from "../fixtures/library-extra.json";
 import type { RecipeGraph } from "./types";
 
-export const goldenLibrary: RecipeGraph[] = (library as unknown as { recipes: RecipeGraph[] }).recipes;
+// The seeded library = the original verified set + the cross-cuisine/course expansion (Brief v48).
+export const goldenLibrary: RecipeGraph[] = [
+  ...(library as unknown as { recipes: RecipeGraph[] }).recipes,
+  ...(extra as unknown as { recipes: RecipeGraph[] }).recipes,
+];

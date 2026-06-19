@@ -1,10 +1,14 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
+import { goldenLibrary } from "@tutti/engine";
 import { BrowseScreen } from "./BrowseScreen";
+
+// South-Indian-dominant subset so the default-open accordion shows these dishes deterministically.
+const LIB = goldenLibrary.filter((r) => ["rec_chutney", "rec_rasam", "rec_curdrice", "rec_lemonrice", "rec_beetroot", "rec_sambar", "rec_aglio"].includes(r.recipeId));
 
 describe("BrowseScreen (Brief v8 items 3-5)", () => {
   it("renders seeded library dishes and narrows on search", () => {
-    render(<BrowseScreen avoid={[]} onPick={() => {}} onBack={() => {}} />);
+    render(<BrowseScreen avoid={[]} library={LIB} onPick={() => {}} onBack={() => {}} />);
     expect(screen.getByRole("button", { name: /add coconut chutney/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /add tomato rasam/i })).toBeInTheDocument();
 
@@ -15,7 +19,7 @@ describe("BrowseScreen (Brief v8 items 3-5)", () => {
 
   it("calls onPick with the recipe when a row is tapped", () => {
     const onPick = vi.fn();
-    render(<BrowseScreen avoid={[]} onPick={onPick} onBack={() => {}} />);
+    render(<BrowseScreen avoid={[]} library={LIB} onPick={onPick} onBack={() => {}} />);
     fireEvent.click(screen.getByRole("button", { name: /add curd rice/i }));
     expect(onPick).toHaveBeenCalledTimes(1);
     expect(onPick.mock.calls[0]![0].recipeId).toBe("rec_curdrice");

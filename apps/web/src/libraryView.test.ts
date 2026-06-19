@@ -43,8 +43,11 @@ describe("filterLibrary — stackable filters (Brief v8 item 2)", () => {
     for (const e of quick) expect(e.totalMins).toBeLessThanOrEqual(20);
   });
 
-  it("vegOnly keeps every seeded dish (all vegetarian)", () => {
-    expect(filterLibrary(entries, { vegOnly: true })).toHaveLength(entries.length);
+  it("vegOnly keeps vegetarian dishes and drops egg/meat ones", () => {
+    const veg = filterLibrary(entries, { vegOnly: true });
+    expect(veg.every((e) => e.veg)).toBe(true);
+    expect(veg.length).toBeLessThanOrEqual(entries.length);
+    expect(veg.map((e) => e.recipe.recipeId)).not.toContain("rec_masala_omelette"); // has egg
   });
 });
 

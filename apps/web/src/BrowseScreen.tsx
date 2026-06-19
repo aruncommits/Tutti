@@ -8,6 +8,7 @@ import type { NotesMap } from "./recipeNotes";
 export function BrowseScreen({
   avoid,
   diets = [],
+  library = goldenLibrary,
   candidates = [],
   notes = {},
   photos = {},
@@ -18,6 +19,7 @@ export function BrowseScreen({
 }: {
   avoid: string[];
   diets?: string[];
+  library?: RecipeGraph[];
   candidates?: RecipeGraph[];
   notes?: NotesMap;
   photos?: Record<string, string>;
@@ -31,7 +33,7 @@ export function BrowseScreen({
       <h2 className="zone-h"><span>Browse recipes</span></h2>
 
       <RecipePicker
-        library={goldenLibrary}
+        library={library}
         candidates={candidates}
         notes={notes}
         photos={photos}

@@ -12,7 +12,7 @@ import { formatPlan, shareOrCopy } from "./share";
 import { recordCook, setRating, setNote, type NotesMap } from "./recipeNotes";
 import { toggleStaple, migratePantry, addPantryItem, removePantryItem, type Pantry, type PantryItem } from "./pantry";
 import { exportData, resetData } from "./appData";
-import { isStringArray, isPlainObject, isMealArray, isScreen, isClock } from "./validators";
+import { isStringArray, isPlainObject, isMealArray, isScreen, isClock, isPlan } from "./validators";
 import { factorForPeople } from "./servings";
 import { useInstallPrompt } from "./useInstallPrompt";
 import { addPhoto, resizeToThumb, type Photos } from "./photos";
@@ -116,6 +116,7 @@ export function App() {
   const [plan, setPlan] = usePersistentState<MasterExecutionPlan>(
     "tutti.plan",
     compile([], toKitchenProfile(DEFAULT_KITCHEN), "19:00:00", pace),
+    isPlan,
   );
 
   const nowMins = (() => {
