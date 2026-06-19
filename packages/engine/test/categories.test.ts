@@ -69,6 +69,19 @@ describe("categoryOf — authored wins, else inferred from the name", () => {
       ["Coconut Chutney", "Chutneys & Sauces"],
       ["Banana Oatmeal", "Breakfast & Tiffin"],
       ["Guacamole", "Chutneys & Sauces"],
+      // Global cuisines (Tacos & Wraps / Grills & Kebabs / Mains + tikka-masala guard).
+      ["Chicken Shawarma", "Grills & Kebabs"],
+      ["Chicken Tikka", "Grills & Kebabs"],
+      ["Tandoori Chicken", "Grills & Kebabs"],
+      ["Paneer Tikka Masala", "Curries & Gravies"], // "tikka masala" stays a curry, not a grill
+      ["Carne Asada Tacos", "Tacos & Wraps"],
+      ["Chicken Burrito", "Tacos & Wraps"],
+      ["Chicken Parmigiana", "Mains"],
+      ["Moussaka", "Mains"],
+      ["Mushroom Risotto", "Rice"],
+      ["Greek Salad", "Salads"],
+      ["Tiramisu", "Desserts"],
+      ["Hummus", "Chutneys & Sauces"],
     ];
     for (const [name, cat] of cases) {
       expect(categoryOf(recipe({ recipeId: name, name })), name).toBe(cat);
