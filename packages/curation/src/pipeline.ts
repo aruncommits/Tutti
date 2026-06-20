@@ -19,6 +19,8 @@ export interface CurateOptions {
   maxAttempts?: number;
   /** validate + report but don't persist. */
   dryRun?: boolean;
+  /** regenerate even when a (dishId,tier) already exists (upgrade/overwrite). */
+  force?: boolean;
   log?: (msg: string) => void;
 }
 
@@ -44,7 +46,7 @@ function normalize(graph: RecipeGraph, req: GenerateRequest): RecipeGraph {
 export async function curateCatalog(entries: CatalogEntry[], opts: CurateOptions): Promise<CurationReport> {
   const log = opts.log ?? (() => {});
   const maxAttempts = Math.max(1, opts.maxAttempts ?? 2);
-  const seen = new Set(await opts.store.existingKeys());
+  const seen = new Set(opts.force ? [] : await opts.store.existingKeys());
   const outcomes: CurationOutcome[] = [];
 
   for (const entry of entries) {

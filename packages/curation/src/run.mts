@@ -12,7 +12,7 @@ import { SEED_CATALOG } from "./catalog";
 import { planCuration } from "./plan";
 import { curateCatalog } from "./pipeline";
 import { createAiGenerator } from "./aiGenerator.mts";
-import { createClaudeGenerator } from "./claudeGenerator.mts";
+import { createClaudeGenerator, claudeUsage } from "./claudeGenerator.mts";
 import { createDbStore, publishStaged } from "./dbStore.mts";
 import { closePool } from "../../../apps/web/server/db/client.mts";
 
@@ -20,6 +20,7 @@ const args = process.argv.slice(2);
 const commit = args.includes("--commit");
 const publish = args.includes("--publish");
 const useApi = args.includes("--api"); // prod path: paid provider keys; default is the Claude Code CLI
+const force = args.includes("--force"); // regenerate even if a (dishId,tier) already exists
 const limitArg = args.find((a) => a.startsWith("--limit="));
 const limit = limitArg ? Math.max(1, Number(limitArg.split("=")[1])) : SEED_CATALOG.length;
 const entries = SEED_CATALOG.slice(0, limit);
@@ -60,11 +61,32 @@ const report = await curateCatalog(entries, {
   generator,
   store: createDbStore(),
   dryRun: false,
+  force,
   log: (m) => console.log("  " + m),
 });
 console.log(`\ncreated=${report.created} skipped=${report.skipped} failed=${report.failed}`);
 for (const o of report.outcomes.filter((x) => x.status === "invalid" || x.status === "error")) {
   console.log(`  ✗ ${o.dishId}:${o.tier} — ${o.status}: ${o.detail}`);
+}
+if (!useApi) {
+  const { byModel, realModels } = claudeUsage();
+  console.log("\nClaude CLI usage by model:");
+  let total = 0;
+  let calls = 0;
+  for (const [model, u] of Object.entries(byModel)) {
+    total += u.costUsd;
+    calls += u.calls;
+    console.log(
+      `  ${model.padEnd(8)} ${String(u.calls).padStart(4)} calls · $${u.costUsd.toFixed(4)} · ` +
+        `${u.inputTokens.toLocaleString()} in + ${u.outputTokens.toLocaleString()} out · ${(u.ms / 1000).toFixed(0)}s`,
+    );
+  }
+  console.log(`  TOTAL    ${String(calls).padStart(4)} calls · $${total.toFixed(4)}` + (calls ? ` ($${(total / calls).toFixed(4)}/call)` : ""));
+  if (report.created > 0) {
+    const dishesTouched = new Set(report.outcomes.filter((o) => o.status === "created").map((o) => o.dishId)).size;
+    console.log(`  → $${(total / report.created).toFixed(4)}/recipe` + (dishesTouched ? ` · $${(total / dishesTouched).toFixed(4)}/dish` : ""));
+  }
+  if (realModels.length) console.log(`  (actual model ids: ${realModels.join(", ")})`);
 }
 if (publish) {
   const n = await publishStaged(entries.map((e) => e.dishId));

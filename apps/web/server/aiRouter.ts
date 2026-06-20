@@ -6,13 +6,14 @@
 // Runs in Node (Vite dev middleware or a serverless function). Uses global fetch. No SDKs bundled.
 
 export type Provider = "openai" | "anthropic" | "google";
-export type Task = "generate" | "structure" | "repair";
+export type Task = "generate" | "structure" | "repair" | "draft" | "calculate" | "finish";
 export type Keys = Partial<Record<Provider, string>>;
 
 type Candidate = { provider: Provider; model: string };
 
 // Ordered candidates per task — best-fit first, then cross-provider fallbacks. Quality-first:
 // a frontier model for open-ended generation; a fast capable model where it fully suffices.
+// Model ids are CONFIG — swap as models evolve.
 const REGISTRY: Record<Task, Candidate[]> = {
   // Open-ended "write me a recipe" — needs careful structure, realistic timings, dependencies.
   generate: [
@@ -31,6 +32,25 @@ const REGISTRY: Record<Task, Candidate[]> = {
     { provider: "openai", model: "gpt-4o-mini" },
     { provider: "anthropic", model: "claude-haiku-4-5-20251001" },
     { provider: "google", model: "gemini-2.5-flash" },
+  ],
+  // --- Tiered curation pipeline (mirrors the Claude-CLI generator: cheap bulk, premium polish) ---
+  // draft: the bulk creative pass — cheapest capable model.
+  draft: [
+    { provider: "anthropic", model: "claude-haiku-4-5-20251001" },
+    { provider: "google", model: "gemini-2.5-flash" },
+    { provider: "openai", model: "gpt-4o-mini" },
+  ],
+  // calculate: correct quantities/timings — a mid-tier model.
+  calculate: [
+    { provider: "anthropic", model: "claude-sonnet-4-6" },
+    { provider: "openai", model: "gpt-4o" },
+    { provider: "google", model: "gemini-2.5-pro" },
+  ],
+  // finish: light authenticity/clarity polish — the premium tier (only a small final pass).
+  finish: [
+    { provider: "anthropic", model: "claude-opus-4-8" },
+    { provider: "openai", model: "gpt-4o" },
+    { provider: "google", model: "gemini-2.5-pro" },
   ],
 };
 
@@ -131,6 +151,25 @@ export async function routeRecipe(prompt: string, keys: Keys, task: Task = "gene
     }
   }
   throw lastErr instanceof Error ? lastErr : new Error("all-providers-failed");
+}
+
+/** Tiered recipe pipeline (prod mirror of the Claude-CLI generator): draft on a cheap model, correct
+ *  the numbers on a mid model, light-polish on the premium model. draft is required; the later passes
+ *  are best-effort (skip a tier with no key / on error), so it degrades gracefully. */
+export async function routeRecipeStaged(userPrompt: string, keys: Keys): Promise<RouteResult> {
+  let result = await routeRecipe(`Write ONE recipe. ${userPrompt}`, keys, "draft");
+  for (const task of ["calculate", "finish"] as const) {
+    const ask =
+      task === "calculate"
+        ? `Correct the numbers (ingredient quantities for the stated serving size, sensible amounts, plausible step timings) and re-output the whole recipe:\n\n${result.text}`
+        : `Lightly polish for authenticity, technique and clarity — do not pad it — and re-output the whole recipe:\n\n${result.text}`;
+    try {
+      result = await routeRecipe(ask, keys, task);
+    } catch {
+      /* tier unavailable (no key) or failed — keep the previous stage's text */
+    }
+  }
+  return result;
 }
 
 /** Which providers are configured (for the client to show availability without exposing keys). */

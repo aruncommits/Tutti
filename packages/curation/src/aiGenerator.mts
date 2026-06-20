@@ -4,6 +4,8 @@
 
 import { PasteParser } from "@tutti/ingest";
 // Reaches into the web server's router so curation and the app share one provider-fallback policy.
+// Single Sonnet "generate" pass — on the API there's no Claude Code overhead, so one good pass is
+// already cheap. (routeRecipeStaged remains available in aiRouter for an explicit quality pipeline.)
 import { routeRecipe, type Keys } from "../../../apps/web/server/aiRouter.ts";
 import type { GenerateRequest, RecipeGenerator } from "./types";
 
@@ -28,7 +30,7 @@ export function createAiGenerator(keys: Keys = keysFromEnv()): RecipeGenerator {
         `Write ONE recipe for "${req.name}" (${req.category}${req.cuisine ? `, ${req.cuisine}` : ""}) — ${TIER_HINT[req.tier]}. ` +
         `Serves 4. Format strictly: a title line, then an "Ingredients:" section (one ingredient per line with quantity), ` +
         `then a "Method:" section with numbered steps. No commentary.`;
-      const ai = await routeRecipe(prompt, keys, "generate");
+      const ai = await routeRecipe(prompt, keys, "generate"); // single Sonnet-tier pass
       const result = await new PasteParser().parse({ source: "paste", text: ai.text });
       if (!result.graph) throw new Error(`parse failed: ${result.validation.errors.join("; ")}`);
       return result.graph;
