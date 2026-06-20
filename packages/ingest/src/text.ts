@@ -2,15 +2,15 @@
 // Splits pasted text into an ingredients section and a steps section (by headers, else by line
 // shape), then reuses buildDraftGraph. Best-effort; a human or the AiParser refines.
 
-import { validate, type RecipeGraph } from "@tutti/engine";
+import { validate, compileRecipe, type RecipeGraph } from "@tutti/engine";
 import { buildDraftGraph } from "./draft";
 import type { ParseRequest, ParseResult, RecipeParser } from "./parser.interface";
 
 const slug = (s: string) => "rec_" + (s.trim().toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "").slice(0, 24) || "recipe");
 const stripBullet = (l: string) => l.replace(/^\s*(\d+[.)]|[-*•])\s*/, "").trim();
 
-const UNITS = /\b(cups?|tbsp|tsp|teaspoons?|tablespoons?|grams?|g|kg|ml|l|oz|lb|cloves?|pinch|cans?|slices?|sprigs?|handful)\b/i;
-const STARTS_QTY = /^[\d¼½¾⅓⅔]/;
+const UNITS = /\b(cups?|tbsp|tsp|teaspoons?|tablespoons?|grams?|g|kg|ml|l|oz|lb|cloves?|pinch|cans?|slices?|sprigs?|sticks?|leaf|leaves|bunch|heads?|knobs?|stalks?|pieces?|handful)\b/i;
+const STARTS_QTY = /^[\d¼½¾⅓⅔⅛⅜⅝⅞⅙⅚⅕⅖⅗⅘]/;
 const ingredientLike = (l: string) => (STARTS_QTY.test(l) || UNITS.test(l)) && l.split(/\s+/).length <= 9;
 
 const ING_HDR = /^ingredients?\b/i;
@@ -65,7 +65,10 @@ export function draftFromText(raw: string): RecipeGraph {
   }
 
   if (steps.length === 0) steps = body.map(stripBullet).filter(Boolean); // no usable split → all steps
-  return buildDraftGraph(slug(name), name, ingredients, steps, servings, minServings);
+  const graph = buildDraftGraph(slug(name), name, ingredients, steps, servings, minServings);
+  // Trust an explicit "Serves:"; only when it's absent (servings === undefined → defaulted) do we
+  // derive the base from the ingredients, so a yield-less paste still scales sensibly per-person.
+  return servings === undefined ? compileRecipe(graph, { preferStated: false }) : graph;
 }
 
 /** Key-free parser for pasted text (and the offline fallback for url/ai before a key is added). */

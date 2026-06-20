@@ -63,6 +63,8 @@ export function Builder({
   onBuild,
   onPaste,
   onAskAI,
+  onBrowseAll,
+  libraryCount,
   library,
   candidates,
   notes,
@@ -93,6 +95,8 @@ export function Builder({
   onBuild: () => void;
   onPaste: () => void;
   onAskAI: () => void;
+  onBrowseAll?: () => void;
+  libraryCount?: number | null;
   library: RecipeGraph[];
   candidates: RecipeGraph[];
   notes: NotesMap;
@@ -135,6 +139,12 @@ export function Builder({
         <button className="add-action" onClick={onPaste}><span className="add-ico" aria-hidden="true">📋</span>Paste a recipe</button>
         <button className="add-action" onClick={onAskAI}><span className="add-ico" aria-hidden="true">✨</span>Ask AI</button>
       </div>
+
+      {picking && onBrowseAll && (
+        <button className="browse-all-cta" onClick={onBrowseAll}>
+          🍴 Browse the full library{libraryCount ? ` — ${libraryCount} dishes` : ""} →
+        </button>
+      )}
 
       {picking && (
         <RecipePicker

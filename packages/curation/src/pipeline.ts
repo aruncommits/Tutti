@@ -30,11 +30,13 @@ const keyOf = (dishId: string, tier: ComplexityTier) => `${dishId}:${tier}`;
 /** Force the catalog's identity onto a generated graph so dedup + dish grouping are deterministic. */
 function normalize(graph: RecipeGraph, req: GenerateRequest): RecipeGraph {
   const recipeId = `${req.dishId}_${req.tier}`;
+  // servings is already resolved at parse time (PasteParser → draftFromText: stated, else inferred),
+  // so here we only force the catalog identity + authoritative name.
   return {
     ...graph,
     recipeId,
     dishId: req.dishId,
-    name: graph.name || req.name,
+    name: req.name, // the catalog is authoritative for the dish name — never the AI's parsed title
     category: req.category,
     cuisine: req.cuisine ?? graph.cuisine,
     tier: req.tier,

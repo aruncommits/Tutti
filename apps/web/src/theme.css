@@ -1766,3 +1766,11 @@ header {
 }
 .min-batch { color: var(--accent); }
 body.modal-open { overflow: hidden; }
+
+/* "Browse the full library" call-to-action on the Home builder. */
+.browse-all-cta {
+  display: block; width: 100%; margin: 2px 0 12px; padding: 11px 14px;
+  border-radius: 12px; border: 1px solid var(--accent); background: var(--accent-soft);
+  color: var(--accent); font-weight: 600; cursor: pointer; text-align: center; font: inherit;
+}
+.browse-all-cta:hover { background: var(--accent); color: #fff; }

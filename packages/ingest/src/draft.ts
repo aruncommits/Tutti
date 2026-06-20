@@ -10,16 +10,48 @@ const COOK = /\b(cook|bake|fry|saut|boil|simmer|roast|grill|heat|temper|toast|st
 const SERVE = /\b(serve|plate|garnish|sprinkle over|drizzle over|enjoy)\b/i;
 const ELASTIC = /\b(chop|dice|slice|mince|knead|grate|peel|cut|whisk|beat|fold|mix|stir together)\b/i;
 
-/** Loosely parse "1 1/2 cups flour" -> { amount, unit, name }. Falls back to the raw string. */
+// Unicode vulgar fractions → decimals, so "2½ cups" and "½ tsp" parse like "2.5"/"0.5".
+const FRAC: Record<string, number> = {
+  "¼": 0.25, "½": 0.5, "¾": 0.75, "⅓": 1 / 3, "⅔": 2 / 3, "⅛": 0.125, "⅜": 0.375, "⅝": 0.625,
+  "⅞": 0.875, "⅙": 1 / 6, "⅚": 5 / 6, "⅕": 0.2, "⅖": 0.4, "⅗": 0.6, "⅘": 0.8,
+};
+const FCLASS = "¼½¾⅓⅔⅛⅜⅝⅞⅙⅚⅕⅖⅗⅘";
+// A quantity token: mixed "1 1/2", fraction "1/2", decimal/int with optional trailing unicode frac
+// ("2½"), or a bare unicode fraction ("½").
+const QTY = `(?:\\d+\\s+\\d+\\/\\d+|\\d+\\/\\d+|\\d+(?:\\.\\d+)?[${FCLASS}]?|[${FCLASS}])`;
+
+/** Turn an isolated quantity token into a number (handles fractions, mixed, and unicode). */
+function parseQty(q: string): number | undefined {
+  const t = q.trim();
+  const uf = t.match(new RegExp(`^(\\d+)?\\s*([${FCLASS}])$`));
+  if (uf) return (uf[1] ? Number(uf[1]) : 0) + FRAC[uf[2]!]!;
+  const mixed = t.match(/^(\d+)\s+(\d+)\/(\d+)$/);
+  if (mixed) return Number(mixed[1]) + Number(mixed[2]) / Number(mixed[3]);
+  const frac = t.match(/^(\d+)\/(\d+)$/);
+  if (frac) return Number(frac[2]) ? Number(frac[1]) / Number(frac[2]) : undefined;
+  if (/^\d+(?:\.\d+)?$/.test(t)) return Number(t);
+  return undefined;
+}
+
+/** Split "cups flour" → {unit:"cups", name:"flour"}; "flour" → {name:"flour"}. */
+function unitName(rest: string): { unit?: string; name: string } {
+  const m = rest.match(/^([a-zA-Z]+)\.?\s+(.*)$/);
+  return m && m[2]!.trim() ? { unit: m[1], name: m[2]!.trim() } : { name: rest.trim() };
+}
+
+/** Loosely parse "1 1/2 cups flour", "2-3 cups flour", "about 2½ cups flour" → {amount,unit,name}.
+ *  Falls back to the raw string when there's no leading quantity. */
 export function parseIngredient(raw: string): Ingredient {
-  const s = raw.trim();
-  const m = s.match(/^([\d]+(?:[.\/][\d]+)?)\s*([a-zA-Z]+)?\s+(.*)$/);
-  if (m && m[3]) {
-    const amount = m[1]!.includes("/")
-      ? (() => { const [a, b] = m[1]!.split("/").map(Number); return b ? a! / b! : Number(m[1]); })()
-      : Number(m[1]);
-    return { name: m[3]!.trim(), amount: Number.isFinite(amount) ? amount : undefined, unit: m[2] };
+  const s = raw.trim().replace(/^(?:(?:about|around|approx\.?|approximately|roughly)\s+|~\s*)/i, "");
+  // ranges: "2-3 cups flour", "2 to 3 cups flour" → midpoint
+  const range = s.match(new RegExp(`^(${QTY})\\s*(?:-|–|—|to)\\s*(${QTY})\\s+(.*)$`, "i"));
+  if (range && range[3]) {
+    const a = parseQty(range[1]!);
+    const b = parseQty(range[2]!);
+    if (a !== undefined && b !== undefined) return { amount: (a + b) / 2, ...unitName(range[3]!) };
   }
+  const m = s.match(new RegExp(`^(${QTY})\\s*([a-zA-Z]+)?\\s+(.*)$`));
+  if (m && m[3]) return { name: m[3]!.trim(), amount: parseQty(m[1]!), unit: m[2] };
   return { name: s };
 }
 

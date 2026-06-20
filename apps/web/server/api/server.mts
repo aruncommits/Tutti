@@ -11,7 +11,8 @@ const PORT = Number(process.env.LIBRARY_API_PORT || 5181);
 function send(res: ServerResponse, status: number, body: unknown): void {
   res.statusCode = status;
   res.setHeader("content-type", "application/json");
-  res.setHeader("cache-control", "public, max-age=60");
+  // The catalog changes as curation runs — always revalidate so the client never shows a stale subset.
+  res.setHeader("cache-control", "no-cache");
   res.end(JSON.stringify(body));
 }
 

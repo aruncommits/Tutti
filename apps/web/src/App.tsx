@@ -86,6 +86,9 @@ export function App() {
   // Quick-preview modal: read a recipe over the browse list before adding (separate from the full
   // "recipe" screen used by Studio). Holds the full graph (fetched for server recipes).
   const [previewRecipe, setPreviewRecipe] = useState<RecipeGraph | null>(null);
+  // Total dishes in the server catalog — for the Home "Browse the full library" call-to-action.
+  const [libraryCount, setLibraryCount] = useState<number | null>(null);
+  useEffect(() => { library.searchDishes({ pageSize: 1 }).then((r) => setLibraryCount(r.total)).catch(() => {}); }, []);
   // Pantry: stored loosely (back-compat with the old string[] of staples) then migrated on read.
   const [pantryStored, setPantry] = usePersistentState<Pantry>("tutti.pantry", [], Array.isArray);
   const pantry = useMemo(() => migratePantry(pantryStored), [pantryStored]);
@@ -527,6 +530,8 @@ export function App() {
           onBuild={buildPlan}
           onPaste={() => setScreen("addRecipe")}
           onAskAI={() => setScreen("addRecipe")}
+          onBrowseAll={() => setScreen("browse")}
+          libraryCount={libraryCount}
           library={goldenLibrary}
           candidates={candidates}
           notes={notes}

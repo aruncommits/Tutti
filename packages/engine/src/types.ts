@@ -92,6 +92,9 @@ export interface RecipeGraph {
   /** Smallest batch that still turns out well — a suggestion, not a limit (the user can scale below).
    *  Absent ⇒ treat the base `servings` as the recommended minimum. */
   minServings?: number;
+  /** Provenance of `servings`: "stated" (from the source/AI) or "inferred" (derived by compileRecipe
+   *  from the ingredient weights). Absent ⇒ as-authored. */
+  servingsSource?: "stated" | "inferred";
   /** Where the dish sits in a day (breakfast/dinner/side/dessert…). */
   course?: Course;
   /** Free-form discovery tags (e.g. "weeknight", "festive", "one-pot"). */
