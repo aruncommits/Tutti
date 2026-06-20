@@ -15,6 +15,7 @@ import { useWakeLock } from "./useWakeLock";
 import { usePersistentState } from "./state";
 import { createTimer, remainingSec, removeTimer, extendTimer, sortTimers, type Timer } from "./timers";
 import { Stars } from "./Stars";
+import { blendView, isBlend } from "./blendView";
 import type { NotesMap } from "./recipeNotes";
 
 function speak(text: string) {
@@ -31,14 +32,27 @@ const hhmm = (clock: string) => formatClock(parseClock(clock)).slice(0, 5);
 const mmss = (sec: number) => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`;
 
 function Measures({ node }: { node: TaskNode }) {
+  const [open, setOpen] = useState<Set<string>>(new Set());
   if (!node.ingredients.length) return null;
+  const toggle = (n: string) => setOpen((s) => { const x = new Set(s); x.has(n) ? x.delete(n) : x.add(n); return x; });
   return (
     <div className="measure">
-      {node.ingredients.map((ing, i) => (
-        <span className="chip" key={i}>
-          {ing.amount !== undefined && <b>{ing.amount}{ing.unit ? ` ${ing.unit}` : ""}</b>} {ing.name}
-        </span>
-      ))}
+      {node.ingredients.map((ing, i) => {
+        const bv = isBlend(ing.name) ? blendView(ing.name) : null;
+        return (
+          <span className="chip" key={i}>
+            {ing.amount !== undefined && <b>{ing.amount}{ing.unit ? ` ${ing.unit}` : ""}</b>} {ing.name}
+            {bv && (
+              <button className="chip-blend" aria-expanded={open.has(ing.name)} aria-label={`Make ${ing.name} from scratch`} onClick={() => toggle(ing.name)}>🧂</button>
+            )}
+            {bv && open.has(ing.name) && (
+              <span className="chip-blend-body">
+                {bv.constituents.map((c) => `${c.amount ?? ""}${c.unit ? c.unit : ""} ${c.name}`.trim()).join(", ")} — {bv.method}
+              </span>
+            )}
+          </span>
+        );
+      })}
     </div>
   );
 }

@@ -39,6 +39,7 @@ export {
 } from "./categories";
 export { lookupIngredient, gramsOf, ALL_INGREDIENTS, type IngredientInfo } from "./ingredients";
 export { inferServings, compileRecipe, SERVINGS_NORM, type CompileOptions } from "./serving";
+export { isBlend, getBlend, expandBlend, expandBlendsInRecipe, KNOWN_BLENDS, type BlendDef } from "./blends";
 export { nutritionOf, mealNutrition, type NutritionEstimate } from "./nutrition";
 export { DIETS, dietsOf, satisfiesDiets, type Diet } from "./diets";
 export { AISLES, aisleOf, aisleOrder, type Aisle } from "./aisle";

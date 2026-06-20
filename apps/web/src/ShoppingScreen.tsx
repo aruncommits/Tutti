@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { buildShoppingList, normalizeIngredientName, aisleOf, aisleOrder, type RecipeGraph } from "@tutti/engine";
+import { buildShoppingList, normalizeIngredientName, aisleOf, aisleOrder, expandBlendsInRecipe, isBlend, type RecipeGraph } from "@tutti/engine";
 import { usePersistentState } from "./state";
 import { colorFor } from "./dishColors";
 import { formatShoppingList, shareOrCopy, type ShareResult } from "./share";
@@ -36,10 +36,21 @@ export function ShoppingScreen({
   const [checked, setChecked] = usePersistentState<string[]>("tutti.shoppingChecked", []);
   const [manual, setManual] = usePersistentState<string[]>("tutti.shopManual", []);
   const [draft, setDraft] = useState("");
+  // Blends the shopper chose to make from scratch — their constituent spices replace the jar line.
+  const [makeScratch, setMakeScratch] = usePersistentState<string[]>("tutti.shopMakeScratch", []);
+  const scratch = new Set(makeScratch);
+  const toggleScratch = (name: string) => {
+    const n = normalizeIngredientName(name);
+    setMakeScratch((m) => (m.includes(n) ? m.filter((x) => x !== n) : [...m, n]));
+  };
   const isChecked = (key: string) => checked.includes(key);
   const toggle = (key: string) => setChecked((p) => (p.includes(key) ? p.filter((k) => k !== key) : [...p, key]));
 
-  const combined = buildShoppingList(recipes);
+  // Fold chosen-from-scratch blends into their constituents before consolidating.
+  const sourceRecipes = makeScratch.length
+    ? recipes.map((r) => expandBlendsInRecipe(r, (n) => scratch.has(normalizeIngredientName(n))))
+    : recipes;
+  const combined = buildShoppingList(sourceRecipes);
   const { toBuy, staples } = partitionByPantry(combined, pantry);
   const [shareMsg, setShareMsg] = useState<string | null>(null);
 
@@ -75,8 +86,15 @@ export function ShoppingScreen({
         </button>
         {item.manual ? (
           <button className="row-x" aria-label={`Remove ${item.name}`} onClick={() => setManual((m) => m.filter((x) => x !== item.name))}>×</button>
-        ) : onToggleStaple && (
-          <button className={`staple-toggle${staple ? " on" : ""}`} aria-pressed={staple} aria-label={`${staple ? "Remove" : "Mark"} ${item.name} as always-have`} title="I always have this" onClick={(e) => { e.stopPropagation(); onToggleStaple(item.name); }}>🏠</button>
+        ) : (
+          <>
+            {isBlend(item.name) && (
+              <button className="blend-scratch-btn" aria-label={`Make ${item.name} from scratch`} title="Make from scratch instead of buying the jar" onClick={(e) => { e.stopPropagation(); toggleScratch(item.name); }}>🧂</button>
+            )}
+            {onToggleStaple && (
+              <button className={`staple-toggle${staple ? " on" : ""}`} aria-pressed={staple} aria-label={`${staple ? "Remove" : "Mark"} ${item.name} as always-have`} title="I always have this" onClick={(e) => { e.stopPropagation(); onToggleStaple(item.name); }}>🏠</button>
+            )}
+          </>
         )}
       </div>
     );
@@ -96,6 +114,15 @@ export function ShoppingScreen({
             <input className="url-input" type="text" value={draft} placeholder="Add an item to buy…" aria-label="Add a shopping item" onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") addManual(); }} />
             <button className="btn mini" onClick={addManual}>Add</button>
           </div>
+
+          {makeScratch.length > 0 && (
+            <p className="scratch-note">
+              Making from scratch:{" "}
+              {makeScratch.map((n) => (
+                <button key={n} className="scratch-chip" title="Buy the jar instead" onClick={() => setMakeScratch((m) => m.filter((x) => x !== n))}>{n} ✕</button>
+              ))}
+            </p>
+          )}
 
           {buyRows.length === 0 ? (
             <div className="idle">All set — everything's in your pantry.</div>
@@ -120,7 +147,7 @@ export function ShoppingScreen({
           )}
         </>
       ) : (
-        recipes.map((r) => {
+        sourceRecipes.map((r) => {
           const names: { raw: string; amount?: number; unit?: string }[] = [];
           const seen = new Set<string>();
           for (const n of r.nodes)

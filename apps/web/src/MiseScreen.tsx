@@ -2,6 +2,7 @@ import { useState } from "react";
 import { buildShoppingList, type RecipeGraph } from "@tutti/engine";
 import { requiredEquipment, labelFor, missingEquipment } from "./mise";
 import { displayAmount } from "./units";
+import { blendView, isBlend, type BlendInfo } from "./blendView";
 import { Stars } from "./Stars";
 import { colorFor } from "./dishColors";
 import type { KitchenUi } from "./kitchenModel";
@@ -9,6 +10,27 @@ import type { NotesMap } from "./recipeNotes";
 
 // Mise en place / "Get ready" (Brief v20). Gather ingredients + ready the equipment before the
 // first timer starts. Checkable, skippable, and honest about tools the kitchen may lack.
+
+// "Make at home" breakdown for a spice blend in the gather list (the constituents to gather + method).
+function BlendGather({ bv, metric }: { bv: BlendInfo; metric: boolean }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="blend">
+      <button className="blend-toggle" aria-expanded={open} onClick={() => setOpen((o) => !o)}>🧂 Make at home {open ? "▾" : "▸"}</button>
+      {open && (
+        <div className="blend-body">
+          <p className="blend-meta">Makes {bv.yields}</p>
+          <ul className="blend-list">
+            {bv.constituents.map((c, k) => (
+              <li key={k}><span className="nm">{c.name}</span><span className="amt">{displayAmount(c.amount, c.unit, false, metric)}</span></li>
+            ))}
+          </ul>
+          <p className="blend-method">{bv.method}</p>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function MiseScreen({
   recipes,
@@ -76,7 +98,16 @@ export function MiseScreen({
 
       <h3 className="meal-sec">Gather</h3>
       <div className="ing-sec">
-        {ingredients.map((i) => <Row key={`g|${i.name}|${i.unit ?? ""}`} k={`g|${i.name}|${i.unit ?? ""}`} label={i.name} sub={displayAmount(i.amount, i.unit, i.toTaste, metric)} />)}
+        {ingredients.map((i) => {
+          const key = `g|${i.name}|${i.unit ?? ""}`;
+          const bv = isBlend(i.name) ? blendView(i.name) : null;
+          return (
+            <div key={key}>
+              <Row k={key} label={i.name} sub={displayAmount(i.amount, i.unit, i.toTaste, metric)} />
+              {bv && <BlendGather bv={bv} metric={metric} />}
+            </div>
+          );
+        })}
       </div>
 
       <h3 className="meal-sec">Equipment</h3>

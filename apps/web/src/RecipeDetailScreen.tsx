@@ -3,7 +3,9 @@ import { orderedSteps, recipeIngredients, recipeTotalMins } from "./recipeView";
 import { Stars } from "./Stars";
 import { colorFor } from "./dishColors";
 import { substitutesFor } from "./substitutions";
+import { blendView, isBlend } from "./blendView";
 import { displayAmount } from "./units";
+import { useState } from "react";
 import { NutritionStrip } from "./NutritionStrip";
 import type { RecipeNote } from "./recipeNotes";
 import type { Collection } from "./collections";
@@ -39,6 +41,8 @@ export function RecipeDetailScreen({
   const allergens = allergensOf(recipe);
   const steps = orderedSteps(recipe);
   const ingredients = recipeIngredients(recipe);
+  const [openBlends, setOpenBlends] = useState<Set<string>>(new Set());
+  const toggleBlend = (n: string) => setOpenBlends((s) => { const x = new Set(s); x.has(n) ? x.delete(n) : x.add(n); return x; });
   const nutrition = nutritionOf(recipe);
   const diets = dietsOf(recipe);
 
@@ -118,6 +122,28 @@ export function RecipeDetailScreen({
                   Out of {i.name}? Try {subs.map((s) => s.swap + (s.note ? ` (${s.note})` : "")).join(" · or ")}
                 </p>
               )}
+              {isBlend(i.name) && (() => {
+                const bv = blendView(i.name)!;
+                const open = openBlends.has(i.name);
+                return (
+                  <div className="blend">
+                    <button className="blend-toggle" aria-expanded={open} onClick={() => toggleBlend(i.name)}>
+                      🧂 Make at home {open ? "▾" : "▸"}
+                    </button>
+                    {open && (
+                      <div className="blend-body">
+                        <p className="blend-meta">Makes {bv.yields}{i.amount !== undefined && !i.toTaste ? ` · this recipe uses ${displayAmount(i.amount, i.unit, false, metric)}` : ""}</p>
+                        <ul className="blend-list">
+                          {bv.constituents.map((c, k) => (
+                            <li key={k}><span className="nm">{c.name}</span><span className="amt">{displayAmount(c.amount, c.unit, false, metric)}</span></li>
+                          ))}
+                        </ul>
+                        <p className="blend-method">{bv.method}</p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
           );
         })}

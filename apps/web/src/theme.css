@@ -1774,3 +1774,23 @@ body.modal-open { overflow: hidden; }
   color: var(--accent); font-weight: 600; cursor: pointer; text-align: center; font: inherit;
 }
 .browse-all-cta:hover { background: var(--accent); color: #fff; }
+
+/* Spice-blend "make at home" expander (recipe detail, mise). */
+.blend { margin: 2px 0 8px; }
+.blend-toggle, .blend-scratch-btn, .chip-blend {
+  font: inherit; cursor: pointer; background: none; border: none; color: var(--accent);
+}
+.blend-toggle { font-size: 0.85em; padding: 2px 0; font-weight: 600; }
+.blend-body { margin: 4px 0 2px; padding: 8px 10px; border-left: 2px solid var(--accent); background: var(--accent-soft); border-radius: 0 8px 8px 0; }
+.blend-meta { font-size: 0.8em; opacity: 0.75; margin: 0 0 4px; }
+.blend-list { list-style: none; margin: 0 0 6px; padding: 0; }
+.blend-list li { display: flex; justify-content: space-between; gap: 8px; font-size: 0.9em; padding: 1px 0; }
+.blend-method { font-size: 0.82em; opacity: 0.8; margin: 0; font-style: italic; }
+/* Cook-mode inline blend reveal. */
+.chip-blend { padding: 0 2px; font-size: 0.9em; }
+.chip-blend-body { display: block; width: 100%; font-size: 0.8em; opacity: 0.8; margin-top: 2px; }
+/* Shopping-list make-from-scratch controls. */
+.blend-scratch-btn { padding: 0 4px; opacity: 0.6; }
+.blend-scratch-btn:hover { opacity: 1; }
+.scratch-note { font-size: 0.85em; opacity: 0.85; margin: 6px 0; }
+.scratch-chip { font: inherit; cursor: pointer; border: 1px solid var(--accent); background: var(--accent-soft); color: var(--accent); border-radius: 999px; padding: 2px 8px; margin: 0 4px 4px 0; font-size: 0.85em; }
