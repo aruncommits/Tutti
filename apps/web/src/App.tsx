@@ -133,6 +133,8 @@ export function App() {
     compile([], toKitchenProfile(DEFAULT_KITCHEN), "19:00:00", pace),
     isPlan,
   );
+  // The cook's preferred step order (nodeIds). Honored by the scheduler where deps/resources allow.
+  const [manualOrder, setManualOrder] = usePersistentState<string[]>("tutti.manualOrder", [], isStringArray);
 
   const nowMins = (() => {
     const d = new Date();
@@ -149,7 +151,7 @@ export function App() {
   const asapServe = formatClock(nowMins + span);
   const target = serveAt ?? asapServe; // effective serve time fed to compile
   const previewPlan = selectedRecipes.length
-    ? compile(selectedRecipes, toKitchenProfile(kitchen), target, pace)
+    ? compile(selectedRecipes, toKitchenProfile(kitchen), target, pace, manualOrder)
     : null;
   const soloMins = selectedRecipes.reduce((a, r) => a + r.nodes.reduce((s, n) => s + n.duration.estMins, 0), 0);
   const makespan = previewPlan ? parseClock(previewPlan.projectedServeTime) - parseClock(previewPlan.startTime) : 0;
@@ -267,6 +269,12 @@ export function App() {
     const meal: SavedMeal = { id: `m${Date.now()}`, name: mealName(), dishIds: dishes, servings: servingsFactor, target, savedAt: Date.now(), kind: "saved" };
     setMeals((m) => upsertSaved(m, meal));
     setScreen("preview");
+  };
+  // Reorder the cooking flow: remember the cook's chosen step order and recompile the displayed plan
+  // with it (the scheduler still honors dependencies + kitchen resources). Persisted, so it sticks.
+  const reorderFlow = (order: string[]) => {
+    setManualOrder(order);
+    if (selectedRecipes.length) setPlan(compile(selectedRecipes, toKitchenProfile(kitchen), target, pace, order));
   };
   const startCooking = () => {
     if (!previewPlan) return;
@@ -529,6 +537,7 @@ export function App() {
       ) : screen === "preview" ? (
         <PreviewScreen
           plan={plan}
+          onReorder={reorderFlow}
           onStart={() => setScreen("ready")}
           onEdit={() => setScreen("home")}
           onShare={() => { void shareOrCopy("Tutti plan", formatPlan(plan, selectedRecipes.map((r) => r.name))); }}
@@ -562,19 +571,20 @@ export function App() {
           onAskAI={() => setScreen("addRecipe")}
           onBrowseAll={() => setScreen("browse")}
           libraryCount={libraryCount}
-          library={goldenLibrary}
+          library={allRecipes}
           candidates={candidates}
-          notes={notes}
-          photos={photos}
           avoid={avoid}
           diets={diet}
           selectedIds={dishes}
+          selectedDishIds={dishes.map(dishOf)}
           onPick={addCandidate}
           onDetails={(r) => setPreviewRecipe(r)}
+          onAddRecipeId={pickLibraryRecipe}
+          onDetailsId={openLibraryRecipe}
           onRemoveCandidate={removeCandidate}
           onSetTier={setTier}
           onShopping={() => setScreen("shopping")}
-          cookLive={cookLive}
+          cookLive={cookInProgress}
           fit={fit}
         />
       ) : (

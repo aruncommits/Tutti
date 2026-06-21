@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { formatClock, parseClock, type MasterExecutionPlan } from "@tutti/engine";
 import { colorFor } from "./dishColors";
 
@@ -9,20 +10,29 @@ const hhmm = (clock: string) => formatClock(parseClock(clock)).slice(0, 5);
 
 export function PreviewScreen({
   plan,
+  onReorder,
   onStart,
   onEdit,
   onShare,
 }: {
   plan: MasterExecutionPlan;
+  onReorder?: (nodeIds: string[]) => void;
   onStart: () => void;
   onEdit: () => void;
   onShare?: () => void;
 }) {
   const start = parseClock(plan.startTime);
   const total = Math.max(1, parseClock(plan.projectedServeTime) - start);
-  const rows = [...plan.nodes].sort(
-    (a, b) => parseClock(plan.schedule[a.nodeId]!.plannedStart) - parseClock(plan.schedule[b.nodeId]!.plannedStart),
-  );
+  const byStart = (ids: string[]) =>
+    [...ids].sort((a, b) => parseClock(plan.schedule[a]!.plannedStart) - parseClock(plan.schedule[b]!.plannedStart));
+  const byId = new Map(plan.nodes.map((n) => [n.nodeId, n]));
+  // Local display order: starts as the engine's time order, then follows the user's reordering so a
+  // nudge is immediately visible (the bar still shows the real computed time). Re-syncs only when the
+  // set of steps changes (a different plan), not on every recompile.
+  const idsKey = [...plan.nodes.map((n) => n.nodeId)].sort().join(",");
+  const [order, setOrder] = useState<string[]>(() => byStart(plan.nodes.map((n) => n.nodeId)));
+  useEffect(() => { setOrder(byStart(plan.nodes.map((n) => n.nodeId))); /* eslint-disable-next-line */ }, [idsKey]);
+  const rows = order.map((id) => byId.get(id)).filter((n): n is NonNullable<typeof n> => !!n);
   const voices = new Set(plan.nodes.map((n) => n.recipeId)).size;
 
   return (
@@ -56,6 +66,36 @@ export function PreviewScreen({
           );
         })}
       </div>
+
+      {onReorder && rows.length > 1 && (
+        <>
+          <h3 className="meal-sec">Your order</h3>
+          <p className="hint">Nudge a step up or down to cook it sooner or later. Tutti keeps every dish finishing together and never starts a step before its prerequisite.</p>
+          <div className="editor-list">
+            {rows.map((n, i) => {
+              const move = (dir: -1 | 1) => {
+                const ids = rows.map((r) => r.nodeId);
+                const j = i + dir;
+                if (j < 0 || j >= ids.length) return;
+                [ids[i], ids[j]] = [ids[j]!, ids[i]!];
+                setOrder(ids); // reflect the move immediately
+                onReorder(ids); // recompile timings honoring the new order where feasible
+              };
+              return (
+                <div className="editor-row" key={n.nodeId}>
+                  <span className="editor-num">{i + 1}.</span>
+                  <span className="swatch" style={{ background: colorFor(n.recipeId) }} />
+                  <span className="node-title" style={{ flex: 1, minWidth: 0 }}>{n.title}</span>
+                  <span className="editor-move">
+                    <button className="mini-btn" aria-label={`Move "${n.title}" earlier`} disabled={i === 0} onClick={() => move(-1)}>↑</button>
+                    <button className="mini-btn" aria-label={`Move "${n.title}" later`} disabled={i === rows.length - 1} onClick={() => move(1)}>↓</button>
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
 
       <p className="value finale-line">✓ All dishes ready together at {hhmm(plan.projectedServeTime)}</p>
       <div className="act">

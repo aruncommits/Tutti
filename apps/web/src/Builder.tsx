@@ -1,10 +1,9 @@
 import { useMemo, useState } from "react";
 import { allergensOf, dishIdOf, formatClock, mealNutrition, parseClock, tierOf, variantsForDish, type ComplexityTier, type RecipeGraph } from "@tutti/engine";
 import { colorFor } from "./dishColors";
-import { RecipePicker } from "./RecipePicker";
+import { LibraryBrowser } from "./LibraryBrowser";
 import { NutritionStrip } from "./NutritionStrip";
 import type { MealFit } from "./mealFit";
-import type { NotesMap } from "./recipeNotes";
 
 // The meal-plan builder — Tutti's opening screen. Add any recipes (search / paste / ask AI),
 // see your plan, then Build. Serve time is optional (ASAP by default). No forced steps.
@@ -67,13 +66,14 @@ export function Builder({
   libraryCount,
   library,
   candidates,
-  notes,
-  photos,
   avoid,
   diets,
   selectedIds,
   onPick,
   onDetails,
+  onAddRecipeId,
+  onDetailsId,
+  selectedDishIds,
   onRemoveCandidate,
   onSetTier,
   onShopping,
@@ -99,13 +99,14 @@ export function Builder({
   libraryCount?: number | null;
   library: RecipeGraph[];
   candidates: RecipeGraph[];
-  notes: NotesMap;
-  photos: Record<string, string>;
   avoid: string[];
   diets: string[];
   selectedIds: string[];
   onPick: (r: RecipeGraph) => void;
   onDetails: (r: RecipeGraph) => void;
+  onAddRecipeId: (recipeId: string) => void; // add a server-library recipe by id (single source)
+  onDetailsId: (recipeId: string) => void; // preview a server-library recipe by id
+  selectedDishIds: string[]; // dishIds already in the plan (for the browser's "Added" state)
   onRemoveCandidate?: (recipeId: string) => void;
   onSetTier: (dishId: string, tier: ComplexityTier) => void;
   onShopping: () => void;
@@ -147,18 +148,30 @@ export function Builder({
       )}
 
       {picking && (
-        <RecipePicker
-          library={library}
-          candidates={candidates}
-          notes={notes}
-          photos={photos}
-          avoid={avoid}
-          diets={diets}
-          selectedIds={selectedIds}
-          onPick={onPick}
-          onDetails={onDetails}
-          onRemove={onRemoveCandidate}
-        />
+        <>
+          {candidates.length > 0 && (
+            <div className="ing-sec">
+              <h3 className="meal-sec">Your recipes</h3>
+              <div className="card-grid">
+                {candidates.map((r) => (
+                  <div className="browse-line" key={r.recipeId}>
+                    <button className={`pick-row browse-row${selectedIds.includes(r.recipeId) ? " on" : ""}`} onClick={() => onPick(r)} aria-label={`${selectedIds.includes(r.recipeId) ? "Added" : "Add"} ${r.name}`}>
+                      <span className="pick-main" style={{ pointerEvents: "none" }}>
+                        <span className="swatch" style={{ background: colorFor(r.recipeId) }} />
+                        <span className="node-title">{r.name}</span>
+                        <span className="browse-add">{selectedIds.includes(r.recipeId) ? "✓ Added" : "+ Add"}</span>
+                      </span>
+                    </button>
+                    <button className="browse-info" aria-label={`View ${r.name}`} onClick={() => onDetails(r)}>ⓘ</button>
+                    {onRemoveCandidate && <button className="browse-info" aria-label={`Remove ${r.name}`} onClick={() => onRemoveCandidate(r.recipeId)}>🗑</button>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {/* One source of truth: the same server-backed library the Browse tab uses. */}
+          <LibraryBrowser selectedDishIds={selectedDishIds} diets={diets} onAddRecipe={onAddRecipeId} onDetails={onDetailsId} />
+        </>
       )}
 
       {selected.length === 0 ? (

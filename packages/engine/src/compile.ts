@@ -26,6 +26,7 @@ export function compile(
   kitchenProfile: KitchenProfile,
   targetServeTime: string,
   paceModel?: PaceModel,
+  manualOrder?: string[], // optional cook-chosen step order (honored where deps/resources allow)
 ): MasterExecutionPlan {
   // merge: recipes are independent graphs sharing only resources, never dependencies (Doc 2 §4.1).
   // Apply the user's pace multipliers to elastic durations before scheduling (Doc 2 §7).
@@ -36,7 +37,7 @@ export function compile(
     }),
   );
 
-  const forward = scheduleForward(nodes, kitchenProfile);
+  const forward = scheduleForward(nodes, kitchenProfile, manualOrder);
   const anchored = anchor(nodes, forward, targetServeTime);
   const cpm = criticalPathMethod(nodes);
 

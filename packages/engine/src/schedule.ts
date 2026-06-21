@@ -194,14 +194,20 @@ function earliestFeasibleStart(
  * Priority among schedulable nodes: on the critical path first, then least slack, then longest
  * duration, then nodeId (determinism).
  */
-export function scheduleForward(nodes: TaskNode[], kitchen: KitchenProfile): ForwardSchedule {
+export function scheduleForward(nodes: TaskNode[], kitchen: KitchenProfile, manualOrder?: string[]): ForwardSchedule {
   const k = normalizeKitchen(kitchen);
   const capOf = (c: string) => capacityOf(k, c);
   const byId = new Map(nodes.map((n) => [n.nodeId, n]));
 
   const cpm = criticalPathMethod(nodes);
   const onCritical = new Set(cpm.criticalPath);
-  const priority = (id: string): [number, number, number, string] => [
+  // Optional user-chosen order: among nodes that are READY (deps met, resources free) the manual rank
+  // wins, so the cook's preferred sequence is honored without ever violating dependencies/resources.
+  // Absent ⇒ every rank is 0, so the tuple falls through to the engine's own priority (identical).
+  const manualRank = new Map((manualOrder ?? []).map((id, i) => [id, i]));
+  const rankOf = (id: string) => manualRank.get(id) ?? (manualOrder?.length ?? 0);
+  const priority = (id: string): [number, number, number, number, string] => [
+    rankOf(id), // user's order first (no-op when no manualOrder)
     onCritical.has(id) ? 0 : 1, // critical first
     cpm.entries[id]!.slackMins, // least slack
     -byId.get(id)!.duration.estMins, // longest duration
@@ -210,10 +216,10 @@ export function scheduleForward(nodes: TaskNode[], kitchen: KitchenProfile): For
   const lessPriority = (a: string, b: string): boolean => {
     const pa = priority(a);
     const pb = priority(b);
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 4; i++) {
       if ((pa[i] as number) !== (pb[i] as number)) return (pa[i] as number) < (pb[i] as number);
     }
-    return (pa[3] as string) < (pb[3] as string);
+    return (pa[4] as string) < (pb[4] as string);
   };
 
   const timeline = new Map<string, Interval[]>();
