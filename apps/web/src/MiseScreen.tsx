@@ -3,6 +3,7 @@ import { buildShoppingList, type RecipeGraph } from "@tutti/engine";
 import { requiredEquipment, labelFor, missingEquipment } from "./mise";
 import { displayAmount } from "./units";
 import { blendView, isBlend, type BlendInfo } from "./blendView";
+import { kindColorOf } from "./ingredientColor";
 import { Stars } from "./Stars";
 import { colorFor } from "./dishColors";
 import type { KitchenUi } from "./kitchenModel";
@@ -58,10 +59,10 @@ export function MiseScreen({
   const toggle = (key: string) =>
     setChecked((p) => { const n = new Set(p); n.has(key) ? n.delete(key) : n.add(key); return n; });
 
-  const Row = ({ k, label, sub }: { k: string; label: string; sub?: string }) => (
+  const Row = ({ k, label, sub, dot }: { k: string; label: string; sub?: string; dot?: string }) => (
     <button className={`ing-row${checked.has(k) ? " tick" : ""}`} role="checkbox" aria-checked={checked.has(k)} onClick={() => toggle(k)}>
       <span className="box">{checked.has(k) ? "✓" : ""}</span>
-      <span className="nm">{label}</span>
+      <span className="nm">{dot && <span className="ing-dot" style={{ background: dot }} />}{label}</span>
       {sub && <span className="amt">{sub}</span>}
     </button>
   );
@@ -103,7 +104,7 @@ export function MiseScreen({
           const bv = isBlend(i.name) ? blendView(i.name) : null;
           return (
             <div key={key}>
-              <Row k={key} label={i.name} sub={displayAmount(i.amount, i.unit, i.toTaste, metric)} />
+              <Row k={key} label={i.name} sub={displayAmount(i.amount, i.unit, i.toTaste, metric)} dot={kindColorOf(i.name)} />
               {bv && <BlendGather bv={bv} metric={metric} />}
             </div>
           );

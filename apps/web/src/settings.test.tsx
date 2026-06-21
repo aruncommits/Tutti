@@ -30,6 +30,14 @@ describe("SettingsScreen (Brief v22 items 2+5)", () => {
     expect(p.onPace).toHaveBeenCalledTimes(1);
   });
 
+  it("offers a System/Light/Dark theme picker that calls onSetTheme", () => {
+    const p = { ...props(), theme: "system" as const, onSetTheme: vi.fn() };
+    render(<SettingsScreen {...p} />);
+    expect(screen.getByRole("button", { name: "System" }).getAttribute("aria-pressed")).toBe("true");
+    fireEvent.click(screen.getByRole("button", { name: "Dark" }));
+    expect(p.onSetTheme).toHaveBeenCalledWith("dark");
+  });
+
   it("requires a second tap to actually reset", () => {
     const p = props();
     render(<SettingsScreen {...p} />);

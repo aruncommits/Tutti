@@ -97,6 +97,23 @@ export function App() {
   const pantry = useMemo(() => migratePantry(pantryStored), [pantryStored]);
   const [people, setPeople] = usePersistentState<number>("tutti.people", 4, (v) => typeof v === "number");
   const [metric, setMetric] = usePersistentState<boolean>("tutti.metric", false, (v) => typeof v === "boolean");
+  // Appearance: system (follow device) / light / dark. Resolve to a concrete data-theme on <html> so
+  // a manual choice overrides the OS setting; when on "system", track OS changes live.
+  const [theme, setTheme] = usePersistentState<"system" | "light" | "dark">(
+    "tutti.theme", "system", (v) => v === "system" || v === "light" || v === "dark",
+  );
+  useEffect(() => {
+    const mq = typeof window.matchMedia === "function" ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+    const apply = () => {
+      const dark = theme === "dark" || (theme === "system" && !!mq?.matches);
+      document.documentElement.dataset.theme = dark ? "dark" : "light";
+      document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#1b1611" : "#fbf5ea");
+    };
+    apply();
+    if (theme !== "system" || !mq) return;
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  }, [theme]);
   const [photos, setPhotos] = usePersistentState<Photos>("tutti.photos", {}, isPlainObject);
   const onPhoto = (id: string, file: File) => {
     resizeToThumb(file).then((u) => setPhotos((p) => addPhoto(p, id, u))).catch(() => { /* unsupported / too big */ });
@@ -495,6 +512,8 @@ export function App() {
           onToggleLearn={() => setLearnPace(!learnPace)}
           metric={metric}
           onToggleMetric={() => setMetric(!metric)}
+          theme={theme}
+          onSetTheme={setTheme}
           canInstall={canInstall}
           onInstall={promptInstall}
           diet={diet}
@@ -537,6 +556,7 @@ export function App() {
       ) : screen === "preview" ? (
         <PreviewScreen
           plan={plan}
+          recipes={selectedRecipes}
           onReorder={reorderFlow}
           onStart={() => setScreen("ready")}
           onEdit={() => setScreen("home")}
