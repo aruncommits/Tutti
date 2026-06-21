@@ -10,6 +10,8 @@ export function SettingsScreen({
   onToggleLearn,
   metric,
   onToggleMetric,
+  theme = "system",
+  onSetTheme,
   canInstall = false,
   onInstall,
   diet = [],
@@ -27,6 +29,8 @@ export function SettingsScreen({
   onToggleLearn: () => void;
   metric: boolean;
   onToggleMetric: () => void;
+  theme?: "system" | "light" | "dark";
+  onSetTheme?: (t: "system" | "light" | "dark") => void;
   canInstall?: boolean;
   onInstall?: () => void;
   diet?: string[];
@@ -91,7 +95,14 @@ export function SettingsScreen({
       )}
 
       <h3 className="meal-sec">Appearance</h3>
-      <p className="hint">Tutti follows your device's light or dark setting automatically.</p>
+      {onSetTheme && (
+        <div className="seg" role="group" aria-label="Theme">
+          {([["system", "System"], ["light", "Light"], ["dark", "Dark"]] as const).map(([val, label]) => (
+            <button key={val} className={`seg-btn${theme === val ? " on" : ""}`} aria-pressed={theme === val} onClick={() => onSetTheme(val)}>{label}</button>
+          ))}
+        </div>
+      )}
+      <p className="hint">“System” follows your device's light or dark setting; pick Light or Dark to override it.</p>
 
       {canInstall && onInstall && (
         <>

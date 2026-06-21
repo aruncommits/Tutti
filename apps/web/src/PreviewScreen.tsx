@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
-import { formatClock, parseClock, type MasterExecutionPlan } from "@tutti/engine";
-import { colorFor } from "./dishColors";
+import { formatClock, parseClock, type MasterExecutionPlan, type RecipeGraph } from "@tutti/engine";
+import { colorFor, dishName } from "./dishColors";
+import { ExpandText, useAccordion } from "./Expandable";
+import { highlightIngredients } from "./ingredientColor";
 
 // Plan preview (Doc 7 §7): a confidence-builder shown once before cooking. The horizontal
 // timeline VISUALIZES interleaving — active tasks sitting inside another dish's passive window —
@@ -10,17 +12,28 @@ const hhmm = (clock: string) => formatClock(parseClock(clock)).slice(0, 5);
 
 export function PreviewScreen({
   plan,
+  recipes = [],
   onReorder,
   onStart,
   onEdit,
   onShare,
 }: {
   plan: MasterExecutionPlan;
+  recipes?: RecipeGraph[];
   onReorder?: (nodeIds: string[]) => void;
   onStart: () => void;
   onEdit: () => void;
   onShare?: () => void;
 }) {
+  const acc = useAccordion();
+  // The dishes this plan cooks: distinct recipeIds (first-seen order) → name + how many steps.
+  const nameOf = (id: string) => recipes.find((r) => r.recipeId === id)?.name ?? dishName(id);
+  const dishes: { id: string; name: string; steps: number }[] = [];
+  for (const n of plan.nodes) {
+    const found = dishes.find((d) => d.id === n.recipeId);
+    if (found) found.steps++;
+    else dishes.push({ id: n.recipeId, name: nameOf(n.recipeId), steps: 1 });
+  }
   const start = parseClock(plan.startTime);
   const total = Math.max(1, parseClock(plan.projectedServeTime) - start);
   const byStart = (ids: string[]) =>
@@ -46,6 +59,17 @@ export function PreviewScreen({
             that sets the real schedule length. */}
         <span className="beat">About {total} min · {voices} dishes</span>
       </p>
+
+      <div className="plan-dishes" aria-label="Dishes in this plan">
+        {dishes.map((d) => (
+          <span className="plan-dish" key={d.id}>
+            <span className="swatch" style={{ background: colorFor(d.id) }} />
+            {d.name}
+            <span className="pd-count">{d.steps} {d.steps === 1 ? "step" : "steps"}</span>
+          </span>
+        ))}
+      </div>
+
       <div className="gantt" role="img" aria-label="Cooking timeline showing dishes interleaved">
         {rows.map((n) => {
           const s = plan.schedule[n.nodeId]!;
@@ -85,10 +109,10 @@ export function PreviewScreen({
                 <div className="editor-row" key={n.nodeId}>
                   <span className="editor-num">{i + 1}.</span>
                   <span className="swatch" style={{ background: colorFor(n.recipeId) }} />
-                  <span className="node-title" style={{ flex: 1, minWidth: 0 }}>{n.title}</span>
+                  <ExpandText text={highlightIngredients(n.instruction ?? n.title)} open={acc.isOpen(n.nodeId)} onToggle={() => acc.toggle(n.nodeId)} />
                   <span className="editor-move">
-                    <button className="mini-btn" aria-label={`Move "${n.title}" earlier`} disabled={i === 0} onClick={() => move(-1)}>↑</button>
-                    <button className="mini-btn" aria-label={`Move "${n.title}" later`} disabled={i === rows.length - 1} onClick={() => move(1)}>↓</button>
+                    <button className="mini-btn" aria-label={`Move step ${i + 1} earlier`} disabled={i === 0} onClick={() => move(-1)}>↑</button>
+                    <button className="mini-btn" aria-label={`Move step ${i + 1} later`} disabled={i === rows.length - 1} onClick={() => move(1)}>↓</button>
                   </span>
                 </div>
               );

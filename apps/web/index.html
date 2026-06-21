@@ -10,6 +10,15 @@
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23c75d33'/%3E%3Ctext x='16' y='22' font-size='18' font-family='Georgia,serif' font-weight='700' fill='%23fff' text-anchor='middle'%3ET%3C/text%3E%3C/svg%3E"
     />
     <title>Tutti — the whole meal, ready at once</title>
+    <!-- Resolve the saved theme (system/light/dark) before first paint so there's no flash. -->
+    <script>
+      try {
+        var raw = localStorage.getItem("tutti.theme");
+        var t = raw ? JSON.parse(raw) : "system";
+        var dark = t === "dark" || (t === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+        document.documentElement.dataset.theme = dark ? "dark" : "light";
+      } catch (e) {}
+    </script>
     <!-- Fonts are self-hosted via @fontsource (imported in main.tsx) for true offline (Brief v7). -->
   </head>
   <body>

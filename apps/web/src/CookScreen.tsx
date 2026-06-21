@@ -15,6 +15,8 @@ import { useWakeLock } from "./useWakeLock";
 import { usePersistentState } from "./state";
 import { createTimer, remainingSec, removeTimer, extendTimer, sortTimers, type Timer } from "./timers";
 import { Stars } from "./Stars";
+import { ExpandText, useAccordion } from "./Expandable";
+import { highlightIngredients, kindColorOf } from "./ingredientColor";
 import { blendView, isBlend } from "./blendView";
 import type { NotesMap } from "./recipeNotes";
 
@@ -41,7 +43,7 @@ function Measures({ node }: { node: TaskNode }) {
         const bv = isBlend(ing.name) ? blendView(ing.name) : null;
         return (
           <span className="chip" key={i}>
-            {ing.amount !== undefined && <b>{ing.amount}{ing.unit ? ` ${ing.unit}` : ""}</b>} {ing.name}
+            {ing.amount !== undefined && <b>{ing.amount}{ing.unit ? ` ${ing.unit}` : ""}</b>} <span style={{ color: kindColorOf(ing.name) }}>{ing.name}</span>
             {bv && (
               <button className="chip-blend" aria-expanded={open.has(ing.name)} aria-label={`Make ${ing.name} from scratch`} onClick={() => toggle(ing.name)}>🧂</button>
             )}
@@ -143,6 +145,7 @@ export function CookScreen({
   onPhoto?: (id: string, file: File) => void;
 }) {
   const view = deriveViewState(plan);
+  const nextAcc = useAccordion(); // tap-to-expand the upcoming steps' full text
   const allDone = view.active.length === 0 && view.queue.length === 0;
   // How many cooks this plan was scheduled for — drives "who does what" lane chips (Brief v14).
   const cooks = Math.max(1, ...plan.nodes.map((n) => (plan.schedule[n.nodeId]?.hand ?? 0) + 1));
@@ -360,7 +363,7 @@ export function CookScreen({
                   </span>
                   <span className="phase">{n.phase}{isPassive ? " · hands-free" : ""}</span>
                 </div>
-                <div className="now-title">{n.title}</div>
+                <div className="now-title">{highlightIngredients(n.instruction ?? n.title)}</div>
                 <Measures node={n} />
                 <div className="act">
                   {isPassive && ticking === undefined ? (
@@ -399,7 +402,7 @@ export function CookScreen({
         {view.queue.map((n) => (
           <div className="q-item" key={n.nodeId}>
             <span className="swatch" style={{ background: colorFor(n.recipeId) }} />
-            <span className="node-title">{n.title}</span>
+            <ExpandText text={highlightIngredients(n.instruction ?? n.title)} open={nextAcc.isOpen(n.nodeId)} onToggle={() => nextAcc.toggle(n.nodeId)} clamp={1} />
             <span className="dur">~{n.duration.estMins}m</span>
           </div>
         ))}

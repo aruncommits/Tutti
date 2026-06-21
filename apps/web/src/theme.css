@@ -1111,7 +1111,7 @@ header {
 }
 .meal-dots { display: flex; gap: 3px; flex: none; }
 .meal-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.meal-text .dur { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60vw; }
+.meal-text .dur { white-space: normal; overflow: visible; } /* wrap the dish list — show every dish, no truncation */
 .meal-x {
   flex: none; width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--card-edge);
   background: var(--surface); color: var(--muted); font-size: 20px; cursor: pointer; box-shadow: var(--shadow-sm);
@@ -1421,10 +1421,8 @@ header {
 }
 .meal-fit.tight { background: #fdf3e3; color: #8a5a1a; }
 .meal-fit.over { background: #fbe8e4; color: #9a3520; }
-@media (prefers-color-scheme: dark) {
-  .meal-fit.tight { background: #3a2e1c; color: #f0c485; }
-  .meal-fit.over { background: #3c241e; color: #f0a48f; }
-}
+[data-theme="dark"] .meal-fit.tight { background: #3a2e1c; color: #f0c485; }
+[data-theme="dark"] .meal-fit.over { background: #3c241e; color: #f0a48f; }
 
 /* =====================================================================
    APP SHELL — sidebar on desktop, bottom tab bar on phones, settings gear.
@@ -1517,7 +1515,7 @@ header {
 .diet-badge { font-size: 11px; font-weight: 700; color: #2f6b3a; background: #e4f1e6; padding: 2px 8px; border-radius: 999px; }
 .diet-badge.sm { font-size: 10px; padding: 1px 6px; margin-left: 6px; }
 .kcal-chip { font-size: 11px; color: var(--muted); margin-left: 6px; }
-@media (prefers-color-scheme: dark) { .diet-badge { color: #bfe5c6; background: #20351f; } }
+[data-theme="dark"] .diet-badge { color: #bfe5c6; background: #20351f; }
 
 /* Shopping (manual add + actions) + Pantry inventory */
 .shop-add, .pantry-add-row { display: flex; gap: 8px; align-items: center; margin: 4px 0 14px; flex-wrap: wrap; }
@@ -1710,35 +1708,35 @@ header {
    Overrides tokens only; every component reads vars, so the whole app
    re-themes. Drop-shadows become hairlines (invisible on dark).
    ===================================================================== */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #1b1611;
-    --bg-tint: #272019;
-    --surface: #2a221b;
-    --ink: #f1e8da;
-    --muted: #b7aa96;
-    --faint: #8f8270;
+/* Dark theme: applied via [data-theme="dark"] (App resolves "system" → light/dark in JS and sets the
+   attribute on <html>), so users can override their device setting from Settings. */
+:root[data-theme="dark"] {
+  --bg: #1b1611;
+  --bg-tint: #272019;
+  --surface: #2a221b;
+  --ink: #f1e8da;
+  --muted: #b7aa96;
+  --faint: #8f8270;
 
-    --accent: #e07a45;
-    --accent-deep: #c75d33;
-    --accent-soft: rgba(224, 122, 69, 0.16);
+  --accent: #e07a45;
+  --accent-deep: #c75d33;
+  --accent-soft: rgba(224, 122, 69, 0.16);
 
-    --card: #2a221b;
-    --card-strong: #342a21;
-    --card-edge: rgba(245, 236, 222, 0.1);
-    --line: rgba(245, 236, 222, 0.08);
-    --staff: rgba(245, 236, 222, 0.12);
+  --card: #2a221b;
+  --card-strong: #342a21;
+  --card-edge: rgba(245, 236, 222, 0.1);
+  --line: rgba(245, 236, 222, 0.08);
+  --staff: rgba(245, 236, 222, 0.12);
 
-    --shadow: 0 0 0 1px var(--card-edge), 0 8px 24px -16px rgba(0, 0, 0, 0.6);
-    --shadow-sm: 0 0 0 1px var(--card-edge);
-  }
-  body {
-    background-image: linear-gradient(180deg, #211a14, var(--bg) 260px);
-  }
-  .btn { color: #1b1208; } /* dark ink on the brighter terracotta reads better */
-  .nudge { color: #9bd587; background: rgba(79, 154, 58, 0.16); }
-  .bottom-nav { background: color-mix(in srgb, var(--surface) 88%, transparent); }
+  --shadow: 0 0 0 1px var(--card-edge), 0 8px 24px -16px rgba(0, 0, 0, 0.6);
+  --shadow-sm: 0 0 0 1px var(--card-edge);
 }
+[data-theme="dark"] body {
+  background-image: linear-gradient(180deg, #211a14, var(--bg) 260px);
+}
+[data-theme="dark"] .btn { color: #1b1208; } /* dark ink on the brighter terracotta reads better */
+[data-theme="dark"] .nudge { color: #9bd587; background: rgba(79, 154, 58, 0.16); }
+[data-theme="dark"] .bottom-nav { background: color-mix(in srgb, var(--surface) 88%, transparent); }
 
 /* finished-dish photos (Brief v33) */
 .dish-thumb { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; flex: none; }
@@ -1812,3 +1810,33 @@ body.modal-open { overflow: hidden; }
 .mini-btn:disabled { opacity: 0.35; cursor: default; }
 .mini-btn.row-x { color: var(--accent); }
 .editor-actions { display: flex; align-items: center; gap: 14px; margin-top: 16px; }
+
+/* Uniform tap-to-expand for truncated text (Expandable.tsx). */
+.clamp { display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
+.clamp-1 { -webkit-line-clamp: 1; }
+.clamp-2 { -webkit-line-clamp: 2; }
+.clamp-3 { -webkit-line-clamp: 3; }
+.expandable {
+  display: flex; align-items: flex-start; gap: 8px; flex: 1; min-width: 0; text-align: left;
+  font: inherit; color: inherit; background: none; border: none; cursor: pointer; padding: 0;
+}
+.expandable > span:first-child { flex: 1; min-width: 0; }
+.expandable-caret { flex: none; color: var(--muted); font-size: 0.85em; line-height: 1.4; }
+/* "Dishes in this plan" legend on the preview. */
+.plan-dishes { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 14px; }
+.plan-dish { display: inline-flex; align-items: center; gap: 7px; padding: 5px 11px; border-radius: 999px;
+  border: 1px solid var(--card-edge); background: var(--surface); font-size: 13px; }
+.plan-dish .swatch { width: 11px; height: 11px; border-radius: 50%; flex: none; }
+.plan-dish .pd-count { color: var(--muted); font-size: 12px; }
+
+/* Ingredient color-coding (ingredientColor.tsx): highlighted words in method steps + list dots. */
+.ing-hl { font-weight: 600; }
+.ing-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 7px; vertical-align: baseline; flex: none; }
+.ing-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 2px 0 14px; font-size: 12.5px; color: var(--muted); }
+.ing-legend .leg { display: inline-flex; align-items: center; }
+
+/* Segmented control (Settings → Appearance theme picker). */
+.seg { display: inline-flex; border: 1px solid var(--card-edge); border-radius: 12px; overflow: hidden; margin: 2px 0 6px; }
+.seg-btn { font: inherit; cursor: pointer; border: none; background: var(--surface); color: var(--muted); padding: 8px 16px; }
+.seg-btn + .seg-btn { border-left: 1px solid var(--card-edge); }
+.seg-btn.on { background: var(--accent); color: #fff; font-weight: 600; }

@@ -4,6 +4,7 @@ import { Stars } from "./Stars";
 import { colorFor } from "./dishColors";
 import { substitutesFor } from "./substitutions";
 import { blendView, isBlend } from "./blendView";
+import { highlightIngredients, kindColorOf, ingredientKind, KIND_COLOR, KIND_LABEL, type Kind } from "./ingredientColor";
 import { displayAmount } from "./units";
 import { useState } from "react";
 import { NutritionStrip } from "./NutritionStrip";
@@ -43,6 +44,7 @@ export function RecipeDetailScreen({
   const allergens = allergensOf(recipe);
   const steps = orderedSteps(recipe);
   const ingredients = recipeIngredients(recipe);
+  const legendKinds = (Object.keys(KIND_LABEL) as Kind[]).filter((k) => ingredients.some((i) => ingredientKind(i.name) === k));
   const [openBlends, setOpenBlends] = useState<Set<string>>(new Set());
   const toggleBlend = (n: string) => setOpenBlends((s) => { const x = new Set(s); x.has(n) ? x.delete(n) : x.add(n); return x; });
   const nutrition = nutritionOf(recipe);
@@ -116,7 +118,7 @@ export function RecipeDetailScreen({
           return (
             <div key={`${i.name}|${i.unit ?? ""}`}>
               <div className="ing-row">
-                <span className="nm">{i.name}</span>
+                <span className="nm"><span className="ing-dot" style={{ background: kindColorOf(i.name) }} />{i.name}</span>
                 <span className="amt">{displayAmount(i.amount, i.unit, i.toTaste, metric)}</span>
               </div>
               {subs.length > 0 && (
@@ -151,11 +153,19 @@ export function RecipeDetailScreen({
         })}
       </div>
 
+      {legendKinds.length > 0 && (
+        <p className="ing-legend" aria-label="Ingredient colour key">
+          {legendKinds.map((k) => (
+            <span className="leg" key={k}><span className="ing-dot" style={{ background: KIND_COLOR[k] }} />{KIND_LABEL[k]}</span>
+          ))}
+        </p>
+      )}
+
       <h3 className="meal-sec">Steps</h3>
       <ol className="recipe-steps">
         {steps.map((n) => (
           <li className="recipe-step" key={n.nodeId}>
-            <span className="recipe-step-title">{n.title}</span>
+            <span className="recipe-step-title">{highlightIngredients(n.instruction ?? n.title)}</span>
             <span className="recipe-step-meta">
               <span className="phase">{n.phase}</span>
               <span className="dur">~{n.duration.estMins} min</span>
