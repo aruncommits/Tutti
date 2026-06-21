@@ -25,6 +25,7 @@ export function RecipeDetailScreen({
   collections = [],
   onToggleCollection,
   onAdd,
+  onEdit,
   onBack,
 }: {
   recipe: RecipeGraph;
@@ -36,6 +37,7 @@ export function RecipeDetailScreen({
   collections?: Collection[];
   onToggleCollection?: (collectionId: string, recipeId: string) => void;
   onAdd: () => void;
+  onEdit?: () => void;
   onBack: () => void;
 }) {
   const allergens = allergensOf(recipe);
@@ -165,6 +167,7 @@ export function RecipeDetailScreen({
 
       <button className="btn big-btn" onClick={onAdd}>+ Add to meal</button>
       <div className="home-links">
+        {onEdit && <button className="link" onClick={onEdit}>✏️ Customize</button>}
         <button className="link" onClick={onBack}>Back</button>
         <button className="link no-print" onClick={() => { if (typeof window !== "undefined") window.print(); }}>🖨 Print</button>
       </div>

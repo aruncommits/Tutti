@@ -16,6 +16,7 @@ export function StudioScreen({
   collections = [],
   onNew,
   onOpen,
+  onEdit,
   onDuplicate,
   onRemove,
   onAddCollection,
@@ -26,6 +27,7 @@ export function StudioScreen({
   collections?: Collection[];
   onNew: () => void;
   onOpen: (r: RecipeGraph) => void;
+  onEdit?: (r: RecipeGraph) => void;
   onDuplicate: (id: string) => void;
   onRemove: (id: string) => void;
   onAddCollection?: (name: string) => void;
@@ -60,6 +62,7 @@ export function StudioScreen({
                   <span className="dur">{recipeTotalMins(r)}m</span>
                 </span>
               </button>
+              {onEdit && <button className="browse-info" aria-label={`Edit ${r.name}`} title="Edit" onClick={() => onEdit(r)}>✏️</button>}
               <button className="browse-info" aria-label={`Duplicate ${r.name}`} title="Duplicate" onClick={() => onDuplicate(r.recipeId)}>⧉</button>
               <button className="browse-info" aria-label={`Delete ${r.name}`} title="Delete" onClick={() => onRemove(r.recipeId)}>🗑</button>
             </div>

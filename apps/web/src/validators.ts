@@ -20,7 +20,7 @@ export function isMealArray(v: unknown): boolean {
 }
 
 const SCREENS: ReadonlySet<Screen> = new Set<Screen>([
-  "onboarding", "kitchen", "home", "calendar", "addRecipe", "studio", "browse", "recipe", "shopping", "pantry",
+  "onboarding", "kitchen", "home", "calendar", "addRecipe", "studio", "browse", "recipe", "editRecipe", "shopping", "pantry",
   "stats", "meals", "settings", "preview", "ready", "cook",
 ]);
 

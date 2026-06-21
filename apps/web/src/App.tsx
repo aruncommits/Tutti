@@ -28,6 +28,7 @@ const Builder = lazy(() => import("./Builder").then((m) => ({ default: m.Builder
 const KitchenScreen = lazy(() => import("./KitchenScreen").then((m) => ({ default: m.KitchenScreen })));
 const MealsScreen = lazy(() => import("./MealsScreen").then((m) => ({ default: m.MealsScreen })));
 const RecipeDetailScreen = lazy(() => import("./RecipeDetailScreen").then((m) => ({ default: m.RecipeDetailScreen })));
+const RecipeEditor = lazy(() => import("./RecipeEditor").then((m) => ({ default: m.RecipeEditor })));
 const MiseScreen = lazy(() => import("./MiseScreen").then((m) => ({ default: m.MiseScreen })));
 const SettingsScreen = lazy(() => import("./SettingsScreen").then((m) => ({ default: m.SettingsScreen })));
 const OnboardingScreen = lazy(() => import("./OnboardingScreen").then((m) => ({ default: m.OnboardingScreen })));
@@ -52,7 +53,7 @@ const SAMPLE_RECIPES: RecipeGraph[] = (() => {
 
 const SCREEN_NAMES: Record<Screen, string> = {
   onboarding: "Welcome", kitchen: "Your kitchen", home: "Home", calendar: "Meal calendar", addRecipe: "Add a dish", studio: "Recipe Studio",
-  browse: "Browse recipes", recipe: "Recipe", shopping: "Shopping list", pantry: "Pantry", stats: "Your pace", meals: "Your meals", settings: "Settings",
+  browse: "Browse recipes", recipe: "Recipe", editRecipe: "Customize recipe", shopping: "Shopping list", pantry: "Pantry", stats: "Your pace", meals: "Your meals", settings: "Settings",
   preview: "Plan preview", ready: "Get ready", cook: "Cook mode",
 };
 
@@ -86,6 +87,8 @@ export function App() {
   // Quick-preview modal: read a recipe over the browse list before adding (separate from the full
   // "recipe" screen used by Studio). Holds the full graph (fetched for server recipes).
   const [previewRecipe, setPreviewRecipe] = useState<RecipeGraph | null>(null);
+  // The recipe currently open in the customize editor (a personal copy when forked from the library).
+  const [editingRecipe, setEditingRecipe] = useState<RecipeGraph | null>(null);
   // Total dishes in the server catalog — for the Home "Browse the full library" call-to-action.
   const [libraryCount, setLibraryCount] = useState<number | null>(null);
   useEffect(() => { library.searchDishes({ pageSize: 1 }).then((r) => setLibraryCount(r.total)).catch(() => {}); }, []);
@@ -217,6 +220,25 @@ export function App() {
       verified: false,
     };
     setCandidates((prev) => [...prev, copy]);
+  };
+  // Customize: open a recipe in the editor. Editing one of my own recipes edits it in place; editing
+  // a library/starter recipe forks a personal copy first (new id + dish), so the catalog is untouched.
+  const editRecipe = (r: RecipeGraph) => {
+    const mine = candidates.some((c) => c.recipeId === r.recipeId);
+    const target = mine
+      ? r
+      : (() => { const ts = Date.now().toString(36); return { ...r, recipeId: `${r.recipeId}_my${ts}`, dishId: `${dishIdOf(r)}_my${ts}`, verified: false }; })();
+    setEditingRecipe(target);
+    setPreviewRecipe(null);
+    setScreen("editRecipe");
+  };
+  // Save the edited recipe into My Recipes (localStorage candidates + IndexedDB cache), then show it.
+  const saveEditedRecipe = (g: RecipeGraph) => {
+    setCandidates((prev) => [...prev.filter((c) => c.recipeId !== g.recipeId), g]);
+    void recipeStore.put(g);
+    setEditingRecipe(null);
+    setDetailRecipe(g);
+    setScreen("recipe");
   };
   // Switch a dish to a different complexity tier: swap its recipeId in the plan, carrying servings.
   const setTier = (dishId: string, tier: ComplexityTier) => {
@@ -412,7 +434,14 @@ export function App() {
           collections={collections}
           onToggleCollection={(cid, rid) => setCollections((c) => toggleInCollection(c, cid, rid))}
           onAdd={() => addCandidate(detailRecipe)}
+          onEdit={() => editRecipe(detailRecipe)}
           onBack={() => setScreen("browse")}
+        />
+      ) : screen === "editRecipe" && editingRecipe ? (
+        <RecipeEditor
+          recipe={editingRecipe}
+          onSave={saveEditedRecipe}
+          onCancel={() => { setEditingRecipe(null); setScreen(candidates.some((c) => c.recipeId === editingRecipe.recipeId) ? "studio" : "browse"); }}
         />
       ) : screen === "shopping" ? (
         <ShoppingScreen
@@ -491,6 +520,7 @@ export function App() {
           collections={collections}
           onNew={() => setScreen("addRecipe")}
           onOpen={(r) => { setDetailRecipe(r); setScreen("recipe"); }}
+          onEdit={editRecipe}
           onDuplicate={duplicateCandidate}
           onRemove={removeCandidate}
           onAddCollection={(name) => setCollections((c) => addCollection(c, name, `col${Date.now().toString(36)}`))}
@@ -574,6 +604,7 @@ export function App() {
               collections={collections}
               onToggleCollection={(cid, rid) => setCollections((c) => toggleInCollection(c, cid, rid))}
               onAdd={() => { addCandidate(previewRecipe); setPreviewRecipe(null); }}
+              onEdit={() => editRecipe(previewRecipe)}
               onBack={() => setPreviewRecipe(null)}
             />
           </Suspense>

@@ -1796,3 +1796,19 @@ body.modal-open { overflow: hidden; }
 .blend-scratch-btn:hover { opacity: 1; }
 .scratch-note { font-size: 0.85em; opacity: 0.85; margin: 6px 0; }
 .scratch-chip { font: inherit; cursor: pointer; border: 1px solid var(--accent); background: var(--accent-soft); color: var(--accent); border-radius: 999px; padding: 2px 8px; margin: 0 4px 4px 0; font-size: 0.85em; }
+
+/* Recipe customize editor. */
+.editor-field { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
+.editor-label { width: 70px; flex: none; color: var(--muted); font-size: 0.9em; }
+.editor-input { flex: 1; min-width: 0; font: inherit; padding: 9px 11px; border-radius: 10px;
+  border: 1px solid var(--card-edge); background: var(--surface); color: inherit; }
+.editor-input.small { flex: none; width: 90px; }
+.editor-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 6px; }
+.editor-row { display: flex; align-items: center; gap: 6px; }
+.editor-num { width: 22px; flex: none; text-align: right; color: var(--muted); font-size: 0.85em; }
+.editor-move { display: inline-flex; gap: 2px; flex: none; }
+.mini-btn { font: inherit; cursor: pointer; border: 1px solid var(--card-edge); background: var(--surface);
+  color: var(--muted); border-radius: 8px; width: 30px; height: 32px; }
+.mini-btn:disabled { opacity: 0.35; cursor: default; }
+.mini-btn.row-x { color: var(--accent); }
+.editor-actions { display: flex; align-items: center; gap: 14px; margin-top: 16px; }

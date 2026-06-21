@@ -29,3 +29,30 @@ export function recipeIngredients(recipe: RecipeGraph): DetailIngredient[] {
 export function recipeTotalMins(recipe: RecipeGraph): number {
   return recipe.nodes.reduce((s, n) => s + n.duration.estMins, 0);
 }
+
+/** An ingredient as a single editable line ("500 g chicken", "salt to taste") — round-trips through
+ *  the paste parser's parseIngredient. */
+export function formatIngredientLine(i: { name: string; amount?: number; unit?: string }): string {
+  if (i.amount === undefined) return i.name;
+  return `${i.amount}${i.unit ? ` ${i.unit}` : ""} ${i.name}`.trim();
+}
+
+/** Every ingredient line of a recipe (across all nodes, in order) for the editor. */
+export function editableIngredientLines(recipe: RecipeGraph): string[] {
+  return recipe.nodes.flatMap((n) => n.ingredients).map(formatIngredientLine);
+}
+
+/** Every step's text, in cook order, for the editor. */
+export function editableStepLines(recipe: RecipeGraph): string[] {
+  return orderedSteps(recipe).map((n) => n.instruction ?? n.title);
+}
+
+/** Re-assemble edited fields into canonical recipe text the PasteParser understands (used by the
+ *  customize editor so a save round-trips through the normal parse + compile pipeline). */
+export function assembleRecipeText(name: string, servings: number, ingredientLines: string[], stepLines: string[]): string {
+  return (
+    `${name.trim()}\nServes: ${Math.max(1, Math.round(servings))}\n\n` +
+    `Ingredients:\n${ingredientLines.map((l) => `- ${l}`).join("\n")}\n\n` +
+    `Method:\n${stepLines.map((l, i) => `${i + 1}. ${l}`).join("\n")}`
+  );
+}
