@@ -5,3 +5,4 @@ export { buildDraftGraph, parseIngredient } from "./draft";
 export { extractJsonLdRecipe, type JsonLdResult } from "./jsonld";
 export { draftFromText, PasteParser } from "./text";
 export { fetchRecipeFromUrl, htmlToText, type FetchRecipeOptions } from "./url";
+export { parseMenu } from "./menu";

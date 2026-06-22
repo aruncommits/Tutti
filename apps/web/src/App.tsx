@@ -29,6 +29,7 @@ const KitchenScreen = lazy(() => import("./KitchenScreen").then((m) => ({ defaul
 const MealsScreen = lazy(() => import("./MealsScreen").then((m) => ({ default: m.MealsScreen })));
 const RecipeDetailScreen = lazy(() => import("./RecipeDetailScreen").then((m) => ({ default: m.RecipeDetailScreen })));
 const RecipeEditor = lazy(() => import("./RecipeEditor").then((m) => ({ default: m.RecipeEditor })));
+const MenuImportScreen = lazy(() => import("./MenuImportScreen").then((m) => ({ default: m.MenuImportScreen })));
 const MiseScreen = lazy(() => import("./MiseScreen").then((m) => ({ default: m.MiseScreen })));
 const SettingsScreen = lazy(() => import("./SettingsScreen").then((m) => ({ default: m.SettingsScreen })));
 const OnboardingScreen = lazy(() => import("./OnboardingScreen").then((m) => ({ default: m.OnboardingScreen })));
@@ -53,7 +54,7 @@ const SAMPLE_RECIPES: RecipeGraph[] = (() => {
 
 const SCREEN_NAMES: Record<Screen, string> = {
   onboarding: "Welcome", kitchen: "Your kitchen", home: "Home", calendar: "Meal calendar", addRecipe: "Add a dish", studio: "Recipe Studio",
-  browse: "Browse recipes", recipe: "Recipe", editRecipe: "Customize recipe", shopping: "Shopping list", pantry: "Pantry", stats: "Your pace", meals: "Your meals", settings: "Settings",
+  browse: "Browse recipes", recipe: "Recipe", editRecipe: "Customize recipe", menuImport: "Import a menu", shopping: "Shopping list", pantry: "Pantry", stats: "Your pace", meals: "Your meals", settings: "Settings",
   preview: "Plan preview", ready: "Get ready", cook: "Cook mode",
 };
 
@@ -212,6 +213,12 @@ export function App() {
       return others.includes(g.recipeId) ? others : [...others, g.recipeId];
     });
     setScreen("home"); // adding a recipe returns to the builder
+  };
+  // Save a recipe to the personal library WITHOUT selecting it into the current plan or navigating —
+  // used by bulk flows like menu import (results live in Studio / "Your recipes").
+  const saveToLibrary = (g: RecipeGraph) => {
+    setCandidates((prev) => [...prev.filter((c) => c.recipeId !== g.recipeId), g]);
+    void recipeStore.put(g);
   };
   // Browse-at-scale (Phase D): the catalog hands back a recipeId — resolve+cache the full graph
   // (RemoteProvider stores it for offline cook), then select it / open its detail.
@@ -468,6 +475,8 @@ export function App() {
           onSave={saveEditedRecipe}
           onCancel={() => { setEditingRecipe(null); setScreen(candidates.some((c) => c.recipeId === editingRecipe.recipeId) ? "studio" : "browse"); }}
         />
+      ) : screen === "menuImport" ? (
+        <MenuImportScreen onAdd={saveToLibrary} onBack={() => setScreen("studio")} />
       ) : screen === "shopping" ? (
         <ShoppingScreen
           recipes={weekShopRecipes ?? (selectedRecipes.length ? selectedRecipes : allRecipes)}
@@ -546,6 +555,7 @@ export function App() {
           photos={photos}
           collections={collections}
           onNew={() => setScreen("addRecipe")}
+          onImportMenu={() => setScreen("menuImport")}
           onOpen={(r) => { setDetailRecipe(r); setScreen("recipe"); }}
           onEdit={editRecipe}
           onDuplicate={duplicateCandidate}

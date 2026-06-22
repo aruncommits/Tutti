@@ -15,6 +15,7 @@ export function StudioScreen({
   photos = {},
   collections = [],
   onNew,
+  onImportMenu,
   onOpen,
   onEdit,
   onDuplicate,
@@ -26,6 +27,7 @@ export function StudioScreen({
   photos?: Record<string, string>;
   collections?: Collection[];
   onNew: () => void;
+  onImportMenu?: () => void;
   onOpen: (r: RecipeGraph) => void;
   onEdit?: (r: RecipeGraph) => void;
   onDuplicate: (id: string) => void;
@@ -42,6 +44,7 @@ export function StudioScreen({
 
       <div className="add-row">
         <button className="add-action" onClick={onNew}><span className="add-ico" aria-hidden="true">✨</span>New recipe — paste, a link, or ask AI</button>
+        {onImportMenu && <button className="add-action" onClick={onImportMenu}><span className="add-ico" aria-hidden="true">📋</span>Import a menu</button>}
       </div>
 
       <h3 className="meal-sec">My recipes</h3>
