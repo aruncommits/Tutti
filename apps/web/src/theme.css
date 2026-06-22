@@ -1604,6 +1604,7 @@ header {
   align-items: center;
   gap: 3px;
   padding: 6px 2px;
+  min-height: 44px;
   border: none;
   background: none;
   cursor: pointer;
@@ -1611,9 +1612,31 @@ header {
   font-size: 10.5px;
   font-weight: 600;
   border-radius: 10px;
+  -webkit-tap-highlight-color: transparent;
 }
 .tab.on { color: var(--accent-deep); }
 .tab.on .nav-ico { transform: translateY(-1px); }
+.tab-label { line-height: 1; }
+.tab-ico-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tab-badge {
+  position: absolute;
+  top: -1px;
+  right: -3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e53e3e;
+  border: 1.5px solid var(--surface);
+  pointer-events: none;
+}
+
+/* Suppress tab bar on full-screen / immersive screens */
+.shell--nav-hidden .bottom-nav { display: none; }
 
 @media (min-width: 960px) {
   .shell {
