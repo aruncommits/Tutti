@@ -422,7 +422,7 @@ export function App() {
       <div className="wrap">
         <main>
           <Suspense fallback={<Loading />}>
-            <OnboardingScreen onDone={() => { setOnboarded(true); setScreen("kitchen"); }} />
+            <OnboardingScreen onDone={(skipKitchen) => { setOnboarded(true); setScreen(skipKitchen ? "home" : "kitchen"); }} />
           </Suspense>
         </main>
       </div>

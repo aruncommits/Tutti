@@ -1,34 +1,88 @@
 import { useState } from "react";
 
-// First-run onboarding (Doc 7 §2): three value cards selling the core idea, then into setup.
-// No account needed to cook (local-first, P4). Shown once via the tutti.onboarded flag.
+// V2 onboarding: show HOW not WHY. Three slides focused on the actual product experience.
+// Slide 3 offers two CTAs: "Start cooking" (skip kitchen) and "Set up kitchen" (old path).
 
-const CARDS = [
-  { hand: "every dish hot, together", title: "Cook a whole meal like a pro kitchen", body: "Tutti times every dish so they're all ready at the same moment." },
-  { hand: "we hide the chopping in the simmering", title: "Never juggle three pots again", body: "We schedule the active work of one dish into the quiet windows of another." },
-  { hand: "tell us once, then just cook", title: "Your kitchen, your pace", body: "Set your burners and pans once. Tutti plans around what you actually have." },
+interface Slide {
+  visual: string;           // large emoji or ASCII art representing the screen
+  headline: string;
+  body: string;
+  cta: string;
+}
+
+const SLIDES: Slide[] = [
+  {
+    visual: "🍳",
+    headline: "Everything done at the same time.",
+    body: "Pick your dishes and set a serve time. Tutti works out who does what and when — so every dish finishes together.",
+    cta: "See how it works →",
+  },
+  {
+    visual: "⏱️",
+    headline: "Follow along, hands-free.",
+    body: "Step-by-step instructions that know what's on your stove right now. No more juggling three pots and a timer.",
+    cta: "One more thing →",
+  },
+  {
+    visual: "🚀",
+    headline: "No setup needed.",
+    body: "Start cooking tonight. You can tell Tutti about your kitchen whenever you're ready — it just gets smarter over time.",
+    cta: "",
+  },
 ];
 
-export function OnboardingScreen({ onDone }: { onDone: () => void }) {
+export function OnboardingScreen({
+  onDone,
+}: {
+  onDone: (skipKitchen: boolean) => void;
+}) {
   const [i, setI] = useState(0);
-  const last = i === CARDS.length - 1;
-  const card = CARDS[i]!;
+  const slide = SLIDES[i]!;
+  const isLast = i === SLIDES.length - 1;
+
+  function advance() {
+    if (!isLast) setI(i + 1);
+  }
+
   return (
     <section className="zone onboarding" aria-label="Welcome to Tutti">
+      <button className="link ob-skip" onClick={() => onDone(true)}>
+        Skip
+      </button>
+
       <div className="ob-card">
-        <div className="ob-hand">{card.hand}</div>
-        <h2 className="ob-title">{card.title}</h2>
-        <p className="ob-body">{card.body}</p>
+        <div className="ob-visual" aria-hidden="true">{slide.visual}</div>
+        <h2 className="ob-title">{slide.headline}</h2>
+        <p className="ob-body">{slide.body}</p>
       </div>
-      <div className="ob-dots" aria-hidden="true">
-        {CARDS.map((_, k) => <span key={k} className={k === i ? "on" : ""} />)}
+
+      <div className="ob-dots" aria-label={`Slide ${i + 1} of ${SLIDES.length}`}>
+        {SLIDES.map((_, k) => (
+          <button
+            key={k}
+            className={`ob-dot${k === i ? " on" : ""}`}
+            aria-label={`Go to slide ${k + 1}`}
+            onClick={() => setI(k)}
+          />
+        ))}
       </div>
-      <div className="ob-actions">
-        <button className="link" onClick={onDone}>Skip</button>
-        <button className="btn" onClick={() => (last ? onDone() : setI(i + 1))}>
-          {last ? "Set up my kitchen" : "Next"}
-        </button>
-      </div>
+
+      {isLast ? (
+        <div className="ob-actions ob-actions--last">
+          <button className="btn big-btn" onClick={() => onDone(true)}>
+            Start cooking
+          </button>
+          <button className="link" onClick={() => onDone(false)}>
+            Set up my kitchen first
+          </button>
+        </div>
+      ) : (
+        <div className="ob-actions">
+          <button className="btn" onClick={advance}>
+            {slide.cta}
+          </button>
+        </div>
+      )}
     </section>
   );
 }

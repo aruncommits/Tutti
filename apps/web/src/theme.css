@@ -617,6 +617,14 @@ header {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  position: relative;
+}
+.ob-skip {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 13px;
+  color: var(--muted);
 }
 .ob-card,
 .ob-actions,
@@ -624,15 +632,12 @@ header {
   max-width: 560px;
 }
 .ob-card {
-  padding: 24px 4px;
+  padding: 24px 4px 16px;
 }
-.ob-hand {
-  font-family: var(--display);
-  font-weight: 500;
-  font-style: italic;
-  font-size: 19px;
-  color: var(--accent);
-  margin-bottom: 12px;
+.ob-visual {
+  font-size: 56px;
+  margin-bottom: 16px;
+  line-height: 1;
 }
 .ob-title {
   font-family: var(--display);
@@ -652,14 +657,20 @@ header {
   gap: 8px;
   margin: 20px 4px;
 }
-.ob-dots span {
+.ob-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
   background: var(--card-edge);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  min-width: 8px;
+  min-height: 8px;
 }
-.ob-dots span.on {
+.ob-dot.on {
   background: var(--accent);
+  transform: scale(1.25);
 }
 .ob-actions {
   display: flex;
@@ -670,6 +681,10 @@ header {
 .ob-actions .btn {
   flex: 1;
   padding: 14px;
+}
+.ob-actions--last {
+  flex-direction: column;
+  align-items: stretch;
 }
 
 /* ---- pick dishes ---- */
