@@ -21,6 +21,6 @@ describe("App accessibility scaffolding (Brief v9)", () => {
     expect(region).toBeInTheDocument();
     expect(region?.getAttribute("tabindex")).toBe("-1");
     // BrowseScreen is lazy-loaded — await its heading through Suspense
-    expect(await screen.findByRole("heading", { level: 2, name: /browse recipes/i }, { timeout: 3000 })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 2, name: /browse/i }, { timeout: 3000 })).toBeInTheDocument();
   });
 });

@@ -460,8 +460,8 @@ export function App() {
           diets={diet}
           selectedDishIds={dishes.map(dishOf)}
           onAddRecipe={pickLibraryRecipe}
+          onRemoveRecipe={toggleDish}
           onDetails={openLibraryRecipe}
-          onBack={() => setScreen("home")}
         />
       ) : screen === "recipe" && detailRecipe ? (
         <RecipeDetailScreen
