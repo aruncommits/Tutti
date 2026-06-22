@@ -501,7 +501,7 @@ export function App() {
           onAdd={(item: PantryItem) => setPantry((p) => addPantryItem(migratePantry(p), item))}
           onRemove={(name) => setPantry((p) => removePantryItem(migratePantry(p), name))}
           onToggleStaple={(name) => setPantry((p) => toggleStaple(migratePantry(p), name))}
-          onBack={() => setScreen("home")}
+          onBack={() => setScreen("meals")}
         />
       ) : screen === "calendar" ? (
         <CalendarScreen
@@ -519,7 +519,8 @@ export function App() {
           recipes={allRecipes}
           onRestore={restoreMeal}
           onRemove={(id) => setMeals((m) => removeMeal(m, id))}
-          onBack={() => setScreen("home")}
+          onSettings={() => setScreen("settings")}
+          onCalendar={() => setScreen("calendar")}
         />
       ) : screen === "settings" ? (
         <SettingsScreen
@@ -546,7 +547,7 @@ export function App() {
             setDiet([]); setCollections([]); setCalendar({});
             setScreen("home");
           }}
-          onBack={() => setScreen("home")}
+          onBack={() => setScreen("meals")}
         />
       ) : screen === "stats" ? (
         <StatsScreen
@@ -555,7 +556,7 @@ export function App() {
           learnPace={learnPace}
           onToggleLearn={() => setLearnPace(!learnPace)}
           onForget={() => { setPace({}); setEvents([]); }}
-          onBack={() => setScreen("home")}
+          onBack={() => setScreen("settings")}
         />
       ) : screen === "studio" ? (
         <StudioScreen
