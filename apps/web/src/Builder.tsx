@@ -175,7 +175,18 @@ export function Builder({
       )}
 
       {selected.length === 0 ? (
-        <div className="idle"><b>Your meal plan is empty.</b> Search the library, paste a recipe, or ask AI to add your first dish — then build a plan that has everything ready together.</div>
+        <div className="idle">
+          {onBrowseAll && (
+            <button className="btn big-btn" style={{ marginBottom: 12 }} onClick={onBrowseAll}>
+              Browse recipes
+            </button>
+          )}
+          <div className="idle-secondary">
+            <button className="add-action" onClick={onPaste}><span className="add-ico" aria-hidden="true">📋</span>Paste</button>
+            <button className="add-action" onClick={onAskAI}><span className="add-ico" aria-hidden="true">✨</span>Ask AI</button>
+          </div>
+          <p className="hint" style={{ marginTop: 10 }}>Or search your library above</p>
+        </div>
       ) : (
         <>
           <h3 className="meal-sec">Your meal plan</h3>

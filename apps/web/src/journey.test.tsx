@@ -64,7 +64,7 @@ describe("cook journey (Brief v30 item 1)", () => {
 
     // Leave the finished cook via the nav instead of tapping "Cook it again" — the resume bar must
     // not reappear, because a 7/7 cook has nothing left to resume.
-    fireEvent.click((await screen.findAllByRole("button", { name: /^home$/i }))[0]!);
+    fireEvent.click((await screen.findAllByRole("button", { name: /^cook$/i }))[0]!);
     expect(screen.queryByRole("button", { name: /resume cooking/i })).toBeNull();
   }, COOK_RUN);
 
@@ -83,7 +83,7 @@ describe("cook journey (Brief v30 item 1)", () => {
     render(<App />);
 
     // Open Meals (nav exists in both the sidebar and the bottom bar — take the first), then tap the meal.
-    fireEvent.click((await screen.findAllByRole("button", { name: /^meals$/i }, LAZY))[0]!);
+    fireEvent.click((await screen.findAllByRole("button", { name: /^me$/i }, LAZY))[0]!);
     fireEvent.click(await screen.findByRole("button", { name: /cook saved thali again/i }, LAZY));
 
     // Lands directly on the built plan preview — Start cooking is available without ever building.

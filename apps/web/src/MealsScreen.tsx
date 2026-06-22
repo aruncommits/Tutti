@@ -9,13 +9,15 @@ export function MealsScreen({
   recipes,
   onRestore,
   onRemove,
-  onBack,
+  onSettings,
+  onCalendar,
 }: {
   meals: SavedMeal[];
   recipes: RecipeGraph[];
   onRestore: (m: SavedMeal) => void;
   onRemove: (id: string) => void;
-  onBack: () => void;
+  onSettings?: () => void;
+  onCalendar?: () => void;
 }) {
   const saved = meals.filter((m) => m.kind === "saved");
   const recent = meals.filter((m) => m.kind === "recent");
@@ -59,7 +61,10 @@ export function MealsScreen({
         </>
       )}
 
-      <div className="home-links"><button className="link" onClick={onBack}>Back</button></div>
+      <div className="home-links">
+        {onCalendar && <button className="link" onClick={onCalendar}>📅 Calendar</button>}
+        {onSettings && <button className="link" onClick={onSettings}>⚙ Settings</button>}
+      </div>
     </section>
   );
 }

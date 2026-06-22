@@ -85,6 +85,8 @@ export function App() {
   const [meals, setMeals] = usePersistentState<SavedMeal[]>("tutti.meals", [], isMealArray);
   const [notes, setNotes] = usePersistentState<NotesMap>("tutti.recipeNotes", {}, isPlainObject);
   const [detailRecipe, setDetailRecipe] = useState<RecipeGraph | null>(null);
+  // Track where the recipe detail screen was opened from so Back goes to the right place.
+  const recipeOriginScreen = useRef<Screen>("browse");
   // Quick-preview modal: read a recipe over the browse list before adding (separate from the full
   // "recipe" screen used by Studio). Holds the full graph (fetched for server recipes).
   const [previewRecipe, setPreviewRecipe] = useState<RecipeGraph | null>(null);
@@ -96,6 +98,11 @@ export function App() {
   // Pantry: stored loosely (back-compat with the old string[] of staples) then migrated on read.
   const [pantryStored, setPantry] = usePersistentState<Pantry>("tutti.pantry", [], Array.isArray);
   const pantry = useMemo(() => migratePantry(pantryStored), [pantryStored]);
+  // Badge the Me tab when any pantry item expires within 3 days.
+  const pantryExpiryBadge = useMemo(() => {
+    const cutoff = Date.now() + 3 * 24 * 60 * 60 * 1000;
+    return pantry.some((item) => item.expiry != null && new Date(item.expiry).getTime() < cutoff);
+  }, [pantry]);
   const [people, setPeople] = usePersistentState<number>("tutti.people", 4, (v) => typeof v === "number");
   const [metric, setMetric] = usePersistentState<boolean>("tutti.metric", false, (v) => typeof v === "boolean");
   // Appearance: system (follow device) / light / dark. Resolve to a concrete data-theme on <html> so
@@ -264,6 +271,7 @@ export function App() {
     void recipeStore.put(g);
     setEditingRecipe(null);
     setDetailRecipe(g);
+    recipeOriginScreen.current = "studio";
     setScreen("recipe");
   };
   // Switch a dish to a different complexity tier: swap its recipeId in the plan, carrying servings.
@@ -414,7 +422,7 @@ export function App() {
       <div className="wrap">
         <main>
           <Suspense fallback={<Loading />}>
-            <OnboardingScreen onDone={() => { setOnboarded(true); setScreen("kitchen"); }} />
+            <OnboardingScreen onDone={(skipKitchen) => { setOnboarded(true); setScreen(skipKitchen ? "home" : "kitchen"); }} />
           </Suspense>
         </main>
       </div>
@@ -422,7 +430,7 @@ export function App() {
   }
 
   return (
-    <Shell screen={screen} onNavigate={setScreen} cookBar={cookBar}>
+    <Shell screen={screen} onNavigate={setScreen} cookBar={cookBar} pantryExpiryBadge={pantryExpiryBadge}>
       <div role="status" aria-live="polite" className="sr-only">{announce}</div>
       <main id="screen-main" ref={focusRef} tabIndex={-1} className="screen-focus">
       <ErrorBoundary key={screen} onHome={() => setScreen("home")}>
@@ -444,16 +452,16 @@ export function App() {
           onPhoto={onPhoto}
         />
       ) : screen === "kitchen" ? (
-        <KitchenScreen kitchen={kitchen} onChange={setKitchen} avoid={avoid} onToggleAvoid={toggleAvoid} onDone={() => setScreen("home")} />
+        <KitchenScreen kitchen={kitchen} onChange={setKitchen} avoid={avoid} onToggleAvoid={toggleAvoid} onDone={() => setScreen("home")} onSkip={() => setScreen("home")} />
       ) : screen === "addRecipe" ? (
-        <AddRecipe onAdd={addCandidate} onBack={() => setScreen("home")} />
+        <AddRecipe onAdd={addCandidate} onBack={() => setScreen("studio")} />
       ) : screen === "browse" ? (
         <BrowseScreen
           diets={diet}
           selectedDishIds={dishes.map(dishOf)}
           onAddRecipe={pickLibraryRecipe}
+          onRemoveRecipe={toggleDish}
           onDetails={openLibraryRecipe}
-          onBack={() => setScreen("home")}
         />
       ) : screen === "recipe" && detailRecipe ? (
         <RecipeDetailScreen
@@ -467,7 +475,7 @@ export function App() {
           onToggleCollection={(cid, rid) => setCollections((c) => toggleInCollection(c, cid, rid))}
           onAdd={() => addCandidate(detailRecipe)}
           onEdit={() => editRecipe(detailRecipe)}
-          onBack={() => setScreen("browse")}
+          onBack={() => setScreen(recipeOriginScreen.current)}
         />
       ) : screen === "editRecipe" && editingRecipe ? (
         <RecipeEditor
@@ -493,7 +501,7 @@ export function App() {
           onAdd={(item: PantryItem) => setPantry((p) => addPantryItem(migratePantry(p), item))}
           onRemove={(name) => setPantry((p) => removePantryItem(migratePantry(p), name))}
           onToggleStaple={(name) => setPantry((p) => toggleStaple(migratePantry(p), name))}
-          onBack={() => setScreen("home")}
+          onBack={() => setScreen("meals")}
         />
       ) : screen === "calendar" ? (
         <CalendarScreen
@@ -511,7 +519,8 @@ export function App() {
           recipes={allRecipes}
           onRestore={restoreMeal}
           onRemove={(id) => setMeals((m) => removeMeal(m, id))}
-          onBack={() => setScreen("home")}
+          onSettings={() => setScreen("settings")}
+          onCalendar={() => setScreen("calendar")}
         />
       ) : screen === "settings" ? (
         <SettingsScreen
@@ -538,7 +547,7 @@ export function App() {
             setDiet([]); setCollections([]); setCalendar({});
             setScreen("home");
           }}
-          onBack={() => setScreen("home")}
+          onBack={() => setScreen("meals")}
         />
       ) : screen === "stats" ? (
         <StatsScreen
@@ -547,7 +556,7 @@ export function App() {
           learnPace={learnPace}
           onToggleLearn={() => setLearnPace(!learnPace)}
           onForget={() => { setPace({}); setEvents([]); }}
-          onBack={() => setScreen("home")}
+          onBack={() => setScreen("settings")}
         />
       ) : screen === "studio" ? (
         <StudioScreen
@@ -556,7 +565,7 @@ export function App() {
           collections={collections}
           onNew={() => setScreen("addRecipe")}
           onImportMenu={() => setScreen("menuImport")}
-          onOpen={(r) => { setDetailRecipe(r); setScreen("recipe"); }}
+          onOpen={(r) => { setDetailRecipe(r); recipeOriginScreen.current = "studio"; setScreen("recipe"); }}
           onEdit={editRecipe}
           onDuplicate={duplicateCandidate}
           onRemove={removeCandidate}
