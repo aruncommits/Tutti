@@ -452,7 +452,7 @@ export function App() {
           onPhoto={onPhoto}
         />
       ) : screen === "kitchen" ? (
-        <KitchenScreen kitchen={kitchen} onChange={setKitchen} avoid={avoid} onToggleAvoid={toggleAvoid} onDone={() => setScreen("home")} />
+        <KitchenScreen kitchen={kitchen} onChange={setKitchen} avoid={avoid} onToggleAvoid={toggleAvoid} onDone={() => setScreen("home")} onSkip={() => setScreen("home")} />
       ) : screen === "addRecipe" ? (
         <AddRecipe onAdd={addCandidate} onBack={() => setScreen("studio")} />
       ) : screen === "browse" ? (

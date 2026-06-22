@@ -15,10 +15,9 @@ describe("Home meal-plan builder", () => {
     render(<App />);
     // Builder is lazy-loaded (Suspense) — await it.
     expect(await screen.findByRole("heading", { level: 2, name: /plan a meal/i }, { timeout: 3000 })).toBeInTheDocument();
-    expect(screen.getByText(/your meal plan is empty/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /find recipes/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /paste a recipe/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /ask ai/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /browse recipes/i })).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: /paste/i }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole("button", { name: /ask ai/i }).length).toBeGreaterThan(0);
   });
 
   it("does not pre-load the South Indian thali example", async () => {

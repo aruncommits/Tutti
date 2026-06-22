@@ -34,12 +34,14 @@ export function KitchenScreen({
   avoid,
   onToggleAvoid,
   onDone,
+  onSkip,
 }: {
   kitchen: KitchenUi;
   onChange: (k: KitchenUi) => void;
   avoid: string[];
   onToggleAvoid: (allergen: string) => void;
   onDone: () => void;
+  onSkip?: () => void;
 }) {
   const set = <K extends keyof KitchenUi>(key: K, value: KitchenUi[K]) => onChange({ ...kitchen, [key]: value });
   return (
@@ -77,6 +79,11 @@ export function KitchenScreen({
       </div>
 
       <button className="btn big-btn" onClick={onDone}>Save kitchen</button>
+      {onSkip && (
+        <div className="home-links" style={{ marginTop: 8 }}>
+          <button className="link" onClick={onSkip}>Skip for now</button>
+        </div>
+      )}
     </section>
   );
 }

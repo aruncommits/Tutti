@@ -346,6 +346,13 @@ header {
   background: var(--bg-tint);
   border-radius: 14px;
   line-height: 1.5;
+  text-align: center;
+}
+.idle-secondary {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 .idle b {
   color: var(--ink);
